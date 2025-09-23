@@ -526,11 +526,11 @@ end subroutine calc_julian_day_sub
   rHour = this%getFractionOfDay() * 24._c_double
   iHour = int(rHour, c_int)
 
-!  rMinute = (rHour - real(iHour, c_float) ) * 1440_c_double
+!  rMinute = (rHour - real(iHour, c_double) ) * 1440_c_double
   rMinute = (rHour - real(iHour, c_double) ) * 60._c_double
   iMinute = int(rMinute, c_int)
 
-!  rSecond = ( rMinute - real(iMinute, c_float) ) * 86400_c_double
+!  rSecond = ( rMinute - real(iMinute, c_double) ) * 86400_c_double
   rSecond = ( rMinute - real(iMinute, c_double) ) * 60._c_double
   iSecond = int(rSecond, c_int)
 
@@ -912,7 +912,7 @@ end function date_minus_date_fn
  function date_plus_float_fn(date1, fValue)  result(newdate)
 
   class(DATETIME_T), intent(in)   :: date1
-  real (c_float), intent(in) :: fValue
+  real (c_double), intent(in) :: fValue
   type(DATETIME_T), allocatable  :: newdate
 
   allocate( newdate )
@@ -927,7 +927,7 @@ end function date_plus_float_fn
  function date_minus_float_fn(date1, fValue)  result(newdate)
 
   class(DATETIME_T), intent(in)   :: date1
-  real (c_float), intent(in) :: fValue
+  real (c_double), intent(in) :: fValue
   type(DATETIME_T), allocatable  :: newdate
 
   allocate( newdate )

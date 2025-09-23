@@ -25,13 +25,13 @@ module awc__depth_integrated
   public :: awc_depth_integrated_read, awc_depth_integrated_initialize, AVAILABLE_WATER_CONTENT
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pSOILS_CODE_GRID
-  real (c_float), allocatable     :: AVAILABLE_WATER_CONTENT(:,:)
+  real (c_double), allocatable     :: AVAILABLE_WATER_CONTENT(:,:)
 
 contains
 
   subroutine awc_depth_integrated_read( fRooting_Depth )
 
-    real (c_float), intent(inout)       :: fRooting_Depth(:,:)
+    real (c_double), intent(inout)       :: fRooting_Depth(:,:)
 
     ! [ LOCALS ]
 
@@ -39,11 +39,11 @@ contains
     integer (c_int), allocatable  :: iSoils_Table_Code(:)
     integer (c_int), allocatable  :: iSoils_Components(:)
     integer (c_int), allocatable  :: iSoils_Horizons(:)    
-    real (c_float), allocatable   :: fSoils_AWC(:) 
-    real (c_float), allocatable   :: fSoils_Top_Depth(:)
-    real (c_float), allocatable   :: fSoils_Bottom_Depth(:)
-    real (c_float), allocatable   :: fSoils_Component_Fraction(:)
-    real (c_float), allocatable   :: fSoils_Horizon_Thickness(:)
+    real (c_double), allocatable   :: fSoils_AWC(:) 
+    real (c_double), allocatable   :: fSoils_Top_Depth(:)
+    real (c_double), allocatable   :: fSoils_Bottom_Depth(:)
+    real (c_double), allocatable   :: fSoils_Component_Fraction(:)
+    real (c_double), allocatable   :: fSoils_Horizon_Thickness(:)
                    
     integer (c_int)               :: iNumberOfLanduses
     integer (c_int)               :: iNumberOfSoils
@@ -54,9 +54,9 @@ contains
     integer (c_int)               :: iNumberOfSoilsBottomDepths
     integer (c_int)               :: iNumberOfSoilsComponentFractions     
 
-    real (c_float)                :: fTemp_AWC               
-    real (c_float)                :: fDepthOfDeepestHorizon
-    real (c_float)                :: fFinal_AWC
+    real (c_double)                :: fTemp_AWC               
+    real (c_double)                :: fDepthOfDeepestHorizon
+    real (c_double)                :: fFinal_AWC
     integer (c_int)               :: iDeepestSoilHorizon
     logical (c_bool)              :: lFirst
 
@@ -64,8 +64,8 @@ contains
     integer (c_int)               :: iStat
     integer (c_int)               :: iIndex, iIndex2
     integer (c_int)               :: iIndex_x, iIndex_y
-    real (c_float)                :: fRooting_Depth_inches
-    real (c_float)                :: fSoil_Thickness_Total
+    real (c_double)                :: fRooting_Depth_inches
+    real (c_double)                :: fSoil_Thickness_Total
 
    call slList%append("LU_Code")
    call slList%append("Landuse_Code")
@@ -162,13 +162,13 @@ contains
       do iIndex_y=lbound( fRooting_Depth, 2 ), ubound( fRooting_Depth, 2 )
 
         ! rooting depth in feet * 12 in/ft = rooting depth in inches
-        fRooting_Depth_inches = fRooting_Depth( iIndex_x, iIndex_y ) * 12.0_c_float
+        fRooting_Depth_inches = fRooting_Depth( iIndex_x, iIndex_y ) * 12.0_c_double
 
-        fTemp_AWC = 0.0_c_float
+        fTemp_AWC = 0.0_c_double
         lFirst = TRUE
         iDeepestSoilHorizon = 0_c_int
-        fDepthOfDeepestHorizon = 0.0_c_float
-        fFinal_AWC = 0.0_c_float
+        fDepthOfDeepestHorizon = 0.0_c_double
+        fFinal_AWC = 0.0_c_double
 
         do iIndex=1, iNumberOfSoils
           if ( pSOILS_CODE_GRID%pGrdBase%iData( iIndex_x, iIndex_y ) == iSoils_Table_Code( iIndex ) ) then
@@ -223,14 +223,14 @@ contains
               fTemp_AWC = fTemp_AWC + fFinal_AWC * ( fRooting_Depth_inches - fDepthOfDeepestHorizon )
 
 
-        if ( fRooting_Depth_inches > 0.0_c_float ) then
+        if ( fRooting_Depth_inches > 0.0_c_double ) then
           fTemp_AWC = fTemp_AWC / fRooting_Depth_inches  ! divide by total rooting depth to obtain weighted average
         else
-          fTemp_AWC = 0.0_c_float
+          fTemp_AWC = 0.0_c_double
         endif    
 
         ! table values are in/in; multiply by 12 in/ft to return AWC in inches/foot
-        AVAILABLE_WATER_CONTENT(iIndex_x, iIndex_y) = fTemp_AWC * 12.0_c_float 
+        AVAILABLE_WATER_CONTENT(iIndex_x, iIndex_y) = fTemp_AWC * 12.0_c_double 
  
       enddo
 
@@ -274,7 +274,7 @@ contains
   subroutine awc_depth_integrated_initialize( lActive, fAWC, iSoils_Code )
 
     logical (c_bool), intent(in)     :: lActive(:,:)
-    real (c_float), intent(inout)    :: fAWC(:)
+    real (c_double), intent(inout)    :: fAWC(:)
     integer (c_int), intent(inout)   :: iSoils_Code(:)
 
     iSoils_Code = pack( pSOILS_CODE_GRID%pGrdBase%iData, lActive )

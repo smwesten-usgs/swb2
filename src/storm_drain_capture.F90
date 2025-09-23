@@ -21,8 +21,8 @@ module storm_drain_capture
   public :: storm_drain_capture_initialize, storm_drain_capture_calculate
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pSTORM_DRAIN_CAPTURE_FRACTION
-  real (c_float), allocatable     :: STORM_DRAIN_CAPTURE_FRACTION(:)
-  real (c_float), allocatable     :: STORM_DRAIN_CAPTURE_FRACTION_TABLE(:)
+  real (c_double), allocatable     :: STORM_DRAIN_CAPTURE_FRACTION(:)
+  real (c_double), allocatable     :: STORM_DRAIN_CAPTURE_FRACTION_TABLE(:)
   type ( DATETIME_T )                  :: DATE_OF_LAST_RETRIEVAL
 
 contains
@@ -59,7 +59,7 @@ contains
       __FILE__, __LINE__ )
 
     ! set default value for STORM_DRAIN_CAPTURE_FRACTION
-    STORM_DRAIN_CAPTURE_FRACTION = 0.0_c_float
+    STORM_DRAIN_CAPTURE_FRACTION = 0.0_c_double
 
     !> Determine how many storm_drain_capture codes are present
     call PARAMS%get_parameters( slKeys=string_list, fValues=STORM_DRAIN_CAPTURE_FRACTION_TABLE )
@@ -93,7 +93,7 @@ contains
                  lFatal=.false._c_bool,                                                    &
                  iLogLevel=LOG_ALL )
 
-       STORM_DRAIN_CAPTURE_FRACTION = 0.0_c_float
+       STORM_DRAIN_CAPTURE_FRACTION = 0.0_c_double
 
      else
 
@@ -115,7 +115,7 @@ contains
 
   subroutine storm_drain_capture_calculate( capture_fraction, indx, is_cell_active )
 
-    real (c_float), intent(inout)     :: capture_fraction
+    real (c_double), intent(inout)     :: capture_fraction
     integer (c_int), intent(in)       :: indx
     logical (c_bool), intent(in)      :: is_cell_active(:,:)
 

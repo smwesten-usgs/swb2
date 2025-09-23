@@ -45,7 +45,7 @@ contains
   subroutine awc_gridded_values_initialize( lActive, fAWC )
 
     logical (c_bool), intent(in)     :: lActive(:,:)
-    real (c_float), intent(inout)    :: fAWC(:)
+    real (c_double), intent(inout)    :: fAWC(:)
 
     if ( associated( pAWC_GRID ) ) then
 

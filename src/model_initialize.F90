@@ -378,7 +378,7 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_SNOW_COVER_STORAGE
 
     ! [ LOCALS ]
-    real (c_float), allocatable  :: fInitial_Snow_Cover_Storage(:)
+    real (c_double), allocatable  :: fInitial_Snow_Cover_Storage(:)
     integer (c_int)              :: iStat
 
     allocate ( fInitial_Snow_Cover_Storage( count( MODEL%active ) ), stat=iStat )
@@ -396,7 +396,7 @@ contains
         sHints="Check your control file to see that a valid INITIAL_SNOW_COVER_STORAGE grid or"  &
           //" constant is specified.", lFatal=FALSE )
 
-      MODEL%snow_storage = 0.0_c_float
+      MODEL%snow_storage = 0.0_c_double
 
     else
 
@@ -406,7 +406,7 @@ contains
       fInitial_Snow_Cover_Storage = pack( pINITIAL_SNOW_COVER_STORAGE%pGrdBase%rData, MODEL%active )
 
      if ( minval( fInitial_Snow_Cover_Storage ) < fZERO &
-        .or. maxval( fInitial_Snow_Cover_Storage ) > 300.0_c_float )  &
+        .or. maxval( fInitial_Snow_Cover_Storage ) > 300.0_c_double )  &
        call warn(sMessage="One or more initial snow cover storage values outside of " &
          //"valid range (0 to 300)", lFatal=TRUE )
 
@@ -423,7 +423,7 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_PERCENT_SOIL_MOISTURE
 
     ! [ LOCALS ]
-    real (c_float), allocatable  :: fInitial_Percent_Soil_Moisture(:)
+    real (c_double), allocatable  :: fInitial_Percent_Soil_Moisture(:)
     integer (c_int)              :: iStat
 
     allocate ( fInitial_Percent_Soil_Moisture( count( MODEL%active ) ), stat=iStat )
@@ -447,11 +447,11 @@ contains
       fInitial_Percent_Soil_Moisture = pack( pINITIAL_PERCENT_SOIL_MOISTURE%pGrdBase%rData, MODEL%active )
 
      if ( minval( fInitial_Percent_Soil_Moisture ) < fZERO &
-        .or. maxval( fInitial_Percent_Soil_Moisture ) > 100.0_c_float )  &
+        .or. maxval( fInitial_Percent_Soil_Moisture ) > 100.0_c_double )  &
        call warn(sMessage="One or more initial percent soils moisture values outside of " &
          //"valid range (0% to 100%)", lFatal=TRUE )
 
-     MODEL%soil_storage = fInitial_Percent_Soil_Moisture / 100.0_c_float * MODEL%soil_storage_max
+     MODEL%soil_storage = fInitial_Percent_Soil_Moisture / 100.0_c_double * MODEL%soil_storage_max
 
     endif
 
@@ -480,7 +480,7 @@ contains
       call pPERCENT_IMPERVIOUS%getvalues()
 
       if (associated( pPERCENT_IMPERVIOUS%pGrdBase) ) then
-        MODEL%pervious_fraction = pack( 1.0_c_float - pPERCENT_IMPERVIOUS%pGrdBase%rData/100.0_c_float, MODEL%active )
+        MODEL%pervious_fraction = pack( 1.0_c_double - pPERCENT_IMPERVIOUS%pGrdBase%rData/100.0_c_double, MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
@@ -490,7 +490,7 @@ contains
       call pPERCENT_PERVIOUS%getvalues()
 
       if (associated( pPERCENT_PERVIOUS%pGrdBase) ) then
-        MODEL%pervious_fraction = pack( (pPERCENT_PERVIOUS%pGrdBase%rData/100.0_c_float), MODEL%active )
+        MODEL%pervious_fraction = pack( (pPERCENT_PERVIOUS%pGrdBase%rData/100.0_c_double), MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
@@ -500,7 +500,7 @@ contains
       call pFRACTION_IMPERVIOUS%getvalues()
 
       if (associated( pFRACTION_IMPERVIOUS%pGrdBase) ) then
-        MODEL%pervious_fraction = pack( 1.0_c_float - pFRACTION_IMPERVIOUS%pGrdBase%rData, MODEL%active )
+        MODEL%pervious_fraction = pack( 1.0_c_double - pFRACTION_IMPERVIOUS%pGrdBase%rData, MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
@@ -517,16 +517,16 @@ contains
 
     else
 
-      MODEL%pervious_fraction = 1.0_c_float
+      MODEL%pervious_fraction = 1.0_c_double
 
     endif
 
      if ( minval( MODEL%pervious_fraction ) < fZERO &
-        .or. maxval( MODEL%pervious_fraction ) > 1.0_c_float )  &
+        .or. maxval( MODEL%pervious_fraction ) > 1.0_c_double )  &
        call warn(sMessage="One or more percent (im)pervious cover percent/fraction values are outside of " &
          //"valid range (0% to 100% or 0.0 to 1.0)", lFatal=TRUE )
 
-     if ( all( MODEL%pervious_fraction < 0.01_c_float ) ) &
+     if ( all( MODEL%pervious_fraction < 0.01_c_double ) ) &
        call warn(sMessage="All (im)pervious cover percent/fraction values are suspiciously low " &
          //"(less than 1% or less than 0.01)", lFatal=TRUE,                                      &
          sHints="Check to see whether (im)pervious cover is expressed as a fraction (0.0-1.0)"   &
@@ -563,7 +563,7 @@ contains
       call pPERCENT_CANOPY_COVER%getvalues()
 
       if (associated( pPERCENT_CANOPY_COVER%pGrdBase) ) then
-        MODEL%canopy_cover_fraction = pack( pPERCENT_CANOPY_COVER%pGrdBase%rData/100.0_c_float, MODEL%active )
+        MODEL%canopy_cover_fraction = pack( pPERCENT_CANOPY_COVER%pGrdBase%rData/100.0_c_double, MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
@@ -580,7 +580,7 @@ contains
 
     else
 
-      MODEL%canopy_cover_fraction = 1.0_c_float
+      MODEL%canopy_cover_fraction = 1.0_c_double
 
       call warn("Could not find a grid or constant value for the canopy cover fraction. Using a" &
         //" value of 1.0 for the entire model domain." )
@@ -588,11 +588,11 @@ contains
     endif
 
     if ( minval( MODEL%canopy_cover_fraction ) < fZERO &
-       .or. maxval( MODEL%canopy_cover_fraction ) > 1.0_c_float )  &
+       .or. maxval( MODEL%canopy_cover_fraction ) > 1.0_c_double )  &
       call warn(sMessage="One or more percent canopy cover percent/fraction values values are outside of " &
         //"valid range (0% to 100% or 0.0 to 1.0)", lFatal=TRUE )
 
-     if ( all( MODEL%canopy_cover_fraction < 0.01_c_float ) )                               &
+     if ( all( MODEL%canopy_cover_fraction < 0.01_c_double ) )                               &
        call warn(sMessage="All canopy cover percent/fraction values are suspiciously low " &
          //"(less than 1% or less than 0.01)", lFatal=TRUE,                                &
          sHints="Check to see whether canopy cover is expressed as a fraction (0.0-1.0)"   &
@@ -685,8 +685,8 @@ contains
     logical (c_bool)                :: any_problems
     type (FSTRING_LIST_T)                 :: slList
     integer (c_int), allocatable    :: polygon_id(:)
-    real (c_float), allocatable     :: rooting_depth_inches(:)
-    real (c_float), allocatable     :: soil_moisture_storage(:)
+    real (c_double), allocatable     :: rooting_depth_inches(:)
+    real (c_double), allocatable     :: soil_moisture_storage(:)
     integer (c_int)                 :: iNumberOfPolygonIDs
     type (GENERAL_GRID_T), pointer       :: pTempGrd
     integer (c_int)                 :: index
@@ -755,7 +755,7 @@ contains
 
 !       where ( MODEL%polygon_id == polygon_id( index ) )
 
-!         MODEL%hwb_rooting_depth = rooting_depth_inches( MODEL%landuse_index( index ) ) / 12.0_c_float
+!         MODEL%hwb_rooting_depth = rooting_depth_inches( MODEL%landuse_index( index ) ) / 12.0_c_double
 
 !         MODEL%hwb_soil_storage_max = soil_moisture_storage( index )
 
@@ -765,7 +765,7 @@ contains
 
 ! !$OMP END PARALLEL DO
 
-!     where ( MODEL%hwb_rooting_depth > 0.0_c_float )
+!     where ( MODEL%hwb_rooting_depth > 0.0_c_double )
 
 !       MODEL%hwb_awc_in_per_ft = MODEL%hwb_soil_storage_max / MODEL%hwb_rooting_depth
 
@@ -1341,7 +1341,7 @@ contains
     integer (c_int)                  :: iStat
     real (c_double)                  :: rX0, rX1, rY0, rY1, rGridCellSize
     integer (c_int)                  :: iNX, iNY
-    real (c_float)                   :: fTempVal
+    real (c_double)                   :: fTempVal
 
     ! For MODEL directive, obtain the associated dictionary entries
     call CF_DICT%get_values( "GRID", myOptions )
@@ -1975,8 +1975,8 @@ contains
     type (FSTRING_LIST_T)               :: slList
     integer( c_int), allocatable  :: iLanduseTableCodes(:)
     integer (c_int)               :: iNumberOfLanduses
-    real (c_float), allocatable   :: SURFACE_STORAGE_MAXIMUM(:)
-    real (c_float)                :: current_surface_storage_max
+    real (c_double), allocatable   :: SURFACE_STORAGE_MAXIMUM(:)
+    real (c_double)                :: current_surface_storage_max
 
 
     ! create list of possible table headings to look for...
@@ -1991,7 +1991,7 @@ contains
     call slList%append("Surface_Storage_Max")
     call slList%append("Surface_Storage_Maximum")
 
-    MODEL%surface_storage_max = 0.0_c_float
+    MODEL%surface_storage_max = 0.0_c_double
 
     call PARAMS%get_parameters( slKeys=slList, fValues=SURFACE_STORAGE_MAXIMUM, lFatal=FALSE )
 

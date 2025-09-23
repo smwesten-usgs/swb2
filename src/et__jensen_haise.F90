@@ -46,12 +46,12 @@ elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin
 
   integer (c_int), intent(in)          :: iDayOfYear
   integer (c_int), intent(in)          :: iNumDaysInYear
-  real (c_float), intent(in)           :: fLatitude
-  real (c_float), intent(in)           :: fTMin
-  real (c_float), intent(in)           :: fTMax
-  real (c_float), intent(in), optional :: fAs
-  real (c_float), intent(in), optional :: fBs
-  real (c_float), intent(in), optional :: fSunPct
+  real (c_double), intent(in)           :: fLatitude
+  real (c_double), intent(in)           :: fTMin
+  real (c_double), intent(in)           :: fTMax
+  real (c_double), intent(in), optional :: fAs
+  real (c_double), intent(in), optional :: fBs
+  real (c_double), intent(in), optional :: fSunPct
   real (c_double)                      :: fReferenceET0
 
   ! [ LOCALS ]
@@ -60,7 +60,7 @@ elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin
   real (c_double) :: dOmega_s
   real (c_double) :: dD_r
   real (c_double) :: dRs
-  real (c_float)  :: fTAvg
+  real (c_double)  :: fTAvg
 
   real (c_double) :: dAs_l
   real (c_double) :: dBs_l
@@ -85,13 +85,13 @@ elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin
   endif
 
 
-  fTAvg = ( fTMin + fTMax ) / 2_c_float
+  fTAvg = ( fTMin + fTMax ) / 2_c_double
 
-!  fD_r = 1.0_c_float + 0.033_c_float * cos( TWOPI * iDayOfYear / iNumDaysInYear )
+!  fD_r = 1.0_c_double + 0.033_c_double * cos( TWOPI * iDayOfYear / iNumDaysInYear )
 
   dD_r = relative_earth_sun_distance__D_r( iDayOfYear=iDayOfYear, iNumDaysInYear=iNumDaysInYear )
 
-!  fDelta = 0.4093_c_float * sin( (TWOPI * iDayOfYear / iNumDaysInYear ) - 1.405_c_float )
+!  fDelta = 0.4093_c_double * sin( (TWOPI * iDayOfYear / iNumDaysInYear ) - 1.405_c_double )
 
   dDelta = solar_declination_simple__delta( iDayOfYear=iDayOfYear, iNumDaysInYear=iNumDaysInYear )
 
@@ -99,7 +99,7 @@ elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin
 
   dOmega_s = sunrise_sunset_angle__omega_s( real( fLatitude, c_double), dDelta )
 
-!  dSo = 2.44722_c_float * 15.392_c_float * dD_r * (     dOmega_s  * sin(dLatitude) * sin(dDelta) + &
+!  dSo = 2.44722_c_double * 15.392_c_double * dD_r * (     dOmega_s  * sin(dLatitude) * sin(dDelta) + &
 !                                                  sin(dOmega_s) * cos(dLatitude) * cos(dDelta) )
 
   dRa =  extraterrestrial_radiation__Ra(dLatitude=real( fLatitude, c_double),    &
@@ -107,17 +107,17 @@ elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin
                                                         dOmega_s=dOmega_s,            &
                                                         dDsubR=dD_r )
 
-!  dSn = dSo * ( 1.0_c_float - fAlbedo_l ) * ( fAs_l + fBs_l * fSunPct_l / 100.0_c_float )
+!  dSn = dSo * ( 1.0_c_double - fAlbedo_l ) * ( fAs_l + fBs_l * fSunPct_l / 100.0_c_double )
 
   dRs = solar_radiation__Rs(dRa=dRa, dAs=dAs_l, dBs=dBs_l, fPctSun=dSunPct_l )
 
   if ( fTAvg <= rFREEZING ) then
-    fReferenceET0 = 0.0_c_float
+    fReferenceET0 = 0.0_c_double
   else
     ! 'equivalent_evaporation' yields the depth of water that could be evaporated for the
     ! given solar radiation in mm
-    fReferenceET0 = ( 0.014_c_float * fTavg - 0.37_c_float ) * equivalent_evaporation( dRs ) / MM_PER_IN
-!    fReferenceET0 = UNIT_CONV * ( 0.025_c_float * fTAvg + 0.078_c_float ) * fSn
+    fReferenceET0 = ( 0.014_c_double * fTavg - 0.37_c_double ) * equivalent_evaporation( dRs ) / MM_PER_IN
+!    fReferenceET0 = UNIT_CONV * ( 0.025_c_double * fTAvg + 0.078_c_double ) * fSn
   end if
 
 !> @todo Check these equations against original paper.

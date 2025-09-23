@@ -17,11 +17,11 @@ module actual_et__fao56__two_stage
                                          KCB_METHOD, crop_coefficients_FAO56_calculate_Kcb_Max
   implicit none
 
-  real (c_float), allocatable   :: REW_l(:,:)
-  real (c_float), allocatable   :: TEW_l(:,:)
-  real (c_float), allocatable   :: DEPLETION_FRACTION(:)
-  real (c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
-  real (c_float), allocatable   :: MIN_FRACTION_COVERED_SOIL(:)
+  real (c_double), allocatable   :: REW_l(:,:)
+  real (c_double), allocatable   :: TEW_l(:,:)
+  real (c_double), allocatable   :: DEPLETION_FRACTION(:)
+  real (c_double), allocatable   :: MEAN_PLANT_HEIGHT(:)
+  real (c_double), allocatable   :: MIN_FRACTION_COVERED_SOIL(:)
 
 contains
 
@@ -65,7 +65,7 @@ contains
     logical (c_bool)              :: list_lengths_are_equal
     type(FSTRING_LIST_T)          :: slList
     integer (c_int), allocatable  :: landuse_table_codes(:)
-    real (c_float), allocatable   :: tempvals(:)
+    real (c_double), allocatable   :: tempvals(:)
     integer (c_int)               :: status
 
     ! create list of possible table headings to look for...
@@ -113,9 +113,9 @@ contains
 elemental subroutine update_evaporable_water_storage( evaporable_water_storage, evaporable_water_deficit,     &
                                                       infiltration, landuse_index, soil_group)
 
-  real (c_float), intent(inout) :: evaporable_water_storage
-  real (c_float), intent(inout) :: evaporable_water_deficit
-  real (c_float), intent(in)    :: infiltration
+  real (c_double), intent(inout) :: evaporable_water_storage
+  real (c_double), intent(inout) :: evaporable_water_deficit
+  real (c_double), intent(in)    :: infiltration
   integer (c_int), intent(in)   :: landuse_index
   integer (c_int), intent(in)   :: soil_group
 
@@ -138,7 +138,7 @@ elemental function calculate_evaporation_reduction_coefficient_Kr( landuse_index
   ! [ ARGUMENTS ]
   integer (c_int), intent(in)  :: landuse_index
   integer (c_int), intent(in)  :: soil_group
-  real (c_float), intent(in)   :: evaporable_water_deficit
+  real (c_double), intent(in)   :: evaporable_water_deficit
 
   ! [ RESULT ]
   real (c_double) :: Kr
@@ -168,14 +168,14 @@ impure elemental function calculate_fraction_exposed_and_wetted_soil_fc( landuse
 
   ! [ ARGUMENTS ]
   integer (c_int), intent(in)    :: landuse_index
-  real (c_float), intent(in)     :: Kcb
-  real (c_float), intent(in)     :: current_plant_height
+  real (c_double), intent(in)     :: Kcb
+  real (c_double), intent(in)     :: current_plant_height
 
   ! [ RESULT ]
-  real (c_float) :: few
+  real (c_double) :: few
 
   ! [ LOCALS ]
-  real (c_float)  :: fc
+  real (c_double)  :: fc
   real (c_double) :: numerator
   real (c_double) :: denominator
   real (c_double) :: exponent
@@ -187,11 +187,11 @@ impure elemental function calculate_fraction_exposed_and_wetted_soil_fc( landuse
   if( denominator > 0.0_c_double ) then
     fc = ( numerator / denominator ) ** exponent
   else
-    fc = 1.0_c_float
+    fc = 1.0_c_double
   endif
 
   fc = max(fc, MIN_FRACTION_COVERED_SOIL( landuse_index ))
-  few = clip(1.0_c_float - fc, minval=0.05, maxval=1.0)
+  few = clip(1.0_c_double - fc, minval=0.05, maxval=1.0)
 
 end function calculate_fraction_exposed_and_wetted_soil_fc
 
@@ -204,10 +204,10 @@ elemental function calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kc
 
   ! [ ARGUMENTS ]
   integer (c_int), intent(in)   :: landuse_index
-  real (c_float), intent(in)    :: Kcb
-  real (c_float), intent(in)    :: Kcb_max
+  real (c_double), intent(in)    :: Kcb
+  real (c_double), intent(in)    :: Kcb_max
   real (c_double), intent(in)   :: Kr
-  real (c_float), intent(in)    :: fraction_exposed_and_wetted_soil
+  real (c_double), intent(in)    :: fraction_exposed_and_wetted_soil
   real (c_double)               :: Ke
   
   real (c_double) :: maximum_value
@@ -232,8 +232,8 @@ elemental subroutine calculate_total_available_water( taw, raw,                 
   real (c_double), intent(inout)   :: raw
   real (c_double), intent(inout)   :: taw
   real (c_double), intent(in)      :: adjusted_depletion_fraction_p
-  real (c_float), intent(in)       :: current_rooting_depth
-  real (c_float), intent(in)       :: awc
+  real (c_double), intent(in)       :: current_rooting_depth
+  real (c_double), intent(in)       :: awc
 
   taw = real(current_rooting_depth, c_double) * real(awc, c_double)
   raw = taw * adjusted_depletion_fraction_p
@@ -248,11 +248,11 @@ elemental function update_plant_height( landuse_index, it_is_growing_season, Kcb
 
   integer (c_int), intent(in)  :: landuse_index
   logical (c_bool), intent(in) :: it_is_growing_season
-  real (c_float), intent(in)   :: Kcb
-  real (c_float)               :: plant_height
+  real (c_double), intent(in)   :: Kcb
+  real (c_double)               :: plant_height
 
   ! [ LOCALS ]
-  real (c_float) :: plant_height_minimum_m
+  real (c_double) :: plant_height_minimum_m
   real (c_double) :: numerator
   real (c_double) :: denominator
   real (c_double) :: exponent
@@ -264,7 +264,7 @@ elemental function update_plant_height( landuse_index, it_is_growing_season, Kcb
 
   if ( it_is_growing_season ) then
     ! FAO documentation suggests limiting the plant height range to a value between 1 and 10 meters
-    plant_height = clip(real( numerator/denominator *  MEAN_PLANT_HEIGHT( landuse_index ) * M_PER_FOOT, kind=c_float),  &
+    plant_height = clip(real( numerator/denominator *  MEAN_PLANT_HEIGHT( landuse_index ) * M_PER_FOOT, kind=c_double),  &
                         minval=plant_height_minimum_m, maxval=10.)
   else
     plant_height = plant_height_minimum_m
@@ -286,7 +286,7 @@ elemental function calculate_water_stress_coefficient_ks( taw, raw,             
 
   if ( soil_moisture_deficit < raw ) then
 
-    Ks = 1.0_c_float
+    Ks = 1.0_c_double
 
   elseif ( soil_moisture_deficit <  taw ) then
 
@@ -294,7 +294,7 @@ elemental function calculate_water_stress_coefficient_ks( taw, raw,             
 
   else
 
-    Ks = 0.0_c_float
+    Ks = 0.0_c_double
 
   endif
 
@@ -329,34 +329,34 @@ impure elemental subroutine calculate_actual_et_fao56_two_stage(                
                                                   infiltration )
 
   real (c_double), intent(inout)            :: actual_et
-  real (c_float), intent(inout)             :: crop_etc
-  real (c_float), intent(inout)             :: bare_soil_evap
+  real (c_double), intent(inout)             :: crop_etc
+  real (c_double), intent(inout)             :: bare_soil_evap
   real (c_double), intent(inout)            :: taw
   real (c_double), intent(inout)            :: raw
-  real (c_float), intent(inout)             :: fraction_exposed_and_wetted_soil
+  real (c_double), intent(inout)             :: fraction_exposed_and_wetted_soil
   real (c_double), intent(inout)            :: Kr
   real (c_double), intent(inout)            :: Ke
   real (c_double), intent(inout)            :: Ks
   real (c_double), intent(inout)            :: adjusted_depletion_fraction_p
   real (c_double), intent(inout)            :: soil_moisture_deficit
-  real (c_float), intent(inout)             :: current_plant_height
-  real (c_float), intent(inout)             :: evaporable_water_storage
-  real (c_float), intent(inout)             :: evaporable_water_deficit
+  real (c_double), intent(inout)             :: current_plant_height
+  real (c_double), intent(inout)             :: evaporable_water_storage
+  real (c_double), intent(inout)             :: evaporable_water_deficit
   logical (c_bool), intent(in)              :: it_is_growing_season
-  real (c_float), intent(in)                :: Kcb
+  real (c_double), intent(in)                :: Kcb
   integer (c_int), intent(in)               :: landuse_index
   integer (c_int), intent(in)               :: soil_group
-  real (c_float), intent(in)                :: awc
-  real (c_float), intent(in)                :: current_rooting_depth
+  real (c_double), intent(in)                :: awc
+  real (c_double), intent(in)                :: current_rooting_depth
   real (c_double), intent(in)               :: soil_storage
-  real (c_float), intent(in)                :: soil_storage_max
+  real (c_double), intent(in)                :: soil_storage_max
   real (c_double), intent(in)               :: reference_et0
-  real (c_float), intent(in)                :: infiltration
+  real (c_double), intent(in)                :: infiltration
 
-  real (c_float)            :: interim_soil_storage
-  real (c_float)            :: interim_soil_storage2
+  real (c_double)            :: interim_soil_storage
+  real (c_double)            :: interim_soil_storage2
   real (c_double)            :: evaporable_water_layer_deficit
-  real (c_float)             :: Kcb_max
+  real (c_double)             :: Kcb_max
 
   current_plant_height = update_plant_height( landuse_index, it_is_growing_season, Kcb )
 
@@ -390,8 +390,8 @@ impure elemental subroutine calculate_actual_et_fao56_two_stage(                
   evaporable_water_storage = max(0.0, evaporable_water_storage - bare_soil_evap / fraction_exposed_and_wetted_soil)
 
   ! need to remove bare soil evap from interim soil to yield lower Ks values
-  interim_soil_storage = clip(real(soil_storage + infiltration, kind=c_float), minval=0.0, maxval=soil_storage_max)
-  interim_soil_storage2 = clip(real(soil_storage + infiltration - bare_soil_evap, kind=c_float), minval=0.0, maxval=soil_storage_max)
+  interim_soil_storage = clip(real(soil_storage + infiltration, kind=c_double), minval=0.0, maxval=soil_storage_max)
+  interim_soil_storage2 = clip(real(soil_storage + infiltration - bare_soil_evap, kind=c_double), minval=0.0, maxval=soil_storage_max)
   ! need to update bare soil evap term to reduce it in the event that more evap is calculated than water available
   bare_soil_evap = clip(interim_soil_storage - interim_soil_storage2, minval=0.0, maxval=soil_storage_max)
 

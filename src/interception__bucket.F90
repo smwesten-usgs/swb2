@@ -34,7 +34,7 @@ module interception__bucket
 !  logical (c_bool), allocatable :: IS_GROWING_SEASON(:)
 
   character( len=2 ), parameter     :: DATE_DELIMS = "/-"
-  real (c_float), parameter    :: NODATA_VALUE = -9999._c_float
+  real (c_double), parameter    :: NODATA_VALUE = -9999._c_double
 
 contains
 
@@ -98,7 +98,7 @@ contains
     if (all( temp_values <= fTINYVAL) ) then
 
       allocate(INTERCEPTION_B_VALUE_GROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
-      INTERCEPTION_B_VALUE_GROWING_SEASON = 0.0_c_float
+      INTERCEPTION_B_VALUE_GROWING_SEASON = 0.0_c_double
 
     else
 
@@ -126,7 +126,7 @@ contains
     if (all( temp_values <= fTINYVAL) ) then
 
       allocate(INTERCEPTION_N_VALUE_GROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
-      INTERCEPTION_N_VALUE_GROWING_SEASON = 1.0_c_float
+      INTERCEPTION_N_VALUE_GROWING_SEASON = 1.0_c_double
 
     else
 
@@ -178,7 +178,7 @@ contains
     if (all( temp_values <= fTINYVAL) ) then
 
       allocate(INTERCEPTION_B_VALUE_NONGROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
-      INTERCEPTION_B_VALUE_NONGROWING_SEASON = 0.0_c_float
+      INTERCEPTION_B_VALUE_NONGROWING_SEASON = 0.0_c_double
 
     else
 
@@ -206,7 +206,7 @@ contains
     if (all( temp_values <= fTINYVAL) ) then
 
       allocate(INTERCEPTION_N_VALUE_NONGROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
-      INTERCEPTION_N_VALUE_NONGROWING_SEASON = 1.0_c_float
+      INTERCEPTION_N_VALUE_NONGROWING_SEASON = 1.0_c_double
 
     else
 
@@ -281,15 +281,15 @@ contains
                                                       fInterception )
 
     integer (c_int), intent(in)   :: iLanduseIndex
-    real (c_float), intent(in)    :: fPrecip
-    real (c_float), intent(in)    :: fFog
-    real (c_float), intent(in)    :: fCanopy_Cover_Fraction
+    real (c_double), intent(in)    :: fPrecip
+    real (c_double), intent(in)    :: fFog
+    real (c_double), intent(in)    :: fCanopy_Cover_Fraction
     logical (c_bool), intent(in)  :: it_is_growing_season
-    real (c_float), intent(out)   :: fInterception
+    real (c_double), intent(out)   :: fInterception
 
     ! [ LOCALS ]
-    real (c_float) :: fPotentialInterception
-    real (c_float) :: precip_plus_fog
+    real (c_double) :: fPotentialInterception
+    real (c_double) :: precip_plus_fog
 
     precip_plus_fog = fPrecip + fFog
 

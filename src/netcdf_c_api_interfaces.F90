@@ -194,10 +194,10 @@ module netcdf_c_api_interfaces
   interface
     function nc_get_var_float(ncid, varid, rp) bind(c)
 
-      import :: c_int, c_float
+      import :: c_int, c_double
 
       integer (c_int), value       :: ncid, varid
-      real (c_float), intent(out) :: rp(*)
+      real (c_double), intent(out) :: rp(*)
 
       integer (c_int)              :: nc_get_var_float
 
@@ -207,10 +207,10 @@ module netcdf_c_api_interfaces
   interface
     function nc_put_var_float(ncid, varid, rp) bind(c)
 
-      import :: c_int, c_float
+      import :: c_int, c_double
 
       integer (c_int), value      :: ncid, varid
-      real (c_float),  intent(in) :: rp(*)
+      real (c_double),  intent(in) :: rp(*)
 
       integer (c_int)             :: nc_put_var_float
 
@@ -329,7 +329,7 @@ module netcdf_c_api_interfaces
   interface
     function nc_get_vars_float(ncid, varid, startp, countp, stridep, vars) bind(c)
 
-      import :: c_int, c_size_t, c_float
+      import :: c_int, c_size_t, c_double
 
       integer (c_int), value             :: ncid, varid
 !      type (c_ptr), value                     :: startp
@@ -340,7 +340,7 @@ module netcdf_c_api_interfaces
       integer (c_size_t)                            :: countp(*)
       integer (c_size_t)                         :: stridep(*)
 
-      real (c_float), intent(out)        :: vars(*)
+      real (c_double), intent(out)        :: vars(*)
 
       integer (c_int)                             :: nc_get_vars_float
 
@@ -350,7 +350,7 @@ module netcdf_c_api_interfaces
   interface
     function nc_put_vars_float(ncid, varid, startp, countp, stridep, vars) bind(c)
 
-      import :: c_int, c_float, c_size_t
+      import :: c_int, c_double, c_size_t
 
       integer (c_int), value      :: ncid, varid
 !      type(c_ptr),         value      :: startp, countp, stridep
@@ -358,7 +358,7 @@ module netcdf_c_api_interfaces
       integer (c_size_t)                            :: countp(*)
       integer (c_size_t)                         :: stridep(*)
 
-      real (c_float),  intent(in) :: vars(*)
+      real (c_double),  intent(in) :: vars(*)
 
       integer (c_int)             :: nc_put_vars_float
 
@@ -450,11 +450,11 @@ module netcdf_c_api_interfaces
   interface
     function nc_get_att_float(ncid, varid, name, ip)   bind(c)
 
-      import :: c_int, c_float, c_char
+      import :: c_int, c_double, c_char
 
       integer (c_int),    value         :: ncid, varid
       character (c_char), intent(in)    :: name(*)
-      real (c_float),     intent(out)   :: ip(*)
+      real (c_double),     intent(out)   :: ip(*)
 
       integer (c_int)                   :: nc_get_att_float
 
@@ -685,13 +685,13 @@ module netcdf_c_api_interfaces
   interface
     function nc_put_att_float(ncid, varid, name, xtype, nlen, fp)   bind(c)
 
-      import :: c_int, c_size_t, c_float, c_char
+      import :: c_int, c_size_t, c_double, c_char
 
       integer (c_int),    value      :: ncid, varid
       integer (c_size_t), value      :: nlen
       integer (c_int),    value      :: xtype
       character (c_char), intent(in) :: name(*)
-      real (c_float),     intent(in) :: fp(*)
+      real (c_double),     intent(in) :: fp(*)
 
       integer (c_int) :: nc_put_att_float
 

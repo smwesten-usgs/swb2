@@ -132,7 +132,7 @@ contains
   function percent_complete_fn( this )   result( percent_complete )
 
     class (DATE_RANGE_T), intent(inout)   :: this
-    real (c_float)                   :: percent_complete
+    real (c_double)                   :: percent_complete
 
     percent_complete = real(this%curr - this%start) / real( this%end - this%start ) * 100.
 

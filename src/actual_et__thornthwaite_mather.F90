@@ -11,7 +11,7 @@ module actual_et__thornthwaite_mather
   use iso_c_binding, only : c_short, c_int, c_float, c_double
   implicit none
 
-  real (c_float), parameter :: NEAR_ZERO = 1.0e-9_c_float
+  real (c_double), parameter :: NEAR_ZERO = 1.0e-9_c_double
 
 contains
 
@@ -24,9 +24,9 @@ contains
 
     real (c_double), intent(inout)            :: actual_et
     real (c_double), intent(in)               :: soil_storage
-    real (c_float), intent(in)                :: soil_storage_max
-    real (c_float), intent(in)                :: infiltration
-    real (c_float), intent(in)                :: crop_etc
+    real (c_double), intent(in)                :: soil_storage_max
+    real (c_double), intent(in)                :: infiltration
+    real (c_double), intent(in)                :: crop_etc
 
     ! [ LOCALS ]
     real (c_double) :: P_minus_PE
@@ -43,7 +43,7 @@ contains
       if ( soil_storage_max > NEAR_ZERO ) then
 
 !        soil_storage_temp = max( 0.0, min( soil_storage_max, precipitation + soil_storage ) )
-!        actual_et =  soil_storage_temp * ( 1.0_c_float - exp( -crop_etc / soil_storage_max ) )
+!        actual_et =  soil_storage_temp * ( 1.0_c_double - exp( -crop_etc / soil_storage_max ) )
 
         ! NOTE: there is a difference in approaches between various practitioners... the Hawaii Water Budget code
         !       calculates actual et on a temporary soil moisture value that includes the moisture received 

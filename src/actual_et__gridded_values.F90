@@ -28,7 +28,7 @@ module actual_et__gridded_values
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pAET_GRID
 
-  real ( c_float), allocatable    :: ACTUAL_ET(:)
+  real ( c_double), allocatable    :: ACTUAL_ET(:)
 
   type ( DATETIME_T )                  :: DATE_OF_LAST_RETRIEVAL
 

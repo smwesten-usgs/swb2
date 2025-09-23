@@ -10,13 +10,13 @@ contains
                                                     snowmelt,             &
                                                     net_snowfall )
 
-    real (c_float), intent(inout)      :: snow_storage
-    real (c_float), intent(inout)      :: snowmelt
-    real (c_float), intent(in)         :: potential_snowmelt
-    real (c_float), intent(in)         :: net_snowfall
+    real (c_double), intent(inout)      :: snow_storage
+    real (c_double), intent(inout)      :: snowmelt
+    real (c_double), intent(in)         :: potential_snowmelt
+    real (c_double), intent(in)         :: net_snowfall
 
 
-    snow_storage = max(0.0_c_float, snow_storage + net_snowfall )
+    snow_storage = max(0.0_c_double, snow_storage + net_snowfall )
 
     if( snow_storage > potential_snowmelt ) then
 
@@ -26,7 +26,7 @@ contains
     else   ! not enough snowcover to satisfy the amount that *could* melt
 
       snowmelt = snow_storage
-      snow_storage = 0.0_c_float
+      snow_storage = 0.0_c_double
 
     end if
 

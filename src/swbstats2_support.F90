@@ -68,8 +68,8 @@ module swbstats2_support
     logical (c_bool)                      :: write_netcdf     = FALSE
     logical (c_bool)                      :: write_arcgrid    = FALSE
     logical (c_bool)                      :: output_active    = FALSE
-    real (c_float)                        :: valid_min        = 10000.   ! only used for netCDF output
-    real (c_float)                        :: valid_max        = -10000.
+    real (c_double)                        :: valid_min        = 10000.   ! only used for netCDF output
+    real (c_double)                        :: valid_max        = -10000.
   end type FILE_COLLECTION_T
 
   type SWBSTATS_T
@@ -826,8 +826,8 @@ contains
            iStart=[ RECNUM ],                                                     &
            iCount=[1_c_size_t],                                                   &
            iStride=[1_c_size_t],                                                  &
-!           rValues=[ real(( start_bnd + end_bnd ) / 2.0_c_float, c_float) ] )
-           rValues=[ real(start_bnd, c_float) ] )
+!           rValues=[ real(( start_bnd + end_bnd ) / 2.0_c_double, c_double) ] )
+           rValues=[ real(start_bnd, c_double) ] )
   
            !       dpValues=[ real( SIM_DT%iNumDaysFromOrigin, c_double) ] )
 
@@ -843,13 +843,13 @@ contains
            iStart=[ RECNUM , 0_c_size_t, 0_c_size_t],                             &
            iCount=[ 1_c_size_t, ny, nx ],                                         &
            iStride=[1_c_size_t, 1_c_size_t, 1_c_size_t],                          &
-           rValues=real(grid_ptr%dpData, c_float) )
+           rValues=real(grid_ptr%dpData, c_double) )
 
         OUTPUT_FILES(stat_indx)%valid_min =    &
-          update_minimum_value(OUTPUT_FILES(stat_indx)%valid_min, real(grid_ptr%dpData, c_float))
+          update_minimum_value(OUTPUT_FILES(stat_indx)%valid_min, real(grid_ptr%dpData, c_double))
 
         OUTPUT_FILES(stat_indx)%valid_max =    &
-          update_maximum_value(OUTPUT_FILES(stat_indx)%valid_max, real(grid_ptr%dpData, c_float))
+          update_maximum_value(OUTPUT_FILES(stat_indx)%valid_max, real(grid_ptr%dpData, c_double))
 
       endif
 
@@ -1058,10 +1058,10 @@ contains
 
 !     ! [ LOCALS ]
 !     integer (c_int)               :: julian_day_number
-!     real (c_float), allocatable   :: tempvals(:)
+!     real (c_double), allocatable   :: tempvals(:)
 !     integer (c_int)               :: day_count
 !     logical (c_bool), allocatable :: local_mask(:,:)
-!     real (c_float), dimension(size(grid_delta%dpData,1), size(grid_delta%dpData,2)) :: rTemp
+!     real (c_double), dimension(size(grid_delta%dpData,1), size(grid_delta%dpData,2)) :: rTemp
 
 !     ! force slice dates to honor bounds of data dates
 !     if ( start_date < this%data_start_date )  start_date = this%data_start_date
@@ -1156,13 +1156,13 @@ contains
 
 !       if (this%annualize_stats) then
 !         where ( local_mask )
-! !          grd_mean = grd_mean/ real( day_count, c_float ) * 365.25
-! !          grd_var = grd_var/ real( day_count, c_float ) * 365.25
+! !          grd_mean = grd_mean/ real( day_count, c_double ) * 365.25
+! !          grd_var = grd_var/ real( day_count, c_double ) * 365.25
 !           grd_sum = grd_sum / real( day_count, c_double ) * 365.25
 !         end where
 !       ! else
 !       !   where ( local_mask )
-!       !     grd_mean = grd_sum / real( day_count, c_float )
+!       !     grd_mean = grd_sum / real( day_count, c_double )
 !       !   end where
 !       endif
 
@@ -1188,7 +1188,7 @@ contains
     integer (c_int)               :: julian_day_number
     integer (c_int)               :: day_count
     logical (c_bool), allocatable :: local_mask(:,:)
-    real (c_float), allocatable   :: rTemp(:,:)
+    real (c_double), allocatable   :: rTemp(:,:)
     real (c_double), allocatable  :: grd_new(:,:)
 
     ! force slice dates to honor bounds of data dates
@@ -1276,13 +1276,13 @@ contains
 
     if (this%annualize_stats) then
       where ( local_mask )
-!        grd_mean = grd_mean/ real( day_count, c_float ) * 365.25
-!        grd_var = grd_var/ real( day_count, c_float ) * 365.25
+!        grd_mean = grd_mean/ real( day_count, c_double ) * 365.25
+!        grd_var = grd_var/ real( day_count, c_double ) * 365.25
         grd_sum = grd_sum / real( day_count, c_double ) * 365.25
       end where
       ! else
       !   where ( local_mask )
-      !     grd_mean = grd_sum / real( day_count, c_float )
+      !     grd_mean = grd_sum / real( day_count, c_double )
       !   end where
     endif
 
@@ -1927,10 +1927,10 @@ contains
 
   pure function update_minimum_value(current_minimum, values)    result(new_minimum)
 
-    real (c_float), intent(in)             :: current_minimum
-    real (c_float), intent(in)             :: values(:,:)
+    real (c_double), intent(in)             :: current_minimum
+    real (c_double), intent(in)             :: values(:,:)
 
-    real (c_float)                         :: new_minimum
+    real (c_double)                         :: new_minimum
 
     new_minimum = min(current_minimum, minval(values))
 
@@ -1940,10 +1940,10 @@ contains
 
   pure function update_maximum_value(current_maximum, values)    result(new_maximum)
 
-    real (c_float), intent(in)             :: current_maximum
-    real (c_float), intent(in)             :: values(:,:)
+    real (c_double), intent(in)             :: current_maximum
+    real (c_double), intent(in)             :: values(:,:)
 
-    real (c_float)                         :: new_maximum
+    real (c_double)                         :: new_maximum
 
     new_maximum = max(current_maximum, maxval(values))
 

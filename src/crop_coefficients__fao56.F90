@@ -62,13 +62,13 @@ module crop_coefficients__fao56
   ! Private, module level variables
   ! kept at a landuse code level (i.e. same value applies to all cells with same LU codes)
   integer (c_int), allocatable  :: LANDUSE_CODE(:)
-!  real (c_float), allocatable   :: REW(:,:)
-!  real (c_float), allocatable   :: TEW(:,:)
-  real (c_float), allocatable   :: KCB_l(:,:)
+!  real (c_double), allocatable   :: REW(:,:)
+!  real (c_double), allocatable   :: TEW(:,:)
+  real (c_double), allocatable   :: KCB_l(:,:)
   integer (c_int), allocatable  :: KCB_METHOD(:)
-  real (c_float), allocatable   :: GROWTH_STAGE_SHIFT_DAYS(:)
-  real (c_float), allocatable   :: GROWTH_STAGE_LENGTH_IN_DAYS(:,:)
-  real (c_float), allocatable   :: GROWTH_STAGE_GDD(:,:)
+  real (c_double), allocatable   :: GROWTH_STAGE_SHIFT_DAYS(:)
+  real (c_double), allocatable   :: GROWTH_STAGE_LENGTH_IN_DAYS(:,:)
+  real (c_double), allocatable   :: GROWTH_STAGE_GDD(:,:)
   type (DATETIME_T), allocatable     :: GROWTH_STAGE_DATE(:,:)
 
   integer (c_int)               :: LU_SOILS_CSV
@@ -88,7 +88,7 @@ contains
     integer (c_int)                   :: iNumberOfLanduses
     integer (c_int)                   :: iIndex, iIndex2
     integer (c_int)                   :: iStat
-    real (c_float)                    :: growing_cycle_length
+    real (c_double)                    :: growing_cycle_length
 
     character (len=10)                :: sMMDDYYYY
     character (len=:), allocatable    :: sText
@@ -97,42 +97,42 @@ contains
     type (DATETIME_T)                 :: dtPlantingDate
     character (len=:), allocatable    :: PlantingDate_str
 
-    real (c_float), allocatable       :: L_ini_l(:)
-    real (c_float), allocatable       :: L_dev_l(:)
-    real (c_float), allocatable       :: L_mid_l(:)
-    real (c_float), allocatable       :: L_late_l(:)
-    real (c_float), allocatable       :: L_fallow_l(:)
+    real (c_double), allocatable       :: L_ini_l(:)
+    real (c_double), allocatable       :: L_dev_l(:)
+    real (c_double), allocatable       :: L_mid_l(:)
+    real (c_double), allocatable       :: L_late_l(:)
+    real (c_double), allocatable       :: L_fallow_l(:)
 
-    real (c_float), allocatable       :: GDD_plant_l(:)
-    real (c_float), allocatable       :: GDD_ini_l(:)
-    real (c_float), allocatable       :: GDD_dev_l(:)
-    real (c_float), allocatable       :: GDD_mid_l(:)
-    real (c_float), allocatable       :: GDD_late_l(:)
+    real (c_double), allocatable       :: GDD_plant_l(:)
+    real (c_double), allocatable       :: GDD_ini_l(:)
+    real (c_double), allocatable       :: GDD_dev_l(:)
+    real (c_double), allocatable       :: GDD_mid_l(:)
+    real (c_double), allocatable       :: GDD_late_l(:)
 
-    real (c_float), allocatable       :: Kcb_MAX(:)
+    real (c_double), allocatable       :: Kcb_MAX(:)
 
-    real (c_float), allocatable       :: Kcb_ini_l(:)
-    real (c_float), allocatable       :: Kcb_mid_l(:)
-    real (c_float), allocatable       :: Kcb_end_l(:)
-    real (c_float), allocatable       :: Kcb_min_l(:)
+    real (c_double), allocatable       :: Kcb_ini_l(:)
+    real (c_double), allocatable       :: Kcb_mid_l(:)
+    real (c_double), allocatable       :: Kcb_end_l(:)
+    real (c_double), allocatable       :: Kcb_min_l(:)
 
-    real (c_float), allocatable       :: Kcb_jan(:)
-    real (c_float), allocatable       :: Kcb_feb(:)
-    real (c_float), allocatable       :: Kcb_mar(:)
-    real (c_float), allocatable       :: Kcb_apr(:)
-    real (c_float), allocatable       :: Kcb_may(:)
-    real (c_float), allocatable       :: Kcb_jun(:)
-    real (c_float), allocatable       :: Kcb_jul(:)
-    real (c_float), allocatable       :: Kcb_aug(:)
-    real (c_float), allocatable       :: Kcb_sep(:)
-    real (c_float), allocatable       :: Kcb_oct(:)
-    real (c_float), allocatable       :: Kcb_nov(:)
-    real (c_float), allocatable       :: Kcb_dec(:)
+    real (c_double), allocatable       :: Kcb_jan(:)
+    real (c_double), allocatable       :: Kcb_feb(:)
+    real (c_double), allocatable       :: Kcb_mar(:)
+    real (c_double), allocatable       :: Kcb_apr(:)
+    real (c_double), allocatable       :: Kcb_may(:)
+    real (c_double), allocatable       :: Kcb_jun(:)
+    real (c_double), allocatable       :: Kcb_jul(:)
+    real (c_double), allocatable       :: Kcb_aug(:)
+    real (c_double), allocatable       :: Kcb_sep(:)
+    real (c_double), allocatable       :: Kcb_oct(:)
+    real (c_double), allocatable       :: Kcb_nov(:)
+    real (c_double), allocatable       :: Kcb_dec(:)
 
-    real (c_float)                    :: fKcb_initial
-    real (c_float)                    :: fRz_initial
+    real (c_double)                    :: fKcb_initial
+    real (c_double)                    :: fRz_initial
 
-    real (c_float), parameter         :: NEAR_ZERO = 1.0e-9_c_float
+    real (c_double), parameter         :: NEAR_ZERO = 1.0e-9_c_double
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_PERCENT_SOIL_MOISTURE
 
@@ -327,17 +327,17 @@ contains
     ! Monthly Kcb, GDD-based, or DOY-based
     do iIndex = lbound( KCB_METHOD, 1), ubound( KCB_METHOD, 1)
 
-      if ( all( KCB_l( JAN:DEC, iIndex ) > 0.0_c_float ) ) then
+      if ( all( KCB_l( JAN:DEC, iIndex ) > 0.0_c_double ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_MONTHLY_VALUES
         KCB_l( KCB_MIN, iIndex ) = minval( KCB_l(JAN:DEC, iIndex) )
         KCB_l( KCB_MID, iIndex) = minval( KCB_l(JAN:DEC, iIndex) )
 
-      elseif ( all( GROWTH_STAGE_GDD( :, iIndex ) >= 0.0_c_float )              &
-         .and. all( KCB_l( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
+      elseif ( all( GROWTH_STAGE_GDD( :, iIndex ) >= 0.0_c_double )              &
+         .and. all( KCB_l( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_double ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_GDD
 
-      elseif ( all( GROWTH_STAGE_LENGTH_IN_DAYS( PLANTING_DATE:, iIndex ) >= 0.0_c_float )              &
-         .and. all( KCB_l( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
+      elseif ( all( GROWTH_STAGE_LENGTH_IN_DAYS( PLANTING_DATE:, iIndex ) >= 0.0_c_double )              &
+         .and. all( KCB_l( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_double ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_FAO56
       endif
 
@@ -359,7 +359,7 @@ contains
       !                                 iSoilGroup( iIndex ) ),                                      &
       !                                 Kcb=fKcb_initial )
       !
-      ! fSoilStorage( iIndex ) = INITIAL_PERCENT_SOIL_MOISTURE( iIndex ) / 100.0_c_float             &
+      ! fSoilStorage( iIndex ) = INITIAL_PERCENT_SOIL_MOISTURE( iIndex ) / 100.0_c_double             &
       !                          * fRz_initial * fAvailable_Water_Content( iIndex )
 
 !    enddo
@@ -385,7 +385,7 @@ contains
                                                                           result(Kcb)
 
   integer (c_int), intent(in)   :: iLanduseIndex
-  real (c_float)                :: Kcb
+  real (c_double)                :: Kcb
 
   ! [ LOCALS ]
   real (c_double) :: fFrac
@@ -454,12 +454,12 @@ pure elemental function crop_coefficients_FAO56_calculate_Kcb_Max(wind_speed_met
                                           Kcb,                         & 
                                           plant_height_meters)                       result(kcb_max)
 
-  real (c_float), intent(in) :: wind_speed_meters_per_sec
-  real (c_float), intent(in) :: relative_humidity_min_pct
-  real (c_float), intent(in) :: Kcb
-  real (c_float), intent(in) :: plant_height_meters
+  real (c_double), intent(in) :: wind_speed_meters_per_sec
+  real (c_double), intent(in) :: relative_humidity_min_pct
+  real (c_double), intent(in) :: Kcb
+  real (c_double), intent(in) :: plant_height_meters
 
-  real (c_float)  :: kcb_max
+  real (c_double)  :: kcb_max
   real (c_double) :: U2
   real (c_double) :: RHmin
   real (c_double) :: plant_height
@@ -490,8 +490,8 @@ end function crop_coefficients_FAO56_calculate_Kcb_Max
                                                                          result(fKcb)
 
   integer (c_int), intent(in)   :: iLanduseIndex
-  real (c_float), intent(in)    :: fGDD
-  real (c_float)                :: fKcb
+  real (c_double), intent(in)    :: fGDD
+  real (c_double)                :: fKcb
 
   ! [ LOCALS ]
   real (c_double) :: fFrac
@@ -558,7 +558,7 @@ end function update_crop_coefficient_GDD_as_threshold
     integer (c_int) :: iIndex
     real (c_double) :: dTempDate
     type (DATETIME_T)    :: dtTempDate
-    real (c_float)  :: growing_cycle_length
+    real (c_double)  :: growing_cycle_length
 
     do iIndex=lbound(GROWTH_STAGE_DATE,2), ubound(GROWTH_STAGE_DATE,2)
 
@@ -622,9 +622,9 @@ end function update_crop_coefficient_GDD_as_threshold
 
   impure elemental subroutine crop_coefficients_FAO56_calculate( Kcb, landuse_index, GDD )
 
-    real (c_float), intent(inout)          :: Kcb
+    real (c_double), intent(inout)          :: Kcb
     integer (c_int), intent(in)            :: landuse_index
-    real (c_float), intent(in), optional   :: GDD
+    real (c_double), intent(in), optional   :: GDD
 
 
     if ( KCB_METHOD( landuse_index )  == KCB_METHOD_FAO56  &
@@ -647,7 +647,7 @@ end function update_crop_coefficient_GDD_as_threshold
                                            Kcb,                                &
                                            it_is_growing_season)
 
-    real (c_float), intent(in)             :: Kcb
+    real (c_double), intent(in)             :: Kcb
     integer (c_int), intent(in)            :: landuse_index
     logical (c_bool), intent(out)          :: it_is_growing_season
 

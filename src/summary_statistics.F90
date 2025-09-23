@@ -124,7 +124,7 @@ contains
     integer (c_int) :: lc
     integer (c_int) :: poly_id_l
     character (len=10)   :: date
-    real (c_float)  :: sms_max, rain, fog, irr, runoff, can_evap, ref_et0,       &
+    real (c_double)  :: sms_max, rain, fog, irr, runoff, can_evap, ref_et0,       &
                             crop_et0, actual_et, recharge, sms_end, snowmelt,         &
                             surface_storage_excess, impervious_frac, surface_storage, &
                             actual_et_soil
@@ -150,14 +150,14 @@ contains
     can_evap = mean( cells%interception, cell_selection )
     ref_et0 = mean( cells%reference_et0, cell_selection )
     crop_et0 = mean( cells%reference_et0 * cells%crop_coefficient_kcb, cell_selection )
-    actual_et_soil = mean( real( cells%actual_et_soil, c_float), cell_selection )
-    actual_et = mean( real( cells%actual_et, c_float), cell_selection )
+    actual_et_soil = mean( real( cells%actual_et_soil, c_double), cell_selection )
+    actual_et = mean( real( cells%actual_et, c_double), cell_selection )
     recharge = mean( cells%net_infiltration, cell_selection )
     sms_end = mean( cells%soil_storage, cell_selection )
     surface_storage_excess = mean( cells%surface_storage_excess, cell_selection )
     surface_storage = mean( cells%surface_storage, cell_selection )
     snowmelt = mean( cells%snowmelt, cell_selection )
-    impervious_frac = 1.0_c_float - mean( cells%pervious_fraction, cell_selection )
+    impervious_frac = 1.0_c_double - mean( cells%pervious_fraction, cell_selection )
 
     write( unit=LU, fmt="(2a,3(i0,a),15(f12.3,a),f12.3)" )                   &
       date, TAB,                                                             &
@@ -227,9 +227,9 @@ contains
 
   function mean( float_vector, cell_selection )  result( mean_value )
 
-    real (c_float)   :: float_vector(:)
+    real (c_double)   :: float_vector(:)
     logical               :: cell_selection(:)
-    real (c_float)   :: mean_value
+    real (c_double)   :: mean_value
 
     ! [ LOCALS ]
     integer (c_int) :: item_count
@@ -238,7 +238,7 @@ contains
 
     if ( item_count > 0 ) then
 
-      mean_value = sum( float_vector, cell_selection ) / real(item_count, c_float)
+      mean_value = sum( float_vector, cell_selection ) / real(item_count, c_double)
 
     else
 

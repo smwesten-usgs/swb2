@@ -26,14 +26,14 @@ module et__zone_values
   public :: et_zone_values_initialize, et_zone_values_calculate
   public :: pET_GRID, ET_RATIOS
 
-  real (c_float), allocatable           :: ET_TABLE_VALUES(:,:)
+  real (c_double), allocatable           :: ET_TABLE_VALUES(:,:)
 
   type (DATA_CATALOG_ENTRY_T), pointer       :: pET_ZONE
   type (DATA_CATALOG_ENTRY_T), pointer       :: pET_GRID
 
   integer (c_int), allocatable          :: ET_ZONE(:)
 
-  real (c_float), allocatable           :: ET_RATIOS(:)
+  real (c_double), allocatable           :: ET_RATIOS(:)
 
  contains
 
@@ -167,11 +167,11 @@ module et__zone_values
     integer (c_int)  :: iLineNum
     integer (c_int)  :: iFieldNum
     integer (c_int)  :: iET_zone_id
-    real (c_float)   :: fFactor
+    real (c_double)   :: fFactor
     integer (c_int)  :: iCount
 
-    ET_RATIOS = 0.0_c_float
-    iCount = 0.0_c_float
+    ET_RATIOS = 0.0_c_double
+    iCount = 0.0_c_double
 
     associate ( dt => SIM_DT%curr )
 

@@ -30,11 +30,11 @@ module direct_soil_moisture__gridded_data
   type (DATA_CATALOG_ENTRY_T), pointer :: pSEPTIC_DISCHARGE
   type (DATA_CATALOG_ENTRY_T), pointer :: pANNUAL_SEPTIC_DISCHARGE
 
-  real (c_float), allocatable     :: fSEPTIC_DISCHARGE(:)
-  real (c_float), allocatable     :: fANNUAL_SEPTIC_DISCHARGE(:)
+  real (c_double), allocatable     :: fSEPTIC_DISCHARGE(:)
+  real (c_double), allocatable     :: fANNUAL_SEPTIC_DISCHARGE(:)
 
-  real (c_float), allocatable     :: fSEPTIC_DISCHARGE_TABLE(:)
-  real (c_float), allocatable     :: fANNUAL_SEPTIC_DISCHARGE_TABLE(:)
+  real (c_double), allocatable     :: fSEPTIC_DISCHARGE_TABLE(:)
+  real (c_double), allocatable     :: fANNUAL_SEPTIC_DISCHARGE_TABLE(:)
 
   type (T_NETCDF4_FILE), pointer       :: pNCFILE
 
@@ -161,7 +161,7 @@ contains
 
   subroutine direct_soil_moisture_calculate( direct_soil_moisture, is_cell_active, indx )
 
-    real (c_float), intent(inout)     :: direct_soil_moisture
+    real (c_double), intent(inout)     :: direct_soil_moisture
     logical (c_bool), intent(in)      :: is_cell_active(:,:)
     integer (c_int), intent(in)       :: indx
 
@@ -173,7 +173,7 @@ contains
     integer (c_int) :: iDaysInMonth
     integer (c_int) :: iNumDaysFromOrigin
     integer (c_int) :: iIndex
-    real (c_float)  :: fFactor
+    real (c_double)  :: fFactor
 
     if ( .not. DATE_OF_LAST_RETRIEVAL == SIM_DT%curr ) then
 
@@ -197,7 +197,7 @@ contains
 
     endif
 
-    direct_soil_moisture = 0.0_c_float
+    direct_soil_moisture = 0.0_c_double
 
     if ( allocated( fSEPTIC_DISCHARGE) )  direct_soil_moisture = direct_soil_moisture           &
                                             + fSEPTIC_DISCHARGE( indx )

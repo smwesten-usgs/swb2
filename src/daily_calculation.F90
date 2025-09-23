@@ -57,7 +57,7 @@ contains
 
     ! update crop evapotranspiration; crop_coefficient_kcb defaults to 1.0
     ! there is less power to evaporate/transpire if there is active evaporation of interception
-    cells%crop_etc = max(cells%reference_et0 - cells%actual_et_interception, 0.0_c_float) * cells%crop_coefficient_kcb
+    cells%crop_etc = max(cells%reference_et0 - cells%actual_et_interception, 0.0_c_double) * cells%crop_coefficient_kcb
 
     call cells%calc_snowfall()
 
@@ -72,9 +72,9 @@ contains
                                       snowmelt=cells%snowmelt,                         &
                                       net_snowfall=cells%net_snowfall )
 
-     cells%runon          = 0.0_c_float
-     cells%runoff         = 0.0_c_float
-     cells%runoff_outside = 0.0_c_float
+     cells%runon          = 0.0_c_double
+     cells%runoff         = 0.0_c_double
+     cells%runoff_outside = 0.0_c_double
 
     !> if flow routing is enabled, the calculations will be made in order from upslope to downslope;
     !! otherwise, the calculations are made in the natural packing order of the data structure
@@ -119,7 +119,7 @@ contains
         canopy_cover_fraction             => cells%canopy_cover_fraction(indx) )
 
         ! inflow is calculated over the entire cell (pervious + impervious) area
-        inflow = max( 0.0_c_float, runon + net_rainfall + fog + snowmelt )
+        inflow = max( 0.0_c_double, runon + net_rainfall + fog + snowmelt )
 
         call cells%calc_runoff( indx )
 
@@ -137,7 +137,7 @@ contains
 
         ! prevent calculated runoff from exceeding the day's inflow;
         ! this can happen when using the monthly runoff fraction method
-        !runoff = max( min( inflow, runoff ), 0.0_c_float )
+        !runoff = max( min( inflow, runoff ), 0.0_c_double )
 
         ! this routine now generates *all* outputs CORRECTED FOR PERVIOUS AREA
         call calculate_impervious_surface_mass_balance(                                         &
@@ -159,14 +159,14 @@ contains
         !    now being performed in the 'mass_balance__impervious_surface' directly
         ! modify the surface storage in inches as if the amount calculated for the impervious area
         ! were to be redistributed uniformly over the total area of the cell
-        !surface_storage_excess = surface_storage_excess * ( 1.0_c_float - pervious_fraction )
+        !surface_storage_excess = surface_storage_excess * ( 1.0_c_double - pervious_fraction )
 
         ! e.g. septic system discharge enters here...
         call cells%calc_direct_soil_moisture( indx )
 
         ! irrigation not considered to be a contributor to runoff...in addition, infiltration
         ! term is calculated with respect to the pervious fraction of the cell
-        infiltration = max( 0.0_c_float,                                       &
+        infiltration = max( 0.0_c_double,                                       &
                              ( ( runon                                         &
                             + net_rainfall                                     &
                             + fog                                              &
@@ -180,11 +180,11 @@ contains
         call cells%calc_actual_et( indx )
 
         ! reduce soil actual et by the amount of interception et, if any
-        !actual_et_soil = max( actual_et_soil - actual_et_interception, 0.0_c_float )
+        !actual_et_soil = max( actual_et_soil - actual_et_interception, 0.0_c_double )
 
         ! OK, supplying a reduced value of reference ET0 to FAO56_two_stage calc
 
-        !actual_et_soil = max( min( actual_et_soil, reference_ET0 - actual_et_interception), 0.0_c_float )
+        !actual_et_soil = max( min( actual_et_soil, reference_ET0 - actual_et_interception), 0.0_c_double )
 
         call calculate_soil_mass_balance( net_infiltration=net_infiltration,             &
                                           soil_storage=soil_storage,                     &
@@ -198,7 +198,7 @@ contains
         ! actual et for the entire cell is the weighted average of the ET for pervious and impervious
         ! fractions of the cell
         actual_et = actual_et_soil * pervious_fraction                                   &
-                   + actual_et_impervious * ( 1.0_c_float - pervious_fraction )          &
+                   + actual_et_impervious * ( 1.0_c_double - pervious_fraction )          &
                           + actual_et_interception * canopy_cover_fraction
 
         call cells%calc_climatic_water_deficit( indx )
@@ -234,7 +234,7 @@ contains
 
   subroutine minmaxmean( variable , varname, logical_vector )
 
-    real (c_float), dimension(:)           :: variable
+    real (c_double), dimension(:)           :: variable
     character (len=*), intent(in)               :: varname
     logical, intent(in), optional               :: logical_vector(:)
 

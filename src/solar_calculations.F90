@@ -6,8 +6,8 @@ module solar_calculations
   use exceptions
   implicit none
 
-  real (c_float) :: EARTH_SUN_DIST_Dr
-  real (c_float) :: SOLAR_DECLINATION_Delta
+  real (c_double) :: EARTH_SUN_DIST_Dr
+  real (c_double) :: SOLAR_DECLINATION_Delta
 
 contains
 
@@ -274,8 +274,8 @@ contains
   function solar_radiation_Hargreaves__Rs( dRa, fTMin, fTMax )   result( dRs )   bind(c)
 
     real (c_double), intent(in) :: dRa
-    real (c_float), intent(in)  :: fTMin
-    real (c_float), intent(in)  :: fTMax
+    real (c_double), intent(in)  :: fTMin
+    real (c_double), intent(in)  :: fTMax
     real (c_double)             :: dRs
 
     ! [ LOCALS ]
@@ -306,21 +306,21 @@ contains
 
   elemental function estimate_percent_of_possible_sunshine__psun(fTMax, fTMin)  result(fPsun)
 
-    real (c_float), intent(in) :: fTMax   ! Kelvin degrees
-    real (c_float), intent(in) :: fTMin   ! Kelvin degrees
-    real (c_float) :: fPsun
+    real (c_double), intent(in) :: fTMax   ! Kelvin degrees
+    real (c_double), intent(in) :: fTMin   ! Kelvin degrees
+    real (c_double) :: fPsun
 
     ! [ LOCALS ]
-    real (c_float), parameter :: fKRs = 0.175
+    real (c_double), parameter :: fKRs = 0.175
 
-    fPsun = ( 2_c_float * fKRs * sqrt( fTMAX - fTMIN ) ) - 0.5_c_float
+    fPsun = ( 2_c_double * fKRs * sqrt( fTMAX - fTMIN ) ) - 0.5_c_double
 
-    if ( fPsun < 0_c_float ) then
-      fPsun = 0_c_float
-    elseif ( fPsun > 1.0_c_float ) then
-      fPsun = 100_c_float
+    if ( fPsun < 0_c_double ) then
+      fPsun = 0_c_double
+    elseif ( fPsun > 1.0_c_double ) then
+      fPsun = 100_c_double
     else
-      fPsun = fPsun * 100_c_float
+      fPsun = fPsun * 100_c_double
     endif
 
   end function estimate_percent_of_possible_sunshine__psun
@@ -397,7 +397,7 @@ contains
   function clear_sky_solar_radiation_noAB__Rso(dRa, fElevation) result(dRso)
 
     real (c_double), intent(in) :: dRa
-    real (c_float), intent(in)  :: fElevation
+    real (c_double), intent(in)  :: fElevation
     real (c_double)             :: dRso
 
     dRso = ( 0.75_c_double + 1.0E-5_c_double * fElevation ) * dRa
@@ -458,8 +458,8 @@ contains
 
   elemental function net_longwave_radiation__Rnl(fTMin, fTMax, dRs, dRso)  result(dRnl)
 
-    real(c_float), intent(in)  :: fTMin
-    real(c_float), intent(in)  :: fTMax
+    real(c_double), intent(in)  :: fTMin
+    real(c_double), intent(in)  :: fTMax
     real(c_double), intent(in) :: dRs
     real(c_double), intent(in) :: dRso
     real(c_double)             :: dRnl

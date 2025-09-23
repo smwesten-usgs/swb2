@@ -1,0 +1,742 @@
+The Meson build system
+Version: 1.9.0
+Source dir: /Users/hellyj/src/swb2-jjh
+Build dir: /Users/hellyj/src/swb2-jjh/build
+Build type: native build
+Project name: swb2
+Project version: undefined
+Fortran compiler for the host machine: gfortran (gcc 15.1.0 "GNU Fortran (MacPorts gcc15 15.1.0_2+stdlib_flag) 15.1.0")
+Fortran linker for the host machine: gfortran ld64 1221.4
+C compiler for the host machine: clang (clang 17.0.0 "Apple clang version 17.0.0 (clang-1700.3.19.1)")
+C linker for the host machine: clang ld64 1221.4
+C++ compiler for the host machine: clang (clang 17.0.0 "Apple clang version 17.0.0 (clang-1700.3.19.1)")
+C++ linker for the host machine: clang ld64 1221.4
+Host machine cpu family: aarch64
+Host machine cpu: aarch64
+Message: GIT BRANCH IS: "develop"
+Message: GIT HASH IS: "65d1dd82"
+Message: VERSION IS: v2.3.4-rc0
+Message: setting Meson conf_data for MacOS
+Message: The compilation profile is: release
+Message: Meson sees the compiler name as:gcc
+Message: Meson sees the C compiler name as: clang
+Message: Meson sees the build machine as: darwin
+Compiler for Fortran supports arguments -fall-intrinsics: YES 
+Compiler for Fortran supports arguments -pedantic: YES 
+Compiler for Fortran supports arguments -std=gnu: YES 
+Compiler for Fortran supports arguments -fallow-argument-mismatch: YES 
+Compiler for Fortran supports arguments -Wcharacter-truncation: YES 
+Compiler for Fortran supports arguments -Wno-unused-dummy-argument: YES 
+Compiler for Fortran supports arguments -Wno-intrinsic-shadow: YES 
+Compiler for Fortran supports arguments -Wno-maybe-uninitialized: YES 
+Compiler for Fortran supports arguments -Wno-uninitialized: YES 
+Compiler for Fortran supports arguments -ffpe-summary=overflow: YES 
+Compiler for Fortran supports arguments -ffpe-trap=overflow,zero,invalid: YES 
+Compiler for Fortran supports arguments -D__APPLE__: YES 
+meson.build:179: WARNING: Consider using the built-in option for language standard version instead of using "-std=gnu".
+Configuring version_control.F90 using configuration
+Library netcdf found: YES
+Build targets in project: 4
+
+Found ninja-1.13.1 at /opt/local/bin/ninja
+[1/361] Compiling C object src/proj4/libswb_external.a.p/adjlon.c.o
+[2/361] Compiling C object src/proj4/libswb_external.a.p/aasincos.c.o
+[3/361] Compiling C object src/proj4/libswb_external.a.p/emess.c.o
+[4/361] Compiling C object src/proj4/libswb_external.a.p/custom_swb_functions.c.o
+[5/361] Compiling C object src/proj4/libswb_external.a.p/gen_cheb.c.o
+[6/361] Compiling C object src/proj4/libswb_external.a.p/bchgen.c.o
+[7/361] Compiling C object src/proj4/libswb_external.a.p/geocent.c.o
+[8/361] Compiling C object src/proj4/libswb_external.a.p/dmstor.c.o
+[9/361] Compiling C object src/proj4/libswb_external.a.p/biveval.c.o
+[10/361] Compiling C object src/proj4/libswb_external.a.p/bch2bps.c.o
+[11/361] Compiling C object src/proj4/libswb_external.a.p/geod_for.c.o
+../src/proj4/geod_for.c:98:4: warning: add explicit braces to avoid dangling else [-Wdangling-else]
+   98 |                         else
+      |                         ^
+1 warning generated.
+[12/361] Compiling C object src/proj4/libswb_external.a.p/geod_inv.c.o
+[13/361] Compiling C object src/proj4/libswb_external.a.p/geod_set.c.o
+[14/361] Compiling C object src/proj4/libswb_external.a.p/nad_cvt.c.o
+[15/361] Compiling C object src/proj4/libswb_external.a.p/nad_intr.c.o
+[16/361] Compiling C object src/proj4/libswb_external.a.p/p_series.c.o
+[17/361] Compiling C object src/proj4/libswb_external.a.p/nad_init.c.o
+[18/361] Compiling C object src/proj4/libswb_external.a.p/mk_cheby.c.o
+../src/proj4/mk_cheby.c:106:7: warning: add explicit braces to avoid dangling else [-Wdangling-else]
+  106 |                                                 else
+      |                                                 ^
+../src/proj4/mk_cheby.c:114:7: warning: add explicit braces to avoid dangling else [-Wdangling-else]
+  114 |                                                 else
+      |                                                 ^
+../src/proj4/mk_cheby.c:132:6: warning: add explicit braces to avoid dangling else [-Wdangling-else]
+  132 |                                         else
+      |                                         ^
+../src/proj4/mk_cheby.c:140:6: warning: add explicit braces to avoid dangling else [-Wdangling-else]
+  140 |                                         else
+      |                                         ^
+4 warnings generated.
+[19/361] Compiling C object src/proj4/libswb_external.a.p/PJ_aea.c.o
+[20/361] Scanning target swb_external for modules
+[21/361] Scanning target swb2 for modules
+[22/361] Compiling C object src/proj4/libswb_external.a.p/PJ_airy.c.o
+[23/361] Compiling C object src/proj4/libswb_external.a.p/pj_auth.c.o
+[24/361] Compiling C object src/proj4/libswb_external.a.p/pj_apply_gridshift.c.o
+[25/361] Compiling C object src/proj4/libswb_external.a.p/PJ_aitoff.c.o
+[26/361] Compiling C object src/proj4/libswb_external.a.p/pj_apply_vgridshift.c.o
+[27/361] Compiling C object src/proj4/libswb_external.a.p/PJ_aeqd.c.o
+[28/361] Compiling C object src/proj4/libswb_external.a.p/PJ_august.c.o
+[29/361] Compiling C object src/proj4/libswb_external.a.p/PJ_bipc.c.o
+[30/361] Scanning target swb_library for modules
+[31/361] Compiling C object src/proj4/libswb_external.a.p/PJ_bacon.c.o
+[32/361] Scanning target swbstats2 for modules
+[33/361] Compiling C object src/proj4/libswb_external.a.p/PJ_cc.c.o
+[34/361] Compiling C object src/proj4/libswb_external.a.p/PJ_crast.c.o
+[35/361] Compiling C object src/proj4/libswb_external.a.p/PJ_cass.c.o
+[36/361] Compiling C object src/proj4/libswb_external.a.p/PJ_cea.c.o
+[37/361] Compiling C object src/proj4/libswb_external.a.p/PJ_collg.c.o
+[38/361] Compiling C object src/proj4/libswb_external.a.p/pj_ctx.c.o
+[39/361] Compiling C object src/proj4/libswb_external.a.p/PJ_boggs.c.o
+[40/361] Compiling C object src/proj4/libswb_external.a.p/pj_datums.c.o
+[41/361] Compiling C object src/proj4/libswb_external.a.p/PJ_bonne.c.o
+[42/361] Compiling C object src/proj4/libswb_external.a.p/PJ_chamb.c.o
+[43/361] Compiling C object src/proj4/libswb_external.a.p/pj_datum_set.c.o
+[44/361] Compiling C object src/proj4/libswb_external.a.p/pj_deriv.c.o
+[45/361] Compiling C object src/proj4/libswb_external.a.p/PJ_denoy.c.o
+[46/361] Compiling C object src/proj4/libswb_external.a.p/PJ_eck1.c.o
+[47/361] Compiling C object src/proj4/libswb_external.a.p/PJ_eck2.c.o
+[48/361] Compiling C object src/proj4/libswb_external.a.p/PJ_eck3.c.o
+[49/361] Generating dynamic dependency information for target swb_library
+[50/361] Compiling C object src/proj4/libswb_external.a.p/PJ_eck4.c.o
+[51/361] Compiling C object src/proj4/libswb_external.a.p/PJ_eck5.c.o
+[52/361] Compiling C object src/proj4/libswb_external.a.p/pj_ell_set.c.o
+[53/361] Compiling C object src/proj4/libswb_external.a.p/PJ_eqc.c.o
+[54/361] Compiling C object src/proj4/libswb_external.a.p/pj_ellps.c.o
+[55/361] Compiling C object src/proj4/libswb_external.a.p/pj_errno.c.o
+[56/361] Compiling C object src/proj4/libswb_external.a.p/pj_factors.c.o
+[57/361] Compiling C object src/proj4/libswb_external.a.p/PJ_fahey.c.o
+[58/361] Compiling C object src/proj4/libswb_external.a.p/PJ_eqdc.c.o
+[59/361] Compiling C object src/proj4/libswb_external.a.p/PJ_fouc_s.c.o
+[60/361] Compiling C object src/proj4/libswb_external.a.p/pj_fwd.c.o
+[61/361] Compiling C object src/proj4/libswb_external.a.p/pj_gauss.c.o
+[62/361] Compiling C object src/proj4/libswb_external.a.p/pj_geocent.c.o
+[63/361] Compiling C object src/proj4/libswb_external.a.p/PJ_gall.c.o
+[64/361] Compiling C object src/proj4/libswb_external.a.p/PJ_geos.c.o
+[65/361] Compiling C object src/proj4/libswb_external.a.p/PJ_gins8.c.o
+[66/361] Compiling C object src/proj4/libswb_external.a.p/PJ_gnom.c.o
+[67/361] Compiling C object src/proj4/libswb_external.a.p/PJ_goode.c.o
+[68/361] Compiling C object src/proj4/libswb_external.a.p/PJ_gn_sinu.c.o
+[69/361] Compiling C object src/proj4/libswb_external.a.p/PJ_hammer.c.o
+[70/361] Compiling C object src/proj4/libswb_external.a.p/PJ_gstmerc.c.o
+[71/361] Compiling C object src/proj4/libswb_external.a.p/pj_gridlist.c.o
+[72/361] Compiling C object src/proj4/libswb_external.a.p/PJ_hatano.c.o
+[73/361] Compiling C object src/proj4/libswb_external.a.p/pj_gridinfo.c.o
+[74/361] Compiling C object src/proj4/libswb_external.a.p/pj_initcache.c.o
+[75/361] Compiling C object src/proj4/libswb_external.a.p/pj_inv.c.o
+[76/361] Compiling C object src/proj4/libswb_external.a.p/PJ_igh.c.o
+[77/361] Compiling C object src/proj4/libswb_external.a.p/PJ_imw_p.c.o
+[78/361] Compiling C object src/proj4/libswb_external.a.p/PJ_krovak.c.o
+[79/361] Compiling C object src/proj4/libswb_external.a.p/PJ_labrd.c.o
+[80/361] Compiling C object src/proj4/libswb_external.a.p/pj_init.c.o
+[81/361] Compiling C object src/proj4/libswb_external.a.p/PJ_healpix.c.o
+[82/361] Compiling C object src/proj4/libswb_external.a.p/PJ_lagrng.c.o
+[83/361] Compiling C object src/proj4/libswb_external.a.p/PJ_larr.c.o
+[84/361] Compiling C object src/proj4/libswb_external.a.p/PJ_lask.c.o
+[85/361] Compiling C object src/proj4/libswb_external.a.p/PJ_laea.c.o
+[86/361] Compiling C object src/proj4/libswb_external.a.p/pj_latlong.c.o
+[87/361] Compiling C object src/proj4/libswb_external.a.p/pj_list.c.o
+[88/361] Compiling C object src/proj4/libswb_external.a.p/PJ_isea.c.o
+[89/361] Compiling C object src/proj4/libswb_external.a.p/PJ_lcc.c.o
+[90/361] Compiling C object src/proj4/libswb_external.a.p/PJ_loxim.c.o
+[91/361] Compiling C object src/proj4/libswb_external.a.p/pj_log.c.o
+[92/361] Compiling C object src/proj4/libswb_external.a.p/PJ_lcca.c.o
+[93/361] Compiling C object src/proj4/libswb_external.a.p/pj_malloc.c.o
+[94/361] Compiling C object src/proj4/libswb_external.a.p/PJ_mbtfpp.c.o
+[95/361] Compiling C object src/proj4/libswb_external.a.p/PJ_mbt_fps.c.o
+[96/361] Compiling C object src/proj4/libswb_external.a.p/PJ_mbtfpq.c.o
+[97/361] Compiling C object src/proj4/libswb_external.a.p/PJ_lsat.c.o
+[98/361] Compiling C object src/proj4/libswb_external.a.p/PJ_merc.c.o
+[99/361] Compiling C object src/proj4/libswb_external.a.p/PJ_mill.c.o
+[100/361] Compiling C object src/proj4/libswb_external.a.p/pj_mlfn.c.o
+[101/361] Compiling C object src/proj4/libswb_external.a.p/pj_msfn.c.o
+[102/361] Compiling C object src/proj4/libswb_external.a.p/pj_mutex.c.o
+[103/361] Compiling C object src/proj4/libswb_external.a.p/PJ_mod_ster.c.o
+[104/361] Compiling C object src/proj4/libswb_external.a.p/PJ_moll.c.o
+[105/361] Compiling C object src/proj4/libswb_external.a.p/PJ_natearth.c.o
+[106/361] Compiling C object src/proj4/libswb_external.a.p/PJ_nell.c.o
+[107/361] Compiling C object src/proj4/libswb_external.a.p/PJ_nocol.c.o
+[108/361] Compiling C object src/proj4/libswb_external.a.p/PJ_nell_h.c.o
+[109/361] Compiling C object src/proj4/libswb_external.a.p/PJ_nsper.c.o
+[110/361] Compiling C object src/proj4/libswb_external.a.p/PJ_ob_tran.c.o
+[111/361] Compiling C object src/proj4/libswb_external.a.p/PJ_oea.c.o
+[112/361] Compiling C object src/proj4/libswb_external.a.p/PJ_ocea.c.o
+[113/361] Compiling C object src/proj4/libswb_external.a.p/PJ_nzmg.c.o
+[114/361] Compiling C object src/proj4/libswb_external.a.p/pj_phi2.c.o
+[115/361] Compiling C object src/proj4/libswb_external.a.p/PJ_ortho.c.o
+[116/361] Compiling C object src/proj4/libswb_external.a.p/pj_open_lib.c.o
+[117/361] Compiling C object src/proj4/libswb_external.a.p/PJ_omerc.c.o
+[118/361] Compiling C object src/proj4/libswb_external.a.p/pj_pr_list.c.o
+[119/361] Compiling C object src/proj4/libswb_external.a.p/pj_param.c.o
+[120/361] Compiling C object src/proj4/libswb_external.a.p/PJ_poly.c.o
+[121/361] Compiling C object src/proj4/libswb_external.a.p/PJ_putp2.c.o
+[122/361] Compiling C object src/proj4/libswb_external.a.p/PJ_putp3.c.o
+[123/361] Compiling C object src/proj4/libswb_external.a.p/PJ_putp4p.c.o
+[124/361] Compiling C object src/proj4/libswb_external.a.p/PJ_putp5.c.o
+[125/361] Compiling C object src/proj4/libswb_external.a.p/pj_qsfn.c.o
+[126/361] Compiling C object src/proj4/libswb_external.a.p/pj_release.c.o
+[127/361] Compiling C object src/proj4/libswb_external.a.p/PJ_putp6.c.o
+[128/361] Compiling C object src/proj4/libswb_external.a.p/PJ_rpoly.c.o
+[129/361] Compiling C object src/proj4/libswb_external.a.p/pj_strerrno.c.o
+[130/361] Compiling C object src/proj4/libswb_external.a.p/PJ_somerc.c.o
+[131/361] Compiling C object src/proj4/libswb_external.a.p/PJ_robin.c.o
+[132/361] Compiling C object src/proj4/libswb_external.a.p/PJ_sterea.c.o
+[133/361] Compiling C object src/proj4/libswb_external.a.p/PJ_tcc.c.o
+[134/361] Compiling C object src/proj4/libswb_external.a.p/PJ_sconics.c.o
+[135/361] Compiling C object src/proj4/libswb_external.a.p/PJ_sts.c.o
+[136/361] Compiling C object src/proj4/libswb_external.a.p/PJ_tcea.c.o
+[137/361] Compiling C object src/proj4/libswb_external.a.p/PJ_stere.c.o
+[138/361] Compiling C object src/proj4/libswb_external.a.p/pj_tsfn.c.o
+[139/361] Compiling C object src/proj4/libswb_external.a.p/PJ_tmerc.c.o
+[140/361] Compiling C object src/proj4/libswb_external.a.p/PJ_tpeqd.c.o
+[141/361] Compiling C object src/proj4/libswb_external.a.p/pj_units.c.o
+[142/361] Compiling C object src/proj4/libswb_external.a.p/PJ_urm5.c.o
+[143/361] Compiling C object src/proj4/libswb_external.a.p/PJ_vandg4.c.o
+[144/361] Compiling C object src/proj4/libswb_external.a.p/PJ_urmfps.c.o
+[145/361] Compiling C object src/proj4/libswb_external.a.p/pj_utils.c.o
+[146/361] Compiling C object src/proj4/libswb_external.a.p/PJ_vandg.c.o
+[147/361] Compiling C object src/proj4/libswb_external.a.p/PJ_vandg2.c.o
+[148/361] Compiling C object src/proj4/libswb_external.a.p/PJ_wag2.c.o
+[149/361] Compiling C object src/proj4/libswb_external.a.p/pj_transform.c.o
+[150/361] Compiling C object src/proj4/libswb_external.a.p/PJ_wag3.c.o
+[151/361] Compiling C object src/proj4/libswb_external.a.p/PJ_wag7.c.o
+[152/361] Compiling C object src/proj4/libswb_external.a.p/PJ_wink1.c.o
+[153/361] Compiling C object src/proj4/libswb_external.a.p/pj_zpoly1.c.o
+[154/361] Compiling C object src/proj4/libswb_external.a.p/PJ_wink2.c.o
+[155/361] Compiling C object src/proj4/libswb_external.a.p/rtodms.c.o
+[156/361] Compiling C object src/proj4/libswb_external.a.p/vector1.c.o
+[157/361] Compiling C object src/proj4/libswb_external.a.p/proj_etmerc.c.o
+[158/361] Compiling C object src/proj4/libswb_external.a.p/proj_mdist.c.o
+[159/361] Compiling C object src/proj4/libswb_external.a.p/proj_rouss.c.o
+[160/361] Compiling Fortran object src/libswb_library.a.p/actual_et__thornthwaite_mather.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[161/361] Compiling Fortran object src/libswb_library.a.p/kiss_random_number_generator.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[162/361] Compiling Fortran object src/libswb_library.a.p/mass_balance__snow.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[163/361] Compiling Fortran object src/libswb_library.a.p/mass_balance__interception.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[164/361] Compiling Fortran object src/libswb_library.a.p/mass_balance__soil.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[165/361] Generating dynamic dependency information for target swb2
+[166/361] Linking static target src/proj4/libswb_external.a
+[167/361] Compiling Fortran object src/libswb_library.a.p/netcdf_c_api_interfaces.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[168/361] Compiling Fortran object src/libswb_library.a.p/snowfall__original.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[169/361] Generating dynamic dependency information for target swbstats2
+[170/361] Compiling Fortran object src/libswb_library.a.p/_Users_hellyj_src_swb2-jjh_build_src_version_control.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[171/361] Compiling Fortran object src/libswb_library.a.p/snowmelt__original.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[172/361] Compiling Fortran object src/swb2.p/actual_et__thornthwaite_mather.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[173/361] Compiling Fortran object src/swb2.p/kiss_random_number_generator.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[174/361] Compiling Fortran object src/swb2.p/mass_balance__snow.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[175/361] Compiling Fortran object src/swb2.p/mass_balance__interception.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[176/361] Compiling Fortran object src/swb2.p/snowmelt__original.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[177/361] Compiling Fortran object src/libswb_library.a.p/constants_and_conversions.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[178/361] Compiling Fortran object src/swb2.p/netcdf_c_api_interfaces.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[179/361] Compiling Fortran object src/swb2.p/snowfall__original.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[180/361] Compiling Fortran object src/swb2.p/mass_balance__soil.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[181/361] Compiling Fortran object src/swb2.p/_Users_hellyj_src_swb2-jjh_build_src_version_control.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[182/361] Compiling Fortran object src/swbstats2.p/actual_et__thornthwaite_mather.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[183/361] Compiling Fortran object src/swbstats2.p/kiss_random_number_generator.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[184/361] Compiling Fortran object src/swbstats2.p/mass_balance__snow.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[185/361] Compiling Fortran object src/libswb_library.a.p/mass_balance__impervious_surface.F90.o
+../src/mass_balance__impervious_surface.F90:18:5:
+
+   18 |                                               paved_to_unpaved,             &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/mass_balance__impervious_surface.F90:19:5:
+
+   19 |                                               surface_storage_max,          &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/mass_balance__impervious_surface.F90:22:5:
+
+   22 |                                               net_rainfall,                 &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/mass_balance__impervious_surface.F90:23:5:
+
+   23 |                                               snowmelt,                     &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[186/361] Compiling Fortran object src/libswb_library.a.p/meteorological_calculations.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[187/361] Compiling Fortran object src/swb2.p/constants_and_conversions.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[188/361] Compiling Fortran object src/swbstats2.p/mass_balance__interception.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[189/361] Compiling Fortran object src/swbstats2.p/mass_balance__soil.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[190/361] Compiling Fortran object src/libswb_library.a.p/fstring.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[191/361] Compiling Fortran object src/swbstats2.p/snowfall__original.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[192/361] Compiling Fortran object src/swbstats2.p/_Users_hellyj_src_swb2-jjh_build_src_version_control.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[193/361] Compiling Fortran object src/swbstats2.p/snowmelt__original.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[194/361] Compiling Fortran object src/libswb_library.a.p/logfiles.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[195/361] Compiling Fortran object src/swbstats2.p/netcdf_c_api_interfaces.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[196/361] Compiling Fortran object src/swb2.p/meteorological_calculations.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[197/361] Compiling Fortran object src/swbstats2.p/constants_and_conversions.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[198/361] Compiling Fortran object src/swb2.p/mass_balance__impervious_surface.F90.o
+../src/mass_balance__impervious_surface.F90:18:5:
+
+   18 |                                               paved_to_unpaved,             &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/mass_balance__impervious_surface.F90:19:5:
+
+   19 |                                               surface_storage_max,          &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/mass_balance__impervious_surface.F90:22:5:
+
+   22 |                                               net_rainfall,                 &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/mass_balance__impervious_surface.F90:23:5:
+
+   23 |                                               snowmelt,                     &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[199/361] Compiling Fortran object src/swb2.p/fstring.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[200/361] Compiling Fortran object src/libswb_library.a.p/timer.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[201/361] Compiling Fortran object src/swbstats2.p/mass_balance__impervious_surface.F90.o
+../src/mass_balance__impervious_surface.F90:18:5:
+
+   18 |                                               paved_to_unpaved,             &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/mass_balance__impervious_surface.F90:19:5:
+
+   19 |                                               surface_storage_max,          &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/mass_balance__impervious_surface.F90:22:5:
+
+   22 |                                               net_rainfall,                 &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/mass_balance__impervious_surface.F90:23:5:
+
+   23 |                                               snowmelt,                     &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[202/361] Compiling Fortran object src/swbstats2.p/meteorological_calculations.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[203/361] Compiling Fortran object src/libswb_library.a.p/disclaimers.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[204/361] Compiling Fortran object src/swbstats2.p/fstring.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[205/361] Compiling Fortran object src/swb2.p/timer.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[206/361] Compiling Fortran object src/swb2.p/logfiles.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[207/361] Compiling Fortran object src/libswb_library.a.p/exceptions.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[208/361] Compiling Fortran object src/swbstats2.p/logfiles.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[209/361] Compiling Fortran object src/swb2.p/disclaimers.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[210/361] Compiling Fortran object src/swbstats2.p/timer.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[211/361] Compiling Fortran object src/swbstats2.p/disclaimers.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[212/361] Compiling Fortran object src/libswb_library.a.p/solar_calculations.F90.o
+../src/solar_calculations.F90:146:4:
+
+  146 |                           - 1.39_c_double)
+      |         1       
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:557:2:
+
+  557 |         function zenith_angle__theta_z( dLatitude, dDelta, dOmega ) result( dTheta_z )     bind(c)
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:559:2:
+
+  559 |           real (c_double), intent(in)            :: dLatitude
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:560:2:
+
+  560 |           real (c_double), intent(in)            :: dDelta
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:564:2:
+
+  564 |           real (c_double) :: dTheta_z
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:573:2:
+
+  573 |           call assert( dLatitude <= HALFPI .and. dLatitude >= -HALFPI , &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:578:2:
+
+  578 |           dTheta_z = acos( sin(dLatitude) * sin(dDelta) + cos(dLatitude) * cos(dDelta) * cos(dOmega_l ) )
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:580:2:
+
+  580 |         end function zenith_angle__theta_z
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[213/361] Compiling Fortran object src/swb2.p/exceptions.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[214/361] Compiling Fortran object src/libswb_library.a.p/fstring_list.F90.o
+../src/fstring_list.F90:756:39:
+
+  756 |   type (ALPHA_SORT_GROUP_T), dimension(nrec), intent(in out) :: sort_group
+      |                                       1
+Warning: GNU Extension: Symbol 'nrec' is used before it is typed at (1)
+../src/fstring_list.F90:810:37:
+
+  810 |   type (INT_SORT_GROUP_T), dimension(nrec), intent(in out) :: sort_group
+      |                                     1
+Warning: GNU Extension: Symbol 'nrec' is used before it is typed at (1)
+../src/fstring_list.F90:864:39:
+
+  864 |   type (FLOAT_SORT_GROUP_T), dimension(nrec), intent(in out) :: sort_group
+      |                                       1
+Warning: GNU Extension: Symbol 'nrec' is used before it is typed at (1)
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[215/361] Compiling Fortran object src/libswb_library.a.p/et__jensen_haise.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[216/361] Compiling Fortran object src/swbstats2.p/exceptions.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[217/361] Compiling Fortran object src/swb2.p/solar_calculations.F90.o
+../src/solar_calculations.F90:146:4:
+
+  146 |                           - 1.39_c_double)
+      |         1       
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:557:2:
+
+  557 |         function zenith_angle__theta_z( dLatitude, dDelta, dOmega ) result( dTheta_z )     bind(c)
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:559:2:
+
+  559 |           real (c_double), intent(in)            :: dLatitude
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:560:2:
+
+  560 |           real (c_double), intent(in)            :: dDelta
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:564:2:
+
+  564 |           real (c_double) :: dTheta_z
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:573:2:
+
+  573 |           call assert( dLatitude <= HALFPI .and. dLatitude >= -HALFPI , &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:578:2:
+
+  578 |           dTheta_z = acos( sin(dLatitude) * sin(dDelta) + cos(dLatitude) * cos(dDelta) * cos(dOmega_l ) )
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:580:2:
+
+  580 |         end function zenith_angle__theta_z
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[218/361] Compiling Fortran object src/swb2.p/fstring_list.F90.o
+../src/fstring_list.F90:756:39:
+
+  756 |   type (ALPHA_SORT_GROUP_T), dimension(nrec), intent(in out) :: sort_group
+      |                                       1
+Warning: GNU Extension: Symbol 'nrec' is used before it is typed at (1)
+../src/fstring_list.F90:810:37:
+
+  810 |   type (INT_SORT_GROUP_T), dimension(nrec), intent(in out) :: sort_group
+      |                                     1
+Warning: GNU Extension: Symbol 'nrec' is used before it is typed at (1)
+../src/fstring_list.F90:864:39:
+
+  864 |   type (FLOAT_SORT_GROUP_T), dimension(nrec), intent(in out) :: sort_group
+      |                                       1
+Warning: GNU Extension: Symbol 'nrec' is used before it is typed at (1)
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[219/361] Compiling Fortran object src/swbstats2.p/solar_calculations.F90.o
+../src/solar_calculations.F90:146:4:
+
+  146 |                           - 1.39_c_double)
+      |         1       
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:557:2:
+
+  557 |         function zenith_angle__theta_z( dLatitude, dDelta, dOmega ) result( dTheta_z )     bind(c)
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:559:2:
+
+  559 |           real (c_double), intent(in)            :: dLatitude
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:560:2:
+
+  560 |           real (c_double), intent(in)            :: dDelta
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:564:2:
+
+  564 |           real (c_double) :: dTheta_z
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:573:2:
+
+  573 |           call assert( dLatitude <= HALFPI .and. dLatitude >= -HALFPI , &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:578:2:
+
+  578 |           dTheta_z = acos( sin(dLatitude) * sin(dDelta) + cos(dLatitude) * cos(dDelta) * cos(dOmega_l ) )
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/solar_calculations.F90:580:2:
+
+  580 |         end function zenith_angle__theta_z
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[220/361] Compiling Fortran object src/libswb_library.a.p/proj4_support.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[221/361] Compiling Fortran object src/swb2.p/et__jensen_haise.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[222/361] Compiling Fortran object src/swbstats2.p/fstring_list.F90.o
+../src/fstring_list.F90:756:39:
+
+  756 |   type (ALPHA_SORT_GROUP_T), dimension(nrec), intent(in out) :: sort_group
+      |                                       1
+Warning: GNU Extension: Symbol 'nrec' is used before it is typed at (1)
+../src/fstring_list.F90:810:37:
+
+  810 |   type (INT_SORT_GROUP_T), dimension(nrec), intent(in out) :: sort_group
+      |                                     1
+Warning: GNU Extension: Symbol 'nrec' is used before it is typed at (1)
+../src/fstring_list.F90:864:39:
+
+  864 |   type (FLOAT_SORT_GROUP_T), dimension(nrec), intent(in out) :: sort_group
+      |                                       1
+Warning: GNU Extension: Symbol 'nrec' is used before it is typed at (1)
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[223/361] Compiling Fortran object src/libswb_library.a.p/datetime.F90.o
+../src/datetime.F90:1013:39:
+
+ 1013 |   write(sTimeText,fmt="(i2.2,':',i2.2':',i2.2)") this%iHour, this%iMinute, this%iSecond
+      |                                       1
+Warning: GNU Extension: Missing comma at (1)
+../src/datetime.F90:1077:37:
+
+ 1077 |   write(sBuf,fmt="(1x,i2.2,':',i2.2':',i2.2)") this%iHour, this%iMinute, this%iSecond
+      |                                     1
+Warning: GNU Extension: Missing comma at (1)
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[224/361] Compiling Fortran object src/swbstats2.p/et__jensen_haise.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[225/361] Compiling Fortran object src/libswb_library.a.p/file_operations.F90.o
+../src/file_operations.F90:154:33:
+
+  154 |     sBufTemp = adjustl(this%sBuf)
+      |                                 1
+Warning: CHARACTER expression will be truncated in assignment (1/65536) at (1) [-Wcharacter-truncation]
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[226/361] Compiling Fortran object src/swb2.p/proj4_support.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[227/361] Compiling Fortran object src/libswb_library.a.p/simulation_datetime.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[228/361] Compiling Fortran object src/swb2.p/datetime.F90.o
+../src/datetime.F90:1013:39:
+
+ 1013 |   write(sTimeText,fmt="(i2.2,':',i2.2':',i2.2)") this%iHour, this%iMinute, this%iSecond
+      |                                       1
+Warning: GNU Extension: Missing comma at (1)
+../src/datetime.F90:1077:37:
+
+ 1077 |   write(sBuf,fmt="(1x,i2.2,':',i2.2':',i2.2)") this%iHour, this%iMinute, this%iSecond
+      |                                     1
+Warning: GNU Extension: Missing comma at (1)
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[229/361] Compiling Fortran object src/swb2.p/file_operations.F90.o
+../src/file_operations.F90:154:33:
+
+  154 |     sBufTemp = adjustl(this%sBuf)
+      |                                 1
+Warning: CHARACTER expression will be truncated in assignment (1/65536) at (1) [-Wcharacter-truncation]
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[230/361] Compiling Fortran object src/swbstats2.p/file_operations.F90.o
+../src/file_operations.F90:154:33:
+
+  154 |     sBufTemp = adjustl(this%sBuf)
+      |                                 1
+Warning: CHARACTER expression will be truncated in assignment (1/65536) at (1) [-Wcharacter-truncation]
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[231/361] Compiling Fortran object src/libswb_library.a.p/dictionary.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[232/361] Compiling Fortran object src/swbstats2.p/datetime.F90.o
+../src/datetime.F90:1013:39:
+
+ 1013 |   write(sTimeText,fmt="(i2.2,':',i2.2':',i2.2)") this%iHour, this%iMinute, this%iSecond
+      |                                       1
+Warning: GNU Extension: Missing comma at (1)
+../src/datetime.F90:1077:37:
+
+ 1077 |   write(sBuf,fmt="(1x,i2.2,':',i2.2':',i2.2)") this%iHour, this%iMinute, this%iSecond
+      |                                     1
+Warning: GNU Extension: Missing comma at (1)
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[233/361] Compiling Fortran object src/swbstats2.p/proj4_support.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[234/361] Compiling Fortran object src/swb2.p/simulation_datetime.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[235/361] Compiling Fortran object src/swbstats2.p/simulation_datetime.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[236/361] Compiling Fortran object src/swb2.p/dictionary.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[237/361] Compiling Fortran object src/swbstats2.p/dictionary.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[238/361] Compiling Fortran object src/libswb_library.a.p/parameters.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[239/361] Compiling Fortran object src/libswb_library.a.p/et__hargreaves_samani.F90.o
+../src/et__hargreaves_samani.F90:141:2:
+
+  141 |         fRa = extraterrestrial_radiation__Ra(dLatitude_radians, fDelta, fOmega_s, fD_r)
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/et__hargreaves_samani.F90:167:16:
+
+  167 |                 mm_to_in( ET_SLOPE * rRa * (F_to_C(rTavg) + ET_CONSTANT) * (rTDelta**ET_EXPONENT) ) )
+      |                1
+Warning: GNU Extension: Different type kinds at (1)
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[240/361] Compiling Fortran object src/libswb_library.a.p/actual_et__fao56.F90.o
+../src/actual_et__fao56.F90:57:2:
+
+   57 |         elemental subroutine calculate_actual_et_fao56( actual_et,                         &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[241/361] Compiling Fortran object src/swb2.p/parameters.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[242/361] Compiling Fortran object src/libswb_library.a.p/grid.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[243/361] Compiling Fortran object src/swbstats2.p/parameters.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[244/361] Compiling Fortran object src/libswb_library.a.p/weather_data_tabular.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[245/361] Compiling Fortran object src/libswb_library.a.p/growing_season.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[246/361] Compiling Fortran object src/libswb_library.a.p/interception__bucket.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[247/361] Compiling Fortran object src/libswb_library.a.p/runoff__curve_number.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[248/361] Compiling Fortran object src/libswb_library.a.p/netcdf4_support.F90.o
+FAILED: [code=1] src/libswb_library.a.p/netcdf4_support.F90.o src/libswb_library.a.p/netcdf4_support.mod 
+gfortran -Isrc/proj4/libswb_external.a.p -Isrc/libswb_library.a.p -Isrc -I../src -fdiagnostics-color=always -std=f2008 -O2 -g -fall-intrinsics -pedantic -std=gnu -fallow-argument-mismatch -Wcharacter-truncation -Wno-unused-dummy-argument -Wno-intrinsic-shadow -Wno-maybe-uninitialized -Wno-uninitialized -ffpe-summary=overflow -ffpe-trap=overflow,zero,invalid -D__APPLE__ -DDEBUG_PRINT -Jsrc/libswb_library.a.p -o src/libswb_library.a.p/netcdf4_support.F90.o -c ../src/netcdf4_support.F90
+../src/netcdf4_support.F90:2159:55:
+
+ 2159 |     call nf_get_variable_slice_float(NCFILE, rTempVals)
+      |                                                       1
+Error: Type mismatch in argument 'rvalues' at (1); passed REAL(4) to REAL(8)
+[249/361] Compiling Fortran object src/swb2.p/actual_et__fao56.F90.o
+../src/actual_et__fao56.F90:57:2:
+
+   57 |         elemental subroutine calculate_actual_et_fao56( actual_et,                         &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[250/361] Compiling Fortran object src/swb2.p/et__hargreaves_samani.F90.o
+../src/et__hargreaves_samani.F90:141:2:
+
+  141 |         fRa = extraterrestrial_radiation__Ra(dLatitude_radians, fDelta, fOmega_s, fD_r)
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/et__hargreaves_samani.F90:167:16:
+
+  167 |                 mm_to_in( ET_SLOPE * rRa * (F_to_C(rTavg) + ET_CONSTANT) * (rTDelta**ET_EXPONENT) ) )
+      |                1
+Warning: GNU Extension: Different type kinds at (1)
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[251/361] Compiling Fortran object src/swbstats2.p/actual_et__fao56.F90.o
+../src/actual_et__fao56.F90:57:2:
+
+   57 |         elemental subroutine calculate_actual_et_fao56( actual_et,                         &
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[252/361] Compiling Fortran object src/swbstats2.p/et__hargreaves_samani.F90.o
+../src/et__hargreaves_samani.F90:141:2:
+
+  141 |         fRa = extraterrestrial_radiation__Ra(dLatitude_radians, fDelta, fOmega_s, fD_r)
+      |         1
+Warning: Nonconforming tab character at (1) [-Wtabs]
+../src/et__hargreaves_samani.F90:167:16:
+
+  167 |                 mm_to_in( ET_SLOPE * rRa * (F_to_C(rTavg) + ET_CONSTANT) * (rTDelta**ET_EXPONENT) ) )
+      |                1
+Warning: GNU Extension: Different type kinds at (1)
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[253/361] Compiling Fortran object src/swb2.p/weather_data_tabular.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[254/361] Compiling Fortran object src/swb2.p/growing_season.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[255/361] Compiling Fortran object src/swb2.p/runoff__curve_number.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[256/361] Compiling Fortran object src/swb2.p/interception__bucket.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[257/361] Compiling Fortran object src/swb2.p/grid.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[258/361] Compiling Fortran object src/swbstats2.p/growing_season.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[259/361] Compiling Fortran object src/swbstats2.p/interception__bucket.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[260/361] Compiling Fortran object src/libswb_library.a.p/running_grid_stats.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+[261/361] Compiling Fortran object src/swbstats2.p/grid.F90.o
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+ninja: build stopped: subcommand failed.
+INFO: autodetecting backend as ninja
+INFO: calculating backend command to run: /opt/local/bin/ninja

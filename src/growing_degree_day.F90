@@ -17,8 +17,8 @@ module growing_degree_day
   public :: growing_degree_day_calculate, growing_degree_day_initialize
   public :: modified_growing_degree_day_calculate
 
-  real (c_float), allocatable  :: GDD_BASE(:)
-  real (c_float), allocatable  :: GDD_MAX(:)
+  real (c_double), allocatable  :: GDD_BASE(:)
+  real (c_double), allocatable  :: GDD_MAX(:)
   integer (c_int), allocatable :: GDD_RESET_DATE(:)
   type (T_NETCDF4_FILE), pointer    :: pNCFILE
 
@@ -35,8 +35,8 @@ contains
     type (FSTRING_LIST_T)              :: parameter_list
     type (FSTRING_LIST_T)              :: gdd_reset_val_list
     character (len=32)                :: sBuf
-    real (c_float), allocatable  :: gdd_base_l(:)
-    real (c_float), allocatable  :: gdd_max_l(:)
+    real (c_double), allocatable  :: gdd_base_l(:)
+    real (c_double), allocatable  :: gdd_max_l(:)
     integer (c_int)              :: number_of_landuse_codes
     integer (c_int), allocatable :: landuse_code(:)
 
@@ -111,7 +111,7 @@ contains
     else
 
       ! if no GDD_MAX found in parameter tables, assign the default FAO-56 value
-      GDD_MAX = 86.0_c_float
+      GDD_MAX = 86.0_c_double
 
     endif
 
@@ -126,7 +126,7 @@ contains
     else
 
       ! if no GDD_Base found in parameter tables, assign the default FAO-56 value
-      GDD_BASE = 50.0_c_float
+      GDD_BASE = 50.0_c_double
 
     endif
 
@@ -137,15 +137,15 @@ contains
   impure elemental subroutine growing_degree_day_calculate( gdd, tmean, order )
 
     ! [ ARGUMENTS ]
-    real (c_float), intent(inout)       :: gdd
-    real (c_float), intent(in)          :: tmean
+    real (c_double), intent(inout)       :: gdd
+    real (c_double), intent(in)          :: tmean
     integer (c_int), intent(in)         :: order
 
     associate( doy_to_reset_gdd => GDD_RESET_DATE( order ),         &
                gdd_max => GDD_MAX( order ),                         &
                gdd_base => GDD_BASE( order ) )
 
-      if ( SIM_DT%iDOY == doy_to_reset_gdd )  gdd = 0.0_c_float
+      if ( SIM_DT%iDOY == doy_to_reset_gdd )  gdd = 0.0_c_double
       
       gdd = gdd + max(tmean, gdd_base) - gdd_base
 
@@ -158,18 +158,18 @@ contains
   impure elemental subroutine modified_growing_degree_day_calculate( gdd, tmin, tmax, order )
 
   ! [ ARGUMENTS ]
-  real (c_float), intent(inout)       :: gdd
-  real (c_float), intent(in)          :: tmin
-  real (c_float), intent(in)          :: tmax
+  real (c_double), intent(inout)       :: gdd
+  real (c_double), intent(in)          :: tmin
+  real (c_double), intent(in)          :: tmax
   integer (c_int), intent(in)         :: order
 
   associate( doy_to_reset_gdd => GDD_RESET_DATE( order ),         &
              gdd_max => GDD_MAX( order ),                         &
              gdd_base => GDD_BASE( order ) )
 
-    if ( SIM_DT%iDOY == doy_to_reset_gdd )  gdd = 0.0_c_float
+    if ( SIM_DT%iDOY == doy_to_reset_gdd )  gdd = 0.0_c_double
     
-    gdd = gdd + max((max(tmin, gdd_base) + min(tmax,gdd_max))/2.0_c_float, gdd_base) - gdd_base
+    gdd = gdd + max((max(tmin, gdd_base) + min(tmax,gdd_max))/2.0_c_double, gdd_base) - gdd_base
 
   end associate
 

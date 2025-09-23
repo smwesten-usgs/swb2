@@ -7,7 +7,7 @@ module snowfall__original
 
   public :: snowfall_original_calculate
 
-  real (c_float), parameter :: FREEZING = 32.0_c_float
+  real (c_double), parameter :: FREEZING = 32.0_c_double
 
 contains
 
@@ -17,27 +17,27 @@ contains
                                                     interception,              &
                                                     gross_precipitation)
 
-    real (c_float), intent(inout)  :: snowfall
-    real (c_float), intent(inout)  :: net_snowfall
-    real (c_float), intent(inout)  :: rainfall
-    real (c_float), intent(inout)  :: net_rainfall
-    real (c_float), intent(in)     :: tmin
-    real (c_float), intent(in)     :: tmax
-    real (c_float), intent(in)     :: interception
-    real (c_float), intent(in)     :: gross_precipitation
+    real (c_double), intent(inout)  :: snowfall
+    real (c_double), intent(inout)  :: net_snowfall
+    real (c_double), intent(inout)  :: rainfall
+    real (c_double), intent(inout)  :: net_rainfall
+    real (c_double), intent(in)     :: tmin
+    real (c_double), intent(in)     :: tmax
+    real (c_double), intent(in)     :: interception
+    real (c_double), intent(in)     :: gross_precipitation
 
     ! classify gross_precipitation as snowfall if condition is met
     if ( ( (tmin + tmax) / 2.0_c_double - ( tmax - tmin ) / 3.0_c_double ) <= FREEZING ) then
 
       snowfall = gross_precipitation
       net_snowfall = gross_precipitation - interception
-      rainfall = 0.0_c_float
-      net_rainfall = 0.0_c_float
+      rainfall = 0.0_c_double
+      net_rainfall = 0.0_c_double
 
     else  ! rainfall
 
-      snowfall = 0.0_c_float
-      net_snowfall = 0.0_c_float
+      snowfall = 0.0_c_double
+      net_snowfall = 0.0_c_double
       rainfall = gross_precipitation
       net_rainfall = gross_precipitation - interception
 

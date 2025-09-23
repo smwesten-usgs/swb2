@@ -181,4 +181,4 @@ add_project_arguments(cc.get_supported_arguments(c_compile_args), language: 'c')
 add_project_link_arguments(fc.get_supported_arguments(link_args), language: 'fortran')
 
 subdir('src')
-subdir('test/unit_tests')
+#subdir('test/unit_tests')

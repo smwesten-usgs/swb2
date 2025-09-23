@@ -89,9 +89,9 @@ module netcdf4_support
   integer(c_int), parameter :: NC_FILL_INT     = -2147483647
   integer(c_int), parameter :: NC_NA_INT       = -9999
 
-  real(c_float),  parameter :: NC_FILL_FLOAT   = -9999.0_c_float
+  real(c_double),  parameter :: NC_FILL_FLOAT   = -9999.0_c_double
   real(c_double), parameter :: NC_FILL_DOUBLE  = -9.9e-20_c_double
-!  real(c_float),  parameter :: NC_FILL_FLOAT   = -( HUGE( 0_c_float ) - 1.0_c_float )
+!  real(c_double),  parameter :: NC_FILL_FLOAT   = -( HUGE( 0_c_double ) - 1.0_c_double )
 !  real(c_double), parameter :: NC_FILL_DOUBLE  = -( HUGE( 0_c_double ) - 1.0_c_double )
 
   ! mode flags for opening and creating datasets
@@ -188,7 +188,7 @@ module netcdf4_support
     character (len=256), dimension(:), allocatable    :: sAttValue
     integer (c_short), dimension(:), allocatable :: i2AttValue
     integer (c_int), dimension(:), allocatable   :: iAttValue
-    real (c_float), dimension(:), allocatable    :: rAttValue
+    real (c_double), dimension(:), allocatable    :: rAttValue
     real (c_double), dimension(:), allocatable   :: dpAttValue
     integer (c_int) :: iNC_AttType
     integer (c_size_t) :: iNC_AttSize
@@ -1032,8 +1032,8 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   character (len=*), intent(in), optional              :: executable_name
   real (c_double), intent(in), optional                :: dpLat(:,:)
   real (c_double), intent(in), optional                :: dpLon(:,:)
-  real (c_float), intent(in), optional                 :: fValidMin
-  real (c_float), intent(in), optional                 :: fValidMax
+  real (c_double), intent(in), optional                 :: fValidMin
+  real (c_double), intent(in), optional                 :: fValidMax
   logical (c_bool), intent(in), optional               :: write_time_bounds
   character (len=*), intent(in), optional              :: filename_prefix
   character (len=*), intent(in), optional              :: filename_modifier
@@ -1047,8 +1047,8 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   type (FSTRING_LIST_T), pointer                    :: history_list_l
   logical (c_bool)                                  :: write_time_bounds_l
   character (len=:), allocatable                    :: executable_name_l
-  real (c_float)                                    :: valid_minimum
-  real (c_float)                                    :: valid_maximum
+  real (c_double)                                    :: valid_minimum
+  real (c_double)                                    :: valid_maximum
   logical (c_bool)                                  :: include_latlon
   type (DATETIME_T)                                 :: DT
   character (len=:), allocatable                    :: date_time_text
@@ -2108,7 +2108,7 @@ end function netcdf_update_time_starting_index
 subroutine netcdf_get_variable_slice(NCFILE, rValues, dpValues, iValues)
 
   type (T_NETCDF4_FILE), intent(inout)       :: NCFILE
-  real (c_float), dimension(:,:), optional   :: rValues
+  real (c_double), dimension(:,:), optional   :: rValues
   real (c_double), dimension(:,:), optional  :: dpValues
   integer (c_int), dimension(:,:), optional  :: iValues
 
@@ -2331,11 +2331,11 @@ end subroutine nf_get_variable_slice_int
 subroutine nf_get_variable_slice_float(NCFILE, rValues)
 
   type (T_NETCDF4_FILE) :: NCFILE
-  real (c_float), dimension(:,:) :: rValues
+  real (c_double), dimension(:,:) :: rValues
 
   ! [ LOCALS ]
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
-  real (c_float), dimension(size(rValues,2) * size(rValues,1)) :: rTemp
+  real (c_double), dimension(size(rValues,2) * size(rValues,1)) :: rTemp
   integer (c_int) :: iStat
   integer (c_int) :: iRow, iCol, iIndex
   integer (c_int) :: iFromRow, iToRow, iByRow
@@ -2642,7 +2642,7 @@ subroutine nf_get_variable_vector_float(NCFILE, iNC_VarID, iNC_Start, iNC_Count,
   integer (c_size_t) :: iNC_Start
   integer (c_size_t) :: iNC_Count
   integer (c_size_t) :: iNC_Stride
-  real (c_float), dimension(:) :: rNC_Vars
+  real (c_double), dimension(:) :: rNC_Vars
 
   call nf_trap(nc_get_vars_float(ncid=NCFILE%iNCID, &
        varid=iNC_VarID, &
@@ -2663,7 +2663,7 @@ subroutine nf_get_variable_array_float(NCFILE, iNC_VarID, iNC_Start, iNC_Count, 
   integer (c_size_t), dimension(:) :: iNC_Start
   integer (c_size_t), dimension(:) :: iNC_Count
   integer (c_size_t), dimension(:) :: iNC_Stride
-  real (c_float), dimension(:,:) :: rNC_Vars
+  real (c_double), dimension(:,:) :: rNC_Vars
 
   call nf_trap(nc_get_vars_float(ncid=NCFILE%iNCID, &
        varid=iNC_VarID, &
@@ -2684,7 +2684,7 @@ subroutine nf_get_variable_array_as_vector_float(NCFILE, iNC_VarID, iNC_Start, i
   integer (c_size_t), dimension(:) :: iNC_Start
   integer (c_size_t), dimension(:) :: iNC_Count
   integer (c_size_t), dimension(:) :: iNC_Stride
-  real (c_float), dimension(:) :: rNC_Vars
+  real (c_double), dimension(:) :: rNC_Vars
 
   call nf_trap(nc_get_vars_float(ncid=NCFILE%iNCID, &
        varid=iNC_VarID, &
@@ -2824,7 +2824,7 @@ function nf_get_first_and_last(NCFILE, iVarIndex)  result(dpValues)
   integer (c_size_t) :: iCount
   integer (c_short), dimension(0:1) :: spValues
   integer (c_int), dimension(0:1) :: ipValues
-  real (c_float), dimension(0:1) :: rpValues
+  real (c_double), dimension(0:1) :: rpValues
 
   call assert (iVarIndex >= lbound(NCFILE%pNC_VAR,1) &
     .and. iVarIndex <= ubound(NCFILE%pNC_VAR,1), &
@@ -2926,7 +2926,7 @@ subroutine nf_get_time_units(NCFILE)
   integer (c_int)  :: iIndex
   logical (c_bool) :: lFound
   integer (c_int)  :: iStat
-  real (c_float)   :: fTempVal
+  real (c_double)   :: fTempVal
 
   call assert(NCFILE%iVarID(NC_TIME) >= 0, "INTERNAL PROGRAMMING ERROR -- " &
     //"nf_get_time_units must be called only after a call is made to ~" &
@@ -3700,8 +3700,8 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
   character (len=*)                  :: sOriginText
   character (len=*), optional        :: PROJ4_string
   logical (c_bool), optional    :: lLatLon
-  real (c_float), optional      :: fValidMin
-  real (c_float), optional      :: fValidMax
+  real (c_double), optional      :: fValidMin
+  real (c_double), optional      :: fValidMax
   logical (c_bool), optional    :: write_time_bounds
 
   ! [ LOCALS ]
@@ -4196,7 +4196,7 @@ subroutine netcdf_rewrite_attribute(NCFILE, sVariableName, sAttributeName,      
   character (len=*) :: sAttributeName
   character (len=*), dimension(:), optional :: sAttributeValue
   integer (c_int), dimension(:), optional :: iAttributeValue
-  real (c_float), dimension(:), optional :: rAttributeValue
+  real (c_double), dimension(:), optional :: rAttributeValue
   real (c_double), dimension(:), optional :: dpAttributeValue
 
   integer (c_int) :: iVarID
@@ -4230,7 +4230,7 @@ subroutine nf_put_attribute(NCFILE, iVarID, sAttributeName, &
   character (len=*) :: sAttributeName
   character (len=*), dimension(:), optional :: sAttributeValue
   integer (c_int), dimension(:), optional :: iAttributeValue
-  real (c_float), dimension(:), optional :: rAttributeValue
+  real (c_double), dimension(:), optional :: rAttributeValue
   real (c_double), dimension(:), optional :: dpAttributeValue
 
   ! [ LOCALS ]
@@ -4451,7 +4451,7 @@ subroutine netcdf_put_variable_array(NCFILE, iVarID, iStart, iCount, iStride, &
   integer (c_size_t), dimension(:) :: iStride
   integer (c_int), dimension(:,:), optional :: iValues
   integer (c_short), dimension(:,:), optional :: i2Values
-  real (c_float), dimension(:,:), optional :: rValues
+  real (c_double), dimension(:,:), optional :: rValues
   real (c_double), dimension(:,:), optional :: dpValues
 
   if (present(iValues) ) then
@@ -4513,8 +4513,8 @@ subroutine netcdf_put_packed_variable_array(NCFILE, iVarID, iStart, iCount, iStr
   integer (c_int), dimension(:,:), optional   :: iField
   integer (c_short), dimension(:), optional   :: i2Values
   integer (c_short), dimension(:,:), optional :: i2Field
-  real (c_float), dimension(:), optional      :: rValues
-  real (c_float), dimension(:,:), optional    :: rField
+  real (c_double), dimension(:), optional      :: rValues
+  real (c_double), dimension(:,:), optional    :: rField
   real (c_double), dimension(:), optional     :: dpValues
   real (c_double), dimension(:,:), optional   :: dpField
 
@@ -4573,7 +4573,7 @@ subroutine netcdf_put_variable_vector(NCFILE, iVarID, iStart, iCount, iStride, &
   integer (c_size_t), dimension(:) :: iStride
   integer (c_int), dimension(:), optional :: iValues
   integer (c_short), dimension(:), optional :: i2Values
-  real (c_float), dimension(:), optional :: rValues
+  real (c_double), dimension(:), optional :: rValues
   real (c_double), dimension(:), optional :: dpValues
 
   if (present(iValues) ) then

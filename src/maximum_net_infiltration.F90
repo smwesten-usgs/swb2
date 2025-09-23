@@ -30,9 +30,9 @@ module maximum_net_infiltration__gridded_data
   public :: maximum_net_infiltration_initialize, maximum_net_infiltration_calculate
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pMAXIMUM_NET_INFILTRATION
-  real (c_float), allocatable     :: fMAXIMUM_NET_INFILTRATION(:)
-  real (c_float), allocatable     :: fMAXIMUM_NET_INFILTRATION_ARRAY(:,:)
-  real (c_float), allocatable     :: fMAXIMUM_NET_INFILTRATION_TABLE(:,:)
+  real (c_double), allocatable     :: fMAXIMUM_NET_INFILTRATION(:)
+  real (c_double), allocatable     :: fMAXIMUM_NET_INFILTRATION_ARRAY(:,:)
+  real (c_double), allocatable     :: fMAXIMUM_NET_INFILTRATION_TABLE(:,:)
   type ( DATETIME_T ), pointer         :: DATE_OF_LAST_RETRIEVAL
 
 contains
@@ -55,7 +55,7 @@ contains
     integer (c_int)                 :: iStat
     type (FSTRING_LIST_T)                 :: parameter_list
     type (FSTRING_LIST_T)                 :: max_net_infiltration_list
-    real (c_float), allocatable     :: max_net_infiltration_vector(:)
+    real (c_double), allocatable     :: max_net_infiltration_vector(:)
     integer (c_int), allocatable    :: sequence_nums(:)
     integer (c_int), allocatable    :: landuse_codes(:)
     logical (c_bool)                :: lAreLengthsEqual
@@ -63,7 +63,7 @@ contains
     integer (c_int)                 :: landuse_indx
     integer (c_int)                 :: number_of_landuses
     integer (c_int)                 :: number_of_soils
-    real (c_float)                  :: value
+    real (c_double)                  :: value
     integer (c_int)                 :: month, day,year, julian_day
     character( len=:), allocatable       :: text_str
 
@@ -195,8 +195,8 @@ contains
                                                rejected_net_infiltration,       &
                                                indx )
 
-    real ( c_float), intent(inout)  :: net_infiltration
-    real (c_float), intent(inout)   :: rejected_net_infiltration
+    real ( c_double), intent(inout)  :: net_infiltration
+    real (c_double), intent(inout)   :: rejected_net_infiltration
     integer (c_int), intent(in)     :: indx
 
     if ( net_infiltration > fMAXIMUM_NET_INFILTRATION( indx ) ) then
@@ -206,7 +206,7 @@ contains
 
     else
 
-      rejected_net_infiltration = 0.0_c_float
+      rejected_net_infiltration = 0.0_c_double
 
     endif
 

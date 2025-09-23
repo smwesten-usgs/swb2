@@ -35,9 +35,9 @@ module et__hargreaves_samani
 
 
   ! ET parameters -- default values are from Hargreaves and Samani (1985)
-  real (c_double) :: ET_SLOPE         ! = 0.0023     
-  real (c_double) :: ET_EXPONENT      ! = 0.5
-  real (c_double) :: ET_CONSTANT      ! = 17.8
+  real (c_float) :: ET_SLOPE         ! = 0.0023     
+  real (c_float) :: ET_EXPONENT      ! = 0.5
+  real (c_float) :: ET_CONSTANT      ! = 17.8
 
 contains
 
@@ -51,7 +51,7 @@ subroutine et_hargreaves_initialize( ) !pConfig, sRecord )
   ! [ LOCALS ]
   character (len=256) :: sOption
   integer (c_int) :: iStat
-  real (c_float) :: rValue
+  real (c_double) :: rValue
 
   real (kind=c_float), allocatable :: fET_slope(:)
   real (kind=c_float), allocatable :: fET_exponent(:)
@@ -94,12 +94,12 @@ subroutine et_hargreaves_initialize( ) !pConfig, sRecord )
 !     call Chomp( sRecord,sOption )
 !     read ( unit=sOption, fmt=*, iostat=iStat ) rValue
 !     call Assert( iStat == 0, "Could not read the southerly latitude" )
-!     pConfig%rSouthernLatitude = dpTWOPI * rValue / 360.0_c_float
+!     pConfig%rSouthernLatitude = dpTWOPI * rValue / 360.0_c_double
 
 !     call Chomp( sRecord,sOption )
 !     read ( unit=sOption, fmt=*, iostat=iStat ) rValue
 !     call Assert( iStat == 0, "Could not read the northerly latitude" )
-!     pConfig%rNorthernLatitude = dpTWOPI * rValue / 360.0_c_float
+!     pConfig%rNorthernLatitude = dpTWOPI * rValue / 360.0_c_double
 
 !   else
 
@@ -119,9 +119,9 @@ impure elemental function et_hargreaves_calculate( iDayOfYear, iNumDaysInYear, f
 
   integer (c_int),intent(in) :: iDayOfYear
   integer (c_int),intent(in) :: iNumDaysInYear
-  real (c_float), intent(in) :: fLatitude
-  real (c_float), intent(in) :: fTMin
-  real (c_float), intent(in) :: fTMax
+  real (c_double), intent(in) :: fLatitude
+  real (c_double), intent(in) :: fTMin
+  real (c_double), intent(in) :: fTMax
   real (c_double)             :: fReferenceET0
 
   ! [ LOCALS ]
@@ -149,8 +149,8 @@ elemental function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
 
   ! [ ARGUMENTS ]
   real (c_double),intent(in) :: rRa
-  real (c_float),intent(in)  :: rTMinF
-  real (c_float),intent(in)  :: rTMaxF
+  real (c_double),intent(in)  :: rTMinF
+  real (c_double),intent(in)  :: rTMaxF
 
   ! [ RETURN VALUE ]
   real (c_double) :: rET_0
@@ -165,7 +165,7 @@ elemental function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
 
   rET_0 = MAX(rZERO, &
                 mm_to_in( ET_SLOPE * rRa * (F_to_C(rTavg) + ET_CONSTANT) * (rTDelta**ET_EXPONENT) ) )
-!                mm_to_in( 0.0023_c_float * rRa * (F_to_C(rTavg) + 17.8_c_float) * sqrt(rTDelta)) )
+!                mm_to_in( 0.0023_c_double * rRa * (F_to_C(rTavg) + 17.8_c_double) * sqrt(rTDelta)) )
 
 end function ET0_hargreaves
 

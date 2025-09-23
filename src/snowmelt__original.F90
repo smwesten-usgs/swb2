@@ -17,9 +17,9 @@ contains
 
   elemental subroutine snowmelt_original_calculate( potential_snowmelt, tmin, tmax, imperial_units )
 
-    real (c_float), intent(inout)      :: potential_snowmelt 
-    real (c_float), intent(in)         :: tmin
-    real (c_float), intent(in)         :: tmax
+    real (c_double), intent(inout)      :: potential_snowmelt 
+    real (c_double), intent(in)         :: tmin
+    real (c_double), intent(in)         :: tmax
     logical ( c_bool), intent(in)      :: imperial_units
 
     if ( imperial_units ) then
@@ -37,7 +37,7 @@ contains
 
       else 
 
-        potential_snowmelt = 0.0_c_float
+        potential_snowmelt = 0.0_c_double
 
       end if
 
@@ -51,7 +51,7 @@ contains
 
       else 
 
-        potential_snowmelt = 0.0_c_float
+        potential_snowmelt = 0.0_c_double
 
       end if
 

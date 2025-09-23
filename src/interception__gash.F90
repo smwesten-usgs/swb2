@@ -31,15 +31,15 @@ module interception__gash
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pEVAPORATION_TO_RAINFALL_RATIO
 
-  real (c_float), allocatable   :: EVAPORATION_TO_RAINFALL_RATIO(:)
+  real (c_double), allocatable   :: EVAPORATION_TO_RAINFALL_RATIO(:)
 
-  real (c_float), allocatable   :: CANOPY_STORAGE_CAPACITY_TABLE_VALUES(:)
-  real (c_float), allocatable   :: TRUNK_STORAGE_CAPACITY_TABLE_VALUES(:)
-  real (c_float), allocatable   :: STEMFLOW_FRACTION_TABLE_VALUES(:)
-  real (c_float), allocatable   :: GASH_INTERCEPTION_STORAGE_MAX_GROWING_SEASON(:)
-  real (c_float), allocatable   :: GASH_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON(:)
+  real (c_double), allocatable   :: CANOPY_STORAGE_CAPACITY_TABLE_VALUES(:)
+  real (c_double), allocatable   :: TRUNK_STORAGE_CAPACITY_TABLE_VALUES(:)
+  real (c_double), allocatable   :: STEMFLOW_FRACTION_TABLE_VALUES(:)
+  real (c_double), allocatable   :: GASH_INTERCEPTION_STORAGE_MAX_GROWING_SEASON(:)
+  real (c_double), allocatable   :: GASH_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON(:)
 
-  real (c_float), allocatable   :: P_SAT(:)
+  real (c_double), allocatable   :: P_SAT(:)
 
   type (T_NETCDF4_FILE), pointer     :: pNCFILE           ! pointer to OUTPUT NetCDF file
 
@@ -52,7 +52,7 @@ contains
   subroutine interception_gash_initialize( lActive, fCanopy_Cover_Fraction, iLandUseIndex )
 
     logical (c_bool), intent(in)    :: lActive(:,:)
-    real (c_float), intent(in)      :: fCanopy_Cover_Fraction(:)
+    real (c_double), intent(in)      :: fCanopy_Cover_Fraction(:)
     integer (c_int), intent(in)     :: iLanduseIndex(:)
 
     ! [ LOCALS ]
@@ -64,7 +64,7 @@ contains
     integer (c_int), allocatable    :: iLanduseTableCodes(:)
     integer (c_int)                 :: iNumberOfLanduses
     logical (c_bool)                :: lAreLengthsEqual
-    real (c_float), allocatable     :: tempvals(:)
+    real (c_double), allocatable     :: tempvals(:)
 
     iCount = count( lActive )
 
@@ -205,21 +205,21 @@ contains
   elemental function precipitation_at_saturation( E_div_P, canopy_storage_capacity, canopy_cover_fraction )  &
                                                                                result( Psat )
 
-    real (c_float), intent(in)    :: E_div_P
-    real (c_float), intent(in)    :: canopy_storage_capacity
-    real (c_float), intent(in)    :: canopy_cover_fraction
-    real (c_float)                :: Psat
+    real (c_double), intent(in)    :: E_div_P
+    real (c_double), intent(in)    :: canopy_storage_capacity
+    real (c_double), intent(in)    :: canopy_cover_fraction
+    real (c_double)                :: Psat
 
     ! [ LOCALS ]
-    real (c_float)                :: P_div_E
+    real (c_double)                :: P_div_E
 
-    if ( canopy_cover_fraction > 0.0_c_float .and. canopy_storage_capacity > 0.0_c_float ) then
+    if ( canopy_cover_fraction > 0.0_c_double .and. canopy_storage_capacity > 0.0_c_double ) then
 
        Psat = - ( canopy_storage_capacity / ( canopy_cover_fraction * E_div_P ) )      &
-                     * log( 1.0_c_float - E_div_P )
+                     * log( 1.0_c_double - E_div_P )
     else
 
-      Psat = 0.0_c_float
+      Psat = 0.0_c_double
 
     endif
 
@@ -237,23 +237,23 @@ contains
                                                     fEvaporation_to_Rainfall_Ratio,                &
                                                     fPrecipitation_at_Saturation, fInterception )
 
-    real (c_float), intent(in)        :: fRainfall
-    real (c_float), intent(in)        :: fFog
-    real (c_float), intent(in)        :: fCanopy_Cover_Fraction
-    real (c_float), intent(in)        :: fTrunk_Storage_Capacity
-    real (c_float), intent(in)        :: fStemflow_Fraction
-    real (c_float), intent(in)        :: fEvaporation_to_Rainfall_Ratio
-    real (c_float), intent(in)        :: fPrecipitation_at_Saturation
-    real (c_float), intent(inout)     :: fInterception
+    real (c_double), intent(in)        :: fRainfall
+    real (c_double), intent(in)        :: fFog
+    real (c_double), intent(in)        :: fCanopy_Cover_Fraction
+    real (c_double), intent(in)        :: fTrunk_Storage_Capacity
+    real (c_double), intent(in)        :: fStemflow_Fraction
+    real (c_double), intent(in)        :: fEvaporation_to_Rainfall_Ratio
+    real (c_double), intent(in)        :: fPrecipitation_at_Saturation
+    real (c_double), intent(inout)     :: fInterception
 
     ! [ LOCALS ]
-    real (c_float)      :: fRainfall_plus_Fog
+    real (c_double)      :: fRainfall_plus_Fog
 
     fRainfall_plus_Fog = fRainfall + fFog
 
-    if ( fPrecipitation_at_Saturation .approxequal. 0.0_c_float ) then
+    if ( fPrecipitation_at_Saturation .approxequal. 0.0_c_double ) then
 
-      fInterception = 0.0_c_float
+      fInterception = 0.0_c_double
 
      ! if(drf+dfog.lt.Psat)then
     else if ( fRainfall_plus_Fog < fPrecipitation_at_Saturation ) then

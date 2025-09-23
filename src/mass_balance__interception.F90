@@ -15,13 +15,13 @@ contains
                                                             interception_storage_max, &
                                                             reference_et0 )
 
-    real (c_float), intent(inout)      :: interception_storage
+    real (c_double), intent(inout)      :: interception_storage
     real (c_double), intent(inout)     :: actual_et_interception
-    real (c_float), intent(inout)      :: interception
-    real (c_float), intent(in)         :: interception_storage_max
+    real (c_double), intent(inout)      :: interception
+    real (c_double), intent(in)         :: interception_storage_max
     real (c_double), intent(in)        :: reference_et0
 
-    real (c_float) :: temp_storage
+    real (c_double) :: temp_storage
 
     temp_storage = interception_storage + interception
 
@@ -35,7 +35,7 @@ contains
     endif
 
     actual_et_interception = min( reference_et0, interception_storage )
-    interception_storage = max( 0.0_c_float, interception_storage - actual_et_interception )
+    interception_storage = max( 0.0_c_double, interception_storage - actual_et_interception )
 
    end subroutine calculate_interception_mass_balance
 

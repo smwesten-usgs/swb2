@@ -1,6 +1,6 @@
 module model_iterate
 
-  use iso_c_binding, only             : c_bool, c_float, c_int
+  use iso_c_binding, only             : c_bool, c_double, c_int
   use constants_and_conversions, only : TRUE, BNDS
   use daily_calculation, only         : perform_daily_calculation
   use file_operations, only           : ASCII_FILE_T

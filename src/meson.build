@@ -151,9 +151,8 @@ if system == 'windows'
   ]
 else
   dependencies = [
-    meson.get_compiler('c').find_library('netcdf', dirs : ['/opt/cray/pe/netcdf/4.8.1.1/intel/19.1/lib',
-                                                           '/opt/cray/pe/netcdf/4.9.0.5/intel/2022.2/lib',
-                                                           '/d/msys64/ucrt64/lib'])
+    meson.get_compiler('c').find_library('netcdf', dirs : ['/opt/local/lib',
+                                                           '/opt/cray/pe/netcdf/4.9.0.5/intel/2022.2/lib'])
   ]
 endif  
 
@@ -165,10 +164,22 @@ executable('swb2',
             link_language : 'fortran',
             dependencies : dependencies,
             install: true)
+	    
+# executable('swbstats2', 
+#             swbstats2_src,
+#             link_with: [swb_external], 
+#             link_language : 'fortran',
+#             dependencies : dependencies,
+#             install: true)
 
-executable('swbstats2', 
-            swbstats2_src,
-            link_with: [swb_external], 
-            link_language : 'fortran',
-            dependencies : dependencies,
-            install: true)
+# We are inside src/meson.build, so this points at .../build/src
+moddir = meson.current_build_dir() + '/libswb_library.a.p'
+
+executable('swbstats2',
+  swbstats2_src,
+  link_with: [swb_library, swb_external],
+  link_language: 'fortran',
+  dependencies: dependencies,
+  install: true,
+  fortran_args: ['-I' + moddir]   # <-- key line: where the .mod files live
+)

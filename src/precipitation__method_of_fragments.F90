@@ -42,7 +42,7 @@ module precipitation__method_of_fragments
   integer (c_int), allocatable, public :: RAIN_GAGE_ID(:)
 
   !> Module variable that holds the current day's rainfall fragment value
-  real (c_float), allocatable, public  :: FRAGMENT_VALUE(:)
+  real (c_double), allocatable, public  :: FRAGMENT_VALUE(:)
 
   !> Module variable indicating which "simulation number" is active
   !! Only has meaning if the rainfall fragments are being applied via a predetermined
@@ -50,7 +50,7 @@ module precipitation__method_of_fragments
   integer (c_int), public :: SIMULATION_NUMBER = 1
 
   !> Module variable that holds the rainfall adjustment factor
-  real (c_float), allocatable, public  :: RAINFALL_ADJUST_FACTOR(:)
+  real (c_double), allocatable, public  :: RAINFALL_ADJUST_FACTOR(:)
 
   !> Module variable that holds a sequence of random numbers associated with the selection
   !! of the fragment set to use
@@ -68,7 +68,7 @@ module precipitation__method_of_fragments
     integer (c_int) :: iMonth
     integer (c_int) :: iRainGageZone
     integer (c_int) :: iFragmentSet
-    real (c_float)  :: fFragmentValue(31)
+    real (c_double)  :: fFragmentValue(31)
   end type FRAGMENTS_T
 
   !> Pointer to a rainfall fragments data structure.
@@ -101,7 +101,7 @@ module precipitation__method_of_fragments
     integer (c_int) :: sim_month
     integer (c_int) :: sim_rainfall_zone
     integer (c_int) :: sim_year
-    real (c_float)  :: sim_random_number
+    real (c_double)  :: sim_random_number
     integer (c_int) :: sim_selected_set
   end type FRAGMENTS_SEQUENCE_T
 
@@ -227,7 +227,7 @@ contains
     integer (c_int)  :: last_fragment
     integer (c_int)  :: last_month
     integer (c_int)  :: iNumLines
-    real (c_float)   :: fTempValue
+    real (c_double)   :: fTempValue
     type (ASCII_FILE_T)   :: FRAGMENTS_FILE
 
 
@@ -339,8 +339,8 @@ contains
         ! This substitution is needed to prevent "-9999" or "9999" values embedded in the fragments file
         ! from creeping into calculations. In the event of a "9999", the appropriate substitution is
         ! zero, since the previous fragments for the month to this point should already sum to 1.0
-        if ( ( fTempValue < 0.0_c_float ) .or. ( fTempValue > 1.0_c_float ) ) then
-          FRAGMENTS(iCount)%fFragmentValue(iIndex) = 0.0_c_float
+        if ( ( fTempValue < 0.0_c_double ) .or. ( fTempValue > 1.0_c_double ) ) then
+          FRAGMENTS(iCount)%fFragmentValue(iIndex) = 0.0_c_double
         else
           FRAGMENTS(iCount)%fFragmentValue(iIndex) = fTempValue
         endif
@@ -450,18 +450,18 @@ contains
     integer (c_int), intent(in)   :: iCount
 
     ! [ LOCALS ]
-    real (c_float) :: sum_fragments
+    real (c_double) :: sum_fragments
 
     ! we only want to correct the fragment if it was actually generated during a
     ! leap year
-    if (FRAGMENTS(iCount)%fFragmentValue(29) > 0.0_c_float) then
+    if (FRAGMENTS(iCount)%fFragmentValue(29) > 0.0_c_double) then
       sum_fragments = sum( FRAGMENTS(iCount)%fFragmentValue(1:28) )
 
       ! bump up all February fragments so that their 28-day sum is 1
       FRAGMENTS(iCount)%fFragmentValue(1:28) = FRAGMENTS(iCount)%fFragmentValue(1:28)   &
                                                  / sum_fragments
       ! zero out remaining values
-      FRAGMENTS(iCount)%fFragmentValue(29:31) = 0.0_c_float
+      FRAGMENTS(iCount)%fFragmentValue(29:31) = 0.0_c_double
     endif
 
   end subroutine normalize_february_fragment_sequence
@@ -680,7 +680,7 @@ contains
 
     ! if by chance a mismatch in shape-to-grid results in an active cell with *NO* valid
     ! rain gage ID, we need to set the entire array to zero to quash any spurious values getting in
-    FRAGMENT_VALUE = 0.0_c_float
+    FRAGMENT_VALUE = 0.0_c_double
 
     do rain_zone = 1, iMaxRainZones
 

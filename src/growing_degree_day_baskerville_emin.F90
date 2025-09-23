@@ -16,8 +16,8 @@ module growing_degree_day_baskerville_emin
   public :: GDD_BASE, GDD_MAX, GDD_RESET_DATE
   public :: growing_degree_day_be_calculate, growing_degree_day_be_initialize
 
-  real (c_float), allocatable  :: GDD_BASE(:)
-  real (c_float), allocatable  :: GDD_MAX(:)
+  real (c_double), allocatable  :: GDD_BASE(:)
+  real (c_double), allocatable  :: GDD_MAX(:)
   integer (c_int), allocatable :: GDD_RESET_DATE(:)
   type (T_NETCDF4_FILE), pointer    :: pNCFILE
 
@@ -34,8 +34,8 @@ contains
     type (FSTRING_LIST_T)              :: parameter_list
     type (FSTRING_LIST_T)              :: gdd_reset_val_list
     character (len=32)                :: sBuf
-    real (c_float), allocatable  :: gdd_base_l(:)
-    real (c_float), allocatable  :: gdd_max_l(:)
+    real (c_double), allocatable  :: gdd_base_l(:)
+    real (c_double), allocatable  :: gdd_max_l(:)
     integer (c_int)              :: number_of_landuse_codes
     integer (c_int), allocatable :: landuse_code(:)
 
@@ -112,7 +112,7 @@ contains
     else
 
       ! if no GDD_MAX found in parameter tables, assign the default FAO-56 value
-      GDD_MAX = 86.0_c_float
+      GDD_MAX = 86.0_c_double
 
     endif
 
@@ -128,7 +128,7 @@ contains
     else
 
       ! if no GDD_Base found in parameter tables, assign the default FAO-56 value
-      GDD_BASE = 50.0_c_float
+      GDD_BASE = 50.0_c_double
 
     endif
 
@@ -139,30 +139,30 @@ contains
   subroutine growing_degree_day_be_calculate( gdd, tmean, tmin, tmax, order )
 
     ! [ ARGUMENTS ]
-    real (c_float), intent(inout)       :: gdd(:)
-    real (c_float), intent(in)          :: tmean(:)
-    real (c_float), intent(in)          :: tmin(:)
-    real (c_float), intent(in)          :: tmax(:)
+    real (c_double), intent(inout)       :: gdd(:)
+    real (c_double), intent(in)          :: tmean(:)
+    real (c_double), intent(in)          :: tmin(:)
+    real (c_double), intent(in)          :: tmax(:)
     integer (c_int), intent(in)         :: order(:)
 
     ! [ LOCALS ]
-    real (c_float)    :: delta
-    real (c_float)    :: tmax_l
-    real (c_float)    :: dd
-    real (c_float)    :: W
-    real (c_float)    :: At
-    real (c_float)    :: A
+    real (c_double)    :: delta
+    real (c_double)    :: tmax_l
+    real (c_double)    :: dd
+    real (c_double)    :: W
+    real (c_double)    :: At
+    real (c_double)    :: A
     integer (c_int)   :: indx
 
     do indx=lbound(order,1),ubound(order,1)
 
-      if ( SIM_DT%iDOY == GDD_RESET_DATE( order(indx) ) )  gdd(indx) = 0.0_c_float
+      if ( SIM_DT%iDOY == GDD_RESET_DATE( order(indx) ) )  gdd(indx) = 0.0_c_double
 
       tmax_l = min( tmax(indx), GDD_MAX( order(indx) ) )
 
       if ( tmax_l <= GDD_BASE( order(indx) ) ) then
 
-        dd = 0.0_c_float
+        dd = 0.0_c_double
 
       elseif ( tmin(indx) >= GDD_BASE( order(indx) ) ) then
 
@@ -170,17 +170,17 @@ contains
 
       else
 
-        W = ( tmax_l -  tmin(indx)) / 2.0_c_float
+        W = ( tmax_l -  tmin(indx)) / 2.0_c_double
 
         At = ( GDD_BASE( order(indx) ) - tmean(indx) ) / W
 
-        if ( At > 1 ) At = 1.0_c_float
-        if ( At < -1 ) At = -1._c_float
+        if ( At > 1 ) At = 1.0_c_double
+        if ( At < -1 ) At = -1._c_double
 
         A = asin( At )
 
         dd = ( ( W * cos( A ) ) - ( ( GDD_BASE( order(indx) ) - tmean(indx) )                    &
-               * ( real( PI / 2._c_double, c_float ) - A ) ) ) / PI
+               * ( real( PI / 2._c_double, c_double ) - A ) ) ) / PI
 
       endif
 

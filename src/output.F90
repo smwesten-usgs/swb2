@@ -24,8 +24,8 @@ module output
   type OUTPUT_SPECS_T
     character (len=27)          :: variable_name
     character (len=21)          :: variable_units
-    real (c_float)              :: valid_minimum
-    real (c_float)              :: valid_maximum
+    real (c_double)              :: valid_minimum
+    real (c_double)              :: valid_maximum
     logical (c_bool)            :: is_active
     logical (c_bool)            :: multisim_outputs
   end type OUTPUT_SPECS_T
@@ -335,7 +335,7 @@ contains
   subroutine output_2D_float_array( ncfile_ptr, values, cells )
 
     type (T_NETCDF4_FILE), pointer      :: ncfile_ptr
-    real (c_float), intent(in)     :: values(:)
+    real (c_double), intent(in)     :: values(:)
     class (MODEL_DOMAIN_T), intent(in)  :: cells
 
     call netcdf_put_variable_vector(NCFILE=ncfile_ptr,                         &
@@ -343,7 +343,7 @@ contains
        iStart=[int(SIM_DT%iNumDaysFromOrigin, c_size_t)],                 &
        iCount=[1_c_size_t],                                                    &
        iStride=[1_c_size_t],                                                &
-       rValues=[real(SIM_DT%iNumDaysFromOrigin, c_float)])
+       rValues=[real(SIM_DT%iNumDaysFromOrigin, c_double)])
 
   call netcdf_put_packed_variable_array(NCFILE=ncfile_ptr,                     &
         iVarID=ncfile_ptr%iVarID(NC_Z),                                        &
@@ -384,7 +384,7 @@ contains
              iStart=[int(SIM_DT%iNumDaysFromOrigin, c_size_t)], &
              iCount=[1_c_size_t], &
              iStride=[1_c_size_t], &
-             rValues=[real(SIM_DT%iNumDaysFromOrigin, c_float)])
+             rValues=[real(SIM_DT%iNumDaysFromOrigin, c_double)])
 
         endif
 
@@ -545,12 +545,12 @@ contains
            .and. (.not. OUTSPECS( NCDF_SURFACE_STORAGE )%multisim_outputs) ) then
 
         call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SURFACE_STORAGE )%ncfile,  &
-                                    values=real(cells%surface_storage, c_float),  &
+                                    values=real(cells%surface_storage, c_double),  &
                                     cells=cells )
         OUTSPECS(NCDF_SURFACE_STORAGE)%valid_maximum =         &
-          update_maximum_value(OUTSPECS(NCDF_SURFACE_STORAGE)%valid_maximum, real(cells%surface_storage, c_float))
+          update_maximum_value(OUTSPECS(NCDF_SURFACE_STORAGE)%valid_maximum, real(cells%surface_storage, c_double))
         OUTSPECS(NCDF_SURFACE_STORAGE)%valid_minimum =         &
-          update_minimum_value(OUTSPECS(NCDF_SURFACE_STORAGE)%valid_minimum, real(cells%surface_storage, c_float))
+          update_minimum_value(OUTSPECS(NCDF_SURFACE_STORAGE)%valid_minimum, real(cells%surface_storage, c_double))
                           
       endif
 
@@ -558,12 +558,12 @@ contains
            .and. (.not. OUTSPECS( NCDF_SOIL_STORAGE )%multisim_outputs) ) then
 
         call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SOIL_STORAGE )%ncfile,  &
-                                    values=real(cells%soil_storage, c_float),  &
+                                    values=real(cells%soil_storage, c_double),  &
                                     cells=cells )
         OUTSPECS(NCDF_SOIL_STORAGE)%valid_maximum =         &
-          update_maximum_value(OUTSPECS(NCDF_SOIL_STORAGE)%valid_maximum, real(cells%soil_storage, c_float))
+          update_maximum_value(OUTSPECS(NCDF_SOIL_STORAGE)%valid_maximum, real(cells%soil_storage, c_double))
         OUTSPECS(NCDF_SOIL_STORAGE)%valid_minimum =         &
-          update_minimum_value(OUTSPECS(NCDF_SOIL_STORAGE)%valid_minimum, real(cells%soil_storage, c_float))
+          update_minimum_value(OUTSPECS(NCDF_SOIL_STORAGE)%valid_minimum, real(cells%soil_storage, c_double))
                           
       endif
 
@@ -595,12 +595,12 @@ contains
       if ( OUTSPECS( NCDF_REFERENCE_ET0 )%is_active ) then
 
         call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_REFERENCE_ET0 )%ncfile,    &
-                                    values=real(cells%reference_ET0, c_float),         &
+                                    values=real(cells%reference_ET0, c_double),         &
                                     cells=cells )
         OUTSPECS(NCDF_REFERENCE_ET0)%valid_maximum =         &
-          update_maximum_value(OUTSPECS(NCDF_REFERENCE_ET0)%valid_maximum, real(cells%reference_et0, c_float))
+          update_maximum_value(OUTSPECS(NCDF_REFERENCE_ET0)%valid_maximum, real(cells%reference_et0, c_double))
         OUTSPECS(NCDF_REFERENCE_ET0)%valid_minimum =         &
-          update_minimum_value(OUTSPECS(NCDF_REFERENCE_ET0)%valid_minimum, real(cells%reference_et0, c_float))
+          update_minimum_value(OUTSPECS(NCDF_REFERENCE_ET0)%valid_minimum, real(cells%reference_et0, c_double))
                           
       endif
 
@@ -608,12 +608,12 @@ contains
            .and. (.not. OUTSPECS( NCDF_ACTUAL_ET )%multisim_outputs) ) then
 
         call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_ACTUAL_ET )%ncfile,  &
-                                    values=real(cells%actual_et, c_float),       &
+                                    values=real(cells%actual_et, c_double),       &
                                     cells=cells )
         OUTSPECS(NCDF_ACTUAL_ET)%valid_maximum =         &
-          update_maximum_value(OUTSPECS(NCDF_ACTUAL_ET)%valid_maximum, real(cells%actual_et, c_float))
+          update_maximum_value(OUTSPECS(NCDF_ACTUAL_ET)%valid_maximum, real(cells%actual_et, c_double))
         OUTSPECS(NCDF_ACTUAL_ET)%valid_minimum =         &
-          update_minimum_value(OUTSPECS(NCDF_ACTUAL_ET)%valid_minimum, real(cells%actual_et, c_float))
+          update_minimum_value(OUTSPECS(NCDF_ACTUAL_ET)%valid_minimum, real(cells%actual_et, c_double))
                           
       endif
 
@@ -621,12 +621,12 @@ contains
            .and. (.not. OUTSPECS( NCDF_CLIMATIC_DEFICIT )%multisim_outputs) ) then
 
         call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_CLIMATIC_DEFICIT )%ncfile,  &
-                                    values=real(cells%climatic_deficit, c_float),       &
+                                    values=real(cells%climatic_deficit, c_double),       &
                                     cells=cells )
         OUTSPECS(NCDF_CLIMATIC_DEFICIT)%valid_maximum =         &
-          update_maximum_value(OUTSPECS(NCDF_CLIMATIC_DEFICIT)%valid_maximum, real(cells%climatic_deficit, c_float))
+          update_maximum_value(OUTSPECS(NCDF_CLIMATIC_DEFICIT)%valid_maximum, real(cells%climatic_deficit, c_double))
         OUTSPECS(NCDF_CLIMATIC_DEFICIT)%valid_minimum =         &
-          update_minimum_value(OUTSPECS(NCDF_CLIMATIC_DEFICIT)%valid_minimum, real(cells%climatic_deficit, c_float))
+          update_minimum_value(OUTSPECS(NCDF_CLIMATIC_DEFICIT)%valid_minimum, real(cells%climatic_deficit, c_double))
                           
       endif
 
@@ -822,7 +822,7 @@ contains
            iStart=[int(SIM_DT%iNumDaysFromOrigin, c_size_t)],                     &
            iCount=[1_c_size_t],                                                        &
            iStride=[1_c_size_t],                                                    &
-           rValues=[real(SIM_DT%iNumDaysFromOrigin, c_float)])
+           rValues=[real(SIM_DT%iNumDaysFromOrigin, c_double)])
 
       endif
 
@@ -841,7 +841,7 @@ contains
 
       call output_2D_float_array(                                                    &
         ncfile_ptr=NC_MULTI_SIM_OUT( NCDF_SOIL_STORAGE, simulation_number )%ncfile,  &
-        values=real(cells%soil_storage, c_float),                               &
+        values=real(cells%soil_storage, c_double),                               &
         cells=cells )
 
     if ( OUTSPECS( NCDF_NET_INFILTRATION )%is_active                    &
@@ -857,7 +857,7 @@ contains
 
       call output_2D_float_array(                                                   &
         ncfile_ptr=NC_MULTI_SIM_OUT( NCDF_ACTUAL_ET, simulation_number )%ncfile,    &
-        values=real(cells%actual_et, c_float),                                 &
+        values=real(cells%actual_et, c_double),                                 &
         cells=cells )
 
     if ( OUTSPECS( NCDF_INTERCEPTION_STORAGE )%is_active                    &
@@ -865,7 +865,7 @@ contains
 
       call output_2D_float_array(                                                            &
         ncfile_ptr=NC_MULTI_SIM_OUT( NCDF_INTERCEPTION_STORAGE, simulation_number )%ncfile,  &
-        values=real(cells%interception_storage, c_float),                               &
+        values=real(cells%interception_storage, c_double),                               &
         cells=cells )
 
     if ( OUTSPECS( NCDF_SURFACE_STORAGE )%is_active                    &
@@ -873,17 +873,17 @@ contains
 
       call output_2D_float_array(                                                         &
         ncfile_ptr=NC_MULTI_SIM_OUT( NCDF_SURFACE_STORAGE, simulation_number )%ncfile,    &
-        values=real(cells%surface_storage, c_float),                                 &
+        values=real(cells%surface_storage, c_double),                                 &
         cells=cells )
 
   end subroutine write_multi_sim_output
 
   pure function update_minimum_value(current_minimum, values)    result(new_minimum)
 
-    real (c_float), intent(in)             :: current_minimum
-    real (c_float), intent(in)             :: values(:)
+    real (c_double), intent(in)             :: current_minimum
+    real (c_double), intent(in)             :: values(:)
 
-    real (c_float)                         :: new_minimum
+    real (c_double)                         :: new_minimum
 
     new_minimum = min(current_minimum, minval(values))
 
@@ -893,10 +893,10 @@ contains
 
   pure function update_maximum_value(current_maximum, values)    result(new_maximum)
 
-    real (c_float), intent(in)             :: current_maximum
-    real (c_float), intent(in)             :: values(:)
+    real (c_double), intent(in)             :: current_maximum
+    real (c_double), intent(in)             :: values(:)
 
-    real (c_float)                         :: new_maximum
+    real (c_double)                         :: new_maximum
 
     new_maximum = max(current_maximum, maxval(values))
 

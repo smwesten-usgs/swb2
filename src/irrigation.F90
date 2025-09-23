@@ -37,18 +37,18 @@ module irrigation
        "Apply constant amount              ", &
        "Apply proportional to (PE + RO - R)"   ]
 
-  real (c_float), allocatable     :: MAXIMUM_ALLOWABLE_DEPLETION_FRACTION(:)
-  real (c_float), allocatable     :: IRRIGATION_FROM_GROUNDWATER(:)
-  real (c_float), allocatable     :: IRRIGATION_FROM_SURFACE_WATER(:)
+  real (c_double), allocatable     :: MAXIMUM_ALLOWABLE_DEPLETION_FRACTION(:)
+  real (c_double), allocatable     :: IRRIGATION_FROM_GROUNDWATER(:)
+  real (c_double), allocatable     :: IRRIGATION_FROM_SURFACE_WATER(:)
 
-  real (c_float), allocatable     :: FRACTION_OF_IRRIGATION_FROM_GW(:)
-  real (c_float), allocatable     :: IRRIGATION_EFFICIENCY(:)
+  real (c_double), allocatable     :: FRACTION_OF_IRRIGATION_FROM_GW(:)
+  real (c_double), allocatable     :: IRRIGATION_EFFICIENCY(:)
   integer (c_int), allocatable    :: NUM_DAYS_OF_IRRIGATION(:)
   integer (c_int), allocatable    :: FIRST_DAY_OF_IRRIGATION(:)
   integer (c_int), allocatable    :: LAST_DAY_OF_IRRIGATION(:)
   integer (c_int), allocatable    :: APPLICATION_METHOD_CODE(:)
   integer (c_short), allocatable  :: MONTHLY_IRRIGATION_SCHEDULE(:,:)
-  real (c_float), allocatable     :: APPLICATION_AMOUNT(:)
+  real (c_double), allocatable     :: APPLICATION_AMOUNT(:)
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pIRRIGATION_MASK
 
@@ -402,11 +402,11 @@ contains
 
     ! if ( associated(pIRRIGATION_MASK) ) then
 
-    !   irrigation_mask = pack( real(pIRRIGATION_MASK%pGrdBase%iData, c_float), is_active )
+    !   irrigation_mask = pack( real(pIRRIGATION_MASK%pGrdBase%iData, c_double), is_active )
 
     ! else
 
-    !   irrigation_mask = 1.0_c_float
+    !   irrigation_mask = 1.0_c_double
 
     ! endif
 
@@ -435,8 +435,8 @@ contains
 
     enddo
 
-    IRRIGATION_FROM_GROUNDWATER(:)    = 0.0_c_float
-    IRRIGATION_FROM_SURFACE_WATER(:)  = 0.0_c_float
+    IRRIGATION_FROM_GROUNDWATER(:)    = 0.0_c_double
+    IRRIGATION_FROM_SURFACE_WATER(:)  = 0.0_c_double
 
   end subroutine irrigation__initialize
 
@@ -467,21 +467,21 @@ contains
                                               monthly_runoff                &
                                                 )
 
-    real (c_float), intent(inout)          :: irrigation_amount
+    real (c_double), intent(inout)          :: irrigation_amount
     integer (c_int), intent(in)            :: landuse_index
     real (c_double), intent(in)            :: soil_storage
-    real (c_float), intent(in)             :: soil_storage_max
+    real (c_double), intent(in)             :: soil_storage_max
     real (c_double), intent(in)            :: total_available_water
-    real (c_float), intent(in)             :: rainfall
-    real (c_float), intent(in)             :: runoff
-    real (c_float), intent(in)             :: crop_etc
-    real (c_float), intent(in)             :: irrigation_mask
+    real (c_double), intent(in)             :: rainfall
+    real (c_double), intent(in)             :: runoff
+    real (c_double), intent(in)             :: crop_etc
+    real (c_double), intent(in)             :: irrigation_mask
     integer (c_int), intent(in)            :: num_days_since_planting
-    real (c_float), intent(in), optional   :: monthly_rainfall
-    real (c_float), intent(in), optional   :: monthly_runoff
+    real (c_double), intent(in), optional   :: monthly_rainfall
+    real (c_double), intent(in), optional   :: monthly_runoff
 
     ! [ LOCALS ]
-    real (c_float)        :: depletion_fraction
+    real (c_double)        :: depletion_fraction
 
     integer (c_int)       :: month
     integer (c_int)       :: day
@@ -493,8 +493,8 @@ contains
     integer (c_int)       :: index
     character (len=31)         :: irrigation_day
     integer (c_int)       :: irrigation_days_per_month
-    real (c_float)        :: efficiency
-    real (c_float)        :: interim_irrigation_amount
+    real (c_double)        :: efficiency
+    real (c_double)        :: interim_irrigation_amount
     integer (c_int)       :: option
 
     ! zero out Irrigation term
@@ -524,25 +524,25 @@ contains
 
     do
 
-      irrigation_amount         = 0.0_c_float
-      interim_irrigation_amount = 0.0_c_float
-      depletion_fraction        = 0.0_c_float
+      irrigation_amount         = 0.0_c_double
+      interim_irrigation_amount = 0.0_c_double
+      depletion_fraction        = 0.0_c_double
 
       if ( ( day_of_year < FIRST_DAY_OF_IRRIGATION( landuse_index ) ) &
         .or. ( day_of_year > LAST_DAY_OF_IRRIGATION( landuse_index ) ) )  exit
 
 !      if ( MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( landuse_index ) > 0.99 )  exit
-      if ( soil_storage_max <= 0.0_c_float ) exit
-      if ( IRRIGATION_MASK < 1.0e-6_c_float ) exit
+      if ( soil_storage_max <= 0.0_c_double ) exit
+      if ( IRRIGATION_MASK < 1.0e-6_c_double ) exit
       if ( num_days_since_planting > NUM_DAYS_OF_IRRIGATION( landuse_index ) ) exit
 
       ! total_available_water is calculated only by the fao56_two_stage module, but
       ! not by any other modules; need to just calculate depletion fraction based on
       ! total soil moisture storage capacity in this case
-      if ( total_available_water > 0.0_c_float ) then
-        depletion_fraction = min( ( soil_storage_max - soil_storage ) / total_available_water, 1.0_c_float )
+      if ( total_available_water > 0.0_c_double ) then
+        depletion_fraction = min( ( soil_storage_max - soil_storage ) / total_available_water, 1.0_c_double )
       else
-        depletion_fraction = min( ( soil_storage_max - soil_storage ) / soil_storage_max, 1.0_c_float )
+        depletion_fraction = min( ( soil_storage_max - soil_storage ) / soil_storage_max, 1.0_c_double )
       endif
 
       option = APPLICATION_METHOD_CODE( landuse_index )
@@ -552,14 +552,14 @@ contains
         case ( APP_FIELD_CAPACITY )
 
           if ( depletion_fraction >= MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( landuse_index ) )      &
-            interim_irrigation_amount = max( 0.0_c_float, soil_storage_max - soil_storage )
+            interim_irrigation_amount = max( 0.0_c_double, soil_storage_max - soil_storage )
 
         case ( APP_DEFINED_DEFICIT )
 
           ! @TODO check this calculation
 
           if ( depletion_fraction >= MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( landuse_index ) )      &
-            interim_irrigation_amount = max( 0.0_c_float, APPLICATION_AMOUNT( landuse_index )     &
+            interim_irrigation_amount = max( 0.0_c_double, APPLICATION_AMOUNT( landuse_index )     &
                                         * soil_storage_max - soil_storage )
 
         case ( APP_CONSTANT_AMOUNT )
@@ -576,26 +576,26 @@ contains
             irrigation_days_per_month = count( MONTHLY_IRRIGATION_SCHEDULE( landuse_index, 1:days_in_month ) == 1 )
 
             if ( irrigation_days_per_month <= 0 ) then
-              interim_irrigation_amount = 0.0_c_float
+              interim_irrigation_amount = 0.0_c_double
             else
-              interim_irrigation_amount = max( 0.0_c_float,    &
-              ( crop_etc * real( days_in_month, c_float) + monthly_runoff - monthly_rainfall ) )  &
-                / real( irrigation_days_per_month, c_float )
+              interim_irrigation_amount = max( 0.0_c_double,    &
+              ( crop_etc * real( days_in_month, c_double) + monthly_runoff - monthly_rainfall ) )  &
+                / real( irrigation_days_per_month, c_double )
             endif
 
           else
 
-            interim_irrigation_amount = max( 0.0_c_float, crop_etc + runoff - rainfall )
+            interim_irrigation_amount = max( 0.0_c_double, crop_etc + runoff - rainfall )
 
           endif
 
         case default
 
-          interim_irrigation_amount = 0.0_c_float
+          interim_irrigation_amount = 0.0_c_double
 
       end select
 
-      efficiency = max( IRRIGATION_EFFICIENCY( landuse_index ), 0.20_c_float )
+      efficiency = max( IRRIGATION_EFFICIENCY( landuse_index ), 0.20_c_double )
 
       irrigation_amount =  interim_irrigation_amount                                    &
                                      * irrigation_mask                                  &

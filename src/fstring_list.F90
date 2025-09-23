@@ -102,7 +102,7 @@ module fstring_list
 
   public :: NA_INT, NA_FLOAT, NA_DOUBLE
   integer (c_int), parameter  :: NA_INT    = - (huge(1_c_int)-1_c_int)
-  real (c_float), parameter   :: NA_FLOAT  = - (huge(1._c_float)-1._c_float)
+  real (c_double), parameter   :: NA_FLOAT  = - (huge(1._c_double)-1._c_double)
   real (c_double), parameter  :: NA_DOUBLE = - (huge(1._c_double)-1._c_double)
 
   public::split
@@ -127,7 +127,7 @@ module fstring_list
 
   type FLOAT_SORT_GROUP_T
     integer (c_int)                :: order
-    real (c_float)                 :: float_value
+    real (c_double)                 :: float_value
   end type FLOAT_SORT_GROUP_T
 
 contains
@@ -380,10 +380,10 @@ end subroutine append_fstring_to_fstring_sub
   function retrieve_values_as_float_fn(this)   result(values)
 
     class (FSTRING_LIST_T), intent(inout), target    :: this
-    real (c_float), allocatable                      :: values(:)
+    real (c_double), allocatable                      :: values(:)
 
     integer (c_int)    :: i
-    real (c_float)     :: value
+    real (c_double)     :: value
     integer (c_int)    :: op_status
     character (len=64) :: sbuf
 
@@ -699,7 +699,7 @@ end function retrieve_values_as_logical_fn
     character (len=*), intent(in), optional   :: sort_order
 
     type (FLOAT_SORT_GROUP_T), allocatable :: sort_group(:)
-    real (c_float), allocatable            :: float_values(:)
+    real (c_double), allocatable            :: float_values(:)
     integer (c_int)                        :: i
     integer (c_int)                        :: count
     logical (c_bool)                       :: decreasing_order
@@ -758,7 +758,7 @@ end function retrieve_values_as_logical_fn
 
   ! LOCAL VARIABLES
   integer (c_int)                  :: left, right
-  real (c_float)                   :: random
+  real (c_double)                   :: random
   character (len=:), allocatable   :: pivot
   type (ALPHA_SORT_GROUP_T)        :: temp
   integer (c_int)                  :: marker
@@ -812,7 +812,7 @@ end function retrieve_values_as_logical_fn
 
   ! LOCAL VARIABLES
   integer (c_int)                  :: left, right
-  real (c_float)                   :: random
+  real (c_double)                   :: random
   integer (c_int)                  :: pivot
   type (INT_SORT_GROUP_T)          :: temp
   integer (c_int)                  :: marker
@@ -866,8 +866,8 @@ end function retrieve_values_as_logical_fn
 
   ! LOCAL VARIABLES
   integer (c_int)                  :: left, right
-  real (c_float)                   :: random
-  real (c_float)                   :: pivot
+  real (c_double)                   :: random
+  real (c_double)                   :: pivot
   type (FLOAT_SORT_GROUP_T)        :: temp
   integer (c_int)                  :: marker
 

@@ -26,13 +26,13 @@ module runoff__gridded_values
 
   public :: runoff_gridded_values_initialize, runoff_gridded_values_update_ratios
 
-  real (c_float), allocatable           :: RUNOFF_TABLE_VALUES(:,:)
+  real (c_double), allocatable           :: RUNOFF_TABLE_VALUES(:,:)
   type ( DATETIME_T ), allocatable           :: RUNOFF_TABLE_DATES(:)
 
   type (DATA_CATALOG_ENTRY_T), pointer       :: pRUNOFF_ZONE
   integer (c_int), allocatable          :: RUNOFF_ZONE(:)
 
-  real (c_float), allocatable, public   :: RUNOFF_RATIOS(:)
+  real (c_double), allocatable, public   :: RUNOFF_RATIOS(:)
 
  contains
 
@@ -167,7 +167,7 @@ module runoff__gridded_values
     integer (c_int)  :: iNumDaysFromOrigin
     integer (c_int)  :: iLineNum
     integer (c_int)  :: iFieldNum
-    real (c_float)   :: fFactor
+    real (c_double)   :: fFactor
     logical (c_bool) :: lMatch
     integer (c_int)  :: iCount
 
@@ -193,7 +193,7 @@ module runoff__gridded_values
     ! now that we have the relevant line of data, distribute values, assuming that
     ! the runoff zone ids is sequential and corresponds to the field numbers
 
-    RUNOFF_RATIOS = 0.0_c_float
+    RUNOFF_RATIOS = 0.0_c_double
 
     do iFieldNum = lbound(RUNOFF_TABLE_VALUES, 2), ubound(RUNOFF_TABLE_VALUES, 2)
 

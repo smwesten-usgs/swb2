@@ -104,17 +104,17 @@ end subroutine initialize_rooting_depth
 !! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
 elemental subroutine update_rooting_depth( Zr_i, Zr_max, landuse_index, Kcb )
 
-  real (c_float), intent(inout)  :: Zr_i
-  real (c_float), intent(in)     :: Zr_max
+  real (c_double), intent(inout)  :: Zr_i
+  real (c_double), intent(in)     :: Zr_max
   integer (c_int), intent(in)    :: landuse_index
-  real (c_float), intent(in)     :: Kcb
+  real (c_double), intent(in)     :: Kcb
 
   ! [ LOCALS ]
   ! 0.328 feet equals 0.1 meters, which is seems to be the standard
   ! initial rooting depth in the FAO-56 methodology
-  real (c_float), parameter :: Zr_min = 0.328
-  real (c_float)            :: MaxKCB
-  real (c_float)            :: MinKCB
+  real (c_double), parameter :: Zr_min = 0.328
+  real (c_double)            :: MaxKCB
+  real (c_double)            :: MinKCB
 
   if (VARIABLE_ROOTING_DEPTH(landuse_index)) then
 
@@ -127,7 +127,7 @@ elemental subroutine update_rooting_depth( Zr_i, Zr_max, landuse_index, Kcb )
     endif
 
 
-!    if ( MinKCB > 0.49_c_float ) then
+!    if ( MinKCB > 0.49_c_double ) then
 
 !      Zr_i = Zr_max
 

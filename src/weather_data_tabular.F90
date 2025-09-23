@@ -148,7 +148,7 @@ contains
   subroutine weather_data_tabular_get_precip( dt, precip_value )
 
     type (DATETIME_T), intent(in)    :: dt
-    real (kind=c_float), intent(out) :: precip_value
+    real (kind=c_double), intent(out) :: precip_value
 
     call weather_data_find_date_indx(dt)
 
@@ -161,7 +161,7 @@ contains
   subroutine weather_data_tabular_get_tmax( dt, tmax_value )
 
     type (DATETIME_T), intent(in)    :: dt
-    real (kind=c_float), intent(out) :: tmax_value
+    real (kind=c_double), intent(out) :: tmax_value
 
     call weather_data_find_date_indx(dt)
     tmax_value = TMAX(DATE_INDX)
@@ -173,7 +173,7 @@ contains
   subroutine weather_data_tabular_get_tmin( dt, tmin_value )
 
     type (DATETIME_T), intent(in)    :: dt
-    real (kind=c_float), intent(out) :: tmin_value
+    real (kind=c_double), intent(out) :: tmin_value
 
     call weather_data_find_date_indx(dt)
     tmin_value = TMIN(DATE_INDX)

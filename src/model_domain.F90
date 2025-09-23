@@ -40,8 +40,8 @@ module model_domain
     real (c_double)               :: gridcellsize
 
     logical (c_bool), allocatable     :: active(:,:)
-    real (c_float), allocatable       :: nodata_fill_value(:,:)
-    real (c_float), allocatable       :: array_output(:,:)
+    real (c_double), allocatable       :: nodata_fill_value(:,:)
+    real (c_double), allocatable       :: array_output(:,:)
 
     integer (c_int), allocatable      :: landuse_code(:)
     integer (c_int), allocatable      :: landuse_index(:)
@@ -56,99 +56,99 @@ module model_domain
     integer (c_int), allocatable      :: col_num_1D(:)
     integer (c_int), allocatable      :: row_num_1D(:)
 
-    real (c_float), allocatable       :: pervious_fraction(:)
-    real (c_float), allocatable       :: canopy_cover_fraction(:)
-    real (c_float), allocatable       :: awc(:)
-    real (c_float), allocatable       :: curve_num_adj(:)
-    real (c_float), allocatable       :: gdd(:)
-    real (c_float), allocatable       :: crop_coefficient_kcb(:)
+    real (c_double), allocatable       :: pervious_fraction(:)
+    real (c_double), allocatable       :: canopy_cover_fraction(:)
+    real (c_double), allocatable       :: awc(:)
+    real (c_double), allocatable       :: curve_num_adj(:)
+    real (c_double), allocatable       :: gdd(:)
+    real (c_double), allocatable       :: crop_coefficient_kcb(:)
     real (c_double), allocatable      :: surf_evap_coef_ke(:)
     real (c_double), allocatable      :: plant_stress_coef_ks(:)
     real (c_double), allocatable      :: evap_reduction_coef_kr(:)
     real (c_double), allocatable      :: total_available_water_taw(:)
     real (c_double), allocatable      :: readily_available_water_raw(:)
 
-    real (c_float), allocatable       :: continuous_frozen_ground_index(:)
-    real (c_float), allocatable       :: cfgi_lower_limit(:)
-    real (c_float), allocatable       :: cfgi_upper_limit(:)
+    real (c_double), allocatable       :: continuous_frozen_ground_index(:)
+    real (c_double), allocatable       :: cfgi_lower_limit(:)
+    real (c_double), allocatable       :: cfgi_upper_limit(:)
 
-    real (c_float), allocatable       :: hargreaves_ET0_slope(:)
-    real (c_float), allocatable       :: hargreaves_ET0_exponent(:)
-    real (c_float), allocatable       :: hargreaves_ET0_constant(:)
+    real (c_double), allocatable       :: hargreaves_ET0_slope(:)
+    real (c_double), allocatable       :: hargreaves_ET0_exponent(:)
+    real (c_double), allocatable       :: hargreaves_ET0_constant(:)
 
-    real (c_float), allocatable       :: rooting_depth_max(:)
+    real (c_double), allocatable       :: rooting_depth_max(:)
 
     integer (c_int), allocatable      :: polygon_id(:)
-    real (c_float), allocatable       :: latitude(:)
+    real (c_double), allocatable       :: latitude(:)
     real (c_double), allocatable      :: reference_et0(:)
-    real (c_float), allocatable       :: crop_etc(:)
+    real (c_double), allocatable       :: crop_etc(:)
 
     real (c_double), allocatable      :: actual_et_interception(:)
     real (c_double), allocatable      :: actual_et_impervious(:)
     real (c_double), allocatable      :: actual_et_soil(:)
     real (c_double), pointer          :: actual_et(:)
-    real (c_float), allocatable       :: bare_soil_evap(:)
+    real (c_double), allocatable       :: bare_soil_evap(:)
 
-    real (c_float), allocatable       :: inflow(:)
-    real (c_float), allocatable       :: runon(:)
-    real (c_float), allocatable       :: runoff(:)
-    real (c_float), allocatable       :: monthly_runoff(:)
-    real (c_float), allocatable       :: runoff_outside(:)
-    real (c_float), allocatable       :: outflow(:)
-    real (c_float), allocatable       :: infiltration(:)
-    real (c_float), allocatable       :: potential_snowmelt(:)
-    real (c_float), allocatable       :: snowmelt(:)
+    real (c_double), allocatable       :: inflow(:)
+    real (c_double), allocatable       :: runon(:)
+    real (c_double), allocatable       :: runoff(:)
+    real (c_double), allocatable       :: monthly_runoff(:)
+    real (c_double), allocatable       :: runoff_outside(:)
+    real (c_double), allocatable       :: outflow(:)
+    real (c_double), allocatable       :: infiltration(:)
+    real (c_double), allocatable       :: potential_snowmelt(:)
+    real (c_double), allocatable       :: snowmelt(:)
     type (GENERAL_GRID_T), pointer    :: pGrdOut
-    real (c_float), allocatable       :: interception(:)
-    real (c_float), pointer           :: interception_storage(:)
-    real (c_float), allocatable       :: interception_storage_max(:)
+    real (c_double), allocatable       :: interception(:)
+    real (c_double), pointer           :: interception_storage(:)
+    real (c_double), allocatable       :: interception_storage_max(:)
 
-    real (c_float), pointer           :: snow_storage(:)
+    real (c_double), pointer           :: snow_storage(:)
     real (c_double), pointer          :: surface_storage(:)
-    real (c_float), allocatable       :: surface_storage_max(:)
-    real (c_float), allocatable       :: surface_storage_excess(:)
-    real (c_float), allocatable       :: storm_drain_capture(:)
-    real (c_float), allocatable       :: delta_soil_storage(:)
+    real (c_double), allocatable       :: surface_storage_max(:)
+    real (c_double), allocatable       :: surface_storage_excess(:)
+    real (c_double), allocatable       :: storm_drain_capture(:)
+    real (c_double), allocatable       :: delta_soil_storage(:)
     real (c_double), pointer          :: soil_storage(:)
-    real (c_float), allocatable       :: soil_storage_max(:)
+    real (c_double), allocatable       :: soil_storage_max(:)
     real (c_double), allocatable      :: soil_moisture_deficit(:)
-    real (c_float), pointer           :: net_infiltration(:)
-    real (c_float), allocatable       :: rejected_net_infiltration(:)
-    real (c_float), allocatable       :: direct_net_infiltration(:)
-    real (c_float), allocatable       :: direct_soil_moisture(:)
-    real (c_float), allocatable       :: current_rooting_depth(:)
-    real (c_float), allocatable       :: current_plant_height(:)
+    real (c_double), pointer           :: net_infiltration(:)
+    real (c_double), allocatable       :: rejected_net_infiltration(:)
+    real (c_double), allocatable       :: direct_net_infiltration(:)
+    real (c_double), allocatable       :: direct_soil_moisture(:)
+    real (c_double), allocatable       :: current_rooting_depth(:)
+    real (c_double), allocatable       :: current_plant_height(:)
     integer (c_int), allocatable      :: number_of_days_since_planting(:)
     logical (c_bool), allocatable     :: it_is_growing_season(:)
 
-    real (c_float), allocatable       :: gross_precip(:)
-    real (c_float), allocatable       :: monthly_gross_precip(:)
-    real (c_float), pointer           :: fog(:)
-    real (c_float), allocatable       :: rainfall(:)
-    real (c_float), allocatable       :: net_rainfall(:)
-    real (c_float), allocatable       :: snowfall(:)
-    real (c_float), allocatable       :: net_snowfall(:)
-    real (c_float), allocatable       :: irrigation(:)
+    real (c_double), allocatable       :: gross_precip(:)
+    real (c_double), allocatable       :: monthly_gross_precip(:)
+    real (c_double), pointer           :: fog(:)
+    real (c_double), allocatable       :: rainfall(:)
+    real (c_double), allocatable       :: net_rainfall(:)
+    real (c_double), allocatable       :: snowfall(:)
+    real (c_double), allocatable       :: net_snowfall(:)
+    real (c_double), allocatable       :: irrigation(:)
 
-    real (c_float), allocatable       :: tmin(:)
-    real (c_float), allocatable       :: tmax(:)
-    real (c_float), allocatable       :: tmean(:)
-    real (c_float), allocatable       :: tmax_minus_tmin(:)
-    real (c_float), allocatable       :: climatic_deficit(:)
+    real (c_double), allocatable       :: tmin(:)
+    real (c_double), allocatable       :: tmax(:)
+    real (c_double), allocatable       :: tmean(:)
+    real (c_double), allocatable       :: tmax_minus_tmin(:)
+    real (c_double), allocatable       :: climatic_deficit(:)
 
-    real (c_float), allocatable       :: routing_fraction(:)
+    real (c_double), allocatable       :: routing_fraction(:)
 
     integer (c_int), allocatable      :: sort_order(:)
 
     real (c_double), allocatable      :: adjusted_depletion_fraction_p(:)
-    real (c_float), allocatable       :: fraction_exposed_and_wetted_soil(:)
+    real (c_double), allocatable       :: fraction_exposed_and_wetted_soil(:)
 
-    real (c_float), allocatable       :: evaporable_water_storage(:)
-    real (c_float), allocatable       :: evaporable_water_deficit(:)
+    real (c_double), allocatable       :: evaporable_water_storage(:)
+    real (c_double), allocatable       :: evaporable_water_deficit(:)
 
     ! member variables that are only allocated if particular optional methods are invoked
 
-    real (c_float), allocatable       :: irrigation_mask(:)
+    real (c_double), allocatable       :: irrigation_mask(:)
 
     !> declare procedure pointers - these will have to be initialized elsewhere
     procedure ( array_method ), pointer  :: init_interception
@@ -272,8 +272,8 @@ module model_domain
     integer (c_int) :: unitnum     = 0
     integer (c_int) :: col         = 0
     integer (c_int) :: row         = 0
-    real (c_float)  :: x_coord     = 0
-    real (c_float)  :: y_coord     = 0
+    real (c_double)  :: x_coord     = 0
+    real (c_double)  :: y_coord     = 0
     integer (c_int) :: indx_start  = 0
     integer (c_int) :: indx_end    = 0
   end type CELL_COL_ROW_T
@@ -284,7 +284,7 @@ module model_domain
   ! creating several module-level globals
   type (MODEL_DOMAIN_T), public             :: MODEL
 
-  real (c_float), allocatable, public  :: ROOTING_DEPTH_MAX(:,:)
+  real (c_double), allocatable, public  :: ROOTING_DEPTH_MAX(:,:)
 
   type (GENERAL_GRID_T), pointer            :: pROOTING_DEPTH
 
@@ -525,72 +525,72 @@ contains
     this%soil_group                          = 0_c_int
     this%num_upslope_connections             = 0_c_int
     this%sum_upslope_cells                   = 0_c_int
-    this%awc                                 = 0.0_c_float
-    this%latitude                            = 0.0_c_float
-    this%reference_ET0                       = 0.0_c_float
+    this%awc                                 = 0.0_c_double
+    this%latitude                            = 0.0_c_double
+    this%reference_ET0                       = 0.0_c_double
     this%actual_ET                           = 0.0_c_double
-    this%bare_soil_evap                      = 0.0_c_float
-    this%inflow                              = 0.0_c_float
-    this%runon                               = 0.0_c_float
-    this%runoff                              = 0.0_c_float
-    this%outflow                             = 0.0_c_float
-    this%infiltration                        = 0.0_c_float
-    this%snowfall                            = 0.0_c_float
-    this%net_snowfall                        = 0.0_c_float
-    this%snowmelt                            = 0.0_c_float
+    this%bare_soil_evap                      = 0.0_c_double
+    this%inflow                              = 0.0_c_double
+    this%runon                               = 0.0_c_double
+    this%runoff                              = 0.0_c_double
+    this%outflow                             = 0.0_c_double
+    this%infiltration                        = 0.0_c_double
+    this%snowfall                            = 0.0_c_double
+    this%net_snowfall                        = 0.0_c_double
+    this%snowmelt                            = 0.0_c_double
 
-    this%interception                        = 0.0_c_float
-    this%rainfall                            = 0.0_c_float
-    this%net_rainfall                        = 0.0_c_float
-    this%interception_storage                = 0.0_c_float
-    this%interception_storage_max            = 0.0_c_float
-    this%snow_storage                        = 0.0_c_float
+    this%interception                        = 0.0_c_double
+    this%rainfall                            = 0.0_c_double
+    this%net_rainfall                        = 0.0_c_double
+    this%interception_storage                = 0.0_c_double
+    this%interception_storage_max            = 0.0_c_double
+    this%snow_storage                        = 0.0_c_double
     this%soil_storage                        = 0.0_c_double
-    this%soil_storage_max                    = 0.0_c_float
-    this%delta_soil_storage                  = 0.0_c_float
-    this%soil_moisture_deficit               = 0.0_c_float
+    this%soil_storage_max                    = 0.0_c_double
+    this%delta_soil_storage                  = 0.0_c_double
+    this%soil_moisture_deficit               = 0.0_c_double
 
-    this%net_infiltration                    = 0.0_c_float
-    this%rejected_net_infiltration           = 0.0_c_float
-    this%fog                                 = 0.0_c_float
-    this%irrigation                          = 0.0_c_float
-    this%curve_num_adj                       = 0.0_c_float
-    this%runoff_outside                      = 0.0_c_float
-    this%pervious_fraction                   = 1.0_c_float     ! note: default is 100% pervious area
-    this%surface_storage                     = 0.0_c_float
-    this%surface_storage_excess              = 0.0_c_float
-    this%surface_storage_max                 = 0.0_c_float
-    this%storm_drain_capture                 = 0.0_c_float
-    this%canopy_cover_fraction               = 0.0_c_float
-    this%crop_coefficient_kcb                = 0.0_c_float
-    this%potential_snowmelt                  = 0.0_c_float
-    this%continuous_frozen_ground_index      = 0.0_c_float
-    this%cfgi_lower_limit                    = 0.0_c_float
-    this%cfgi_upper_limit                    = 0.0_c_float
-    this%rooting_depth_max                   = 0.0_c_float
-    this%current_rooting_depth               = 0.0_c_float
-    this%current_plant_height                = 0.0_c_float
+    this%net_infiltration                    = 0.0_c_double
+    this%rejected_net_infiltration           = 0.0_c_double
+    this%fog                                 = 0.0_c_double
+    this%irrigation                          = 0.0_c_double
+    this%curve_num_adj                       = 0.0_c_double
+    this%runoff_outside                      = 0.0_c_double
+    this%pervious_fraction                   = 1.0_c_double     ! note: default is 100% pervious area
+    this%surface_storage                     = 0.0_c_double
+    this%surface_storage_excess              = 0.0_c_double
+    this%surface_storage_max                 = 0.0_c_double
+    this%storm_drain_capture                 = 0.0_c_double
+    this%canopy_cover_fraction               = 0.0_c_double
+    this%crop_coefficient_kcb                = 0.0_c_double
+    this%potential_snowmelt                  = 0.0_c_double
+    this%continuous_frozen_ground_index      = 0.0_c_double
+    this%cfgi_lower_limit                    = 0.0_c_double
+    this%cfgi_upper_limit                    = 0.0_c_double
+    this%rooting_depth_max                   = 0.0_c_double
+    this%current_rooting_depth               = 0.0_c_double
+    this%current_plant_height                = 0.0_c_double
     this%polygon_id                          = 0_c_int
     this%actual_et_soil                      = 0.0_c_double
     this%actual_et_impervious                = 0.0_c_double
     this%actual_et_interception              = 0.0_c_double
-    this%adjusted_depletion_fraction_p       = 0.0_c_float
-    this%crop_etc                            = 0.0_c_float
-    this%direct_net_infiltration             = 0.0_c_float
-    this%direct_soil_moisture                = 0.0_c_float
+    this%adjusted_depletion_fraction_p       = 0.0_c_double
+    this%crop_etc                            = 0.0_c_double
+    this%direct_net_infiltration             = 0.0_c_double
+    this%direct_soil_moisture                = 0.0_c_double
     this%number_of_days_since_planting       = 0_c_int
-    this%evap_reduction_coef_kr              = 0.0_c_float
-    this%surf_evap_coef_ke                   = 0.0_c_float
-    this%plant_stress_coef_ks                = 0.0_c_float
-    this%total_available_water_taw           = 0.0_c_float
-    this%readily_available_water_raw         = 0.0_c_float
-    this%fraction_exposed_and_wetted_soil    = 0.0_c_float
-    this%evaporable_water_storage            = 0.0_c_float
-    this%evaporable_water_deficit            = 0.0_c_float
+    this%evap_reduction_coef_kr              = 0.0_c_double
+    this%surf_evap_coef_ke                   = 0.0_c_double
+    this%plant_stress_coef_ks                = 0.0_c_double
+    this%total_available_water_taw           = 0.0_c_double
+    this%readily_available_water_raw         = 0.0_c_double
+    this%fraction_exposed_and_wetted_soil    = 0.0_c_double
+    this%evaporable_water_storage            = 0.0_c_double
+    this%evaporable_water_deficit            = 0.0_c_double
     this%it_is_growing_season                = FALSE
-    this%irrigation_mask                     = 1.0_c_float
-    this%tmax_minus_tmin                     = 0.0_c_float
-    this%climatic_deficit                    = 0.0_c_float
+    this%irrigation_mask                     = 1.0_c_double
+    this%tmax_minus_tmin                     = 0.0_c_double
+    this%climatic_deficit                    = 0.0_c_double
 
     do iIndex=1, iCount
       this%sort_order( iIndex ) = iIndex
@@ -1755,8 +1755,8 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)      :: this
 
     ! [ LOCALS ]
-    real (c_float), allocatable :: fTrunk_Storage_Capacity(:)
-    real (c_float), allocatable :: fStemflow_Fraction(:)
+    real (c_double), allocatable :: fTrunk_Storage_Capacity(:)
+    real (c_double), allocatable :: fStemflow_Fraction(:)
 
     fTrunk_Storage_Capacity = TRUNK_STORAGE_CAPACITY_TABLE_VALUES( this%landuse_index )
     fStemflow_Fraction = STEMFLOW_FRACTION_TABLE_VALUES( this%landuse_index )
@@ -1780,7 +1780,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    this%runon = 0.0_c_float
+    this%runon = 0.0_c_double
 
   end subroutine model_initialize_routing_none
 
@@ -1823,7 +1823,7 @@ contains
     ! [ LOCALS ]
     integer (c_int) :: target_index
     integer (c_int) :: cell_index
-    real (c_float)  :: msb
+    real (c_double)  :: msb
 
     integer (c_int) :: cell_row, cell_col, targ_row, targ_col
 
@@ -2059,7 +2059,7 @@ contains
     call et_zone_values_calculate( )
 
     ! as with HWB, multiply ANNUAL ET grid by a monthly to annual RATIO, then divide by number of days
-    this%reference_ET0 = pack( pET_GRID%pGrdBase%rData, this%active ) * ET_RATIOS / real( SIM_DT%iDaysInMonth, c_float)
+    this%reference_ET0 = pack( pET_GRID%pGrdBase%rData, this%active ) * ET_RATIOS / real( SIM_DT%iDaysInMonth, c_double)
 
   end subroutine model_calculate_et_monthly_zone_grid
 
@@ -2086,7 +2086,7 @@ contains
     call et_gridded_values_calculate( )
 
     this%reference_ET0 = pack( pET_GRID%pGrdBase%rData, this%active ) &
-                                      / real( SIM_DT%iDaysInMonth, c_float)
+                                      / real( SIM_DT%iDaysInMonth, c_double)
 
   end subroutine model_calculate_et_monthly_grid
 
@@ -2207,7 +2207,7 @@ contains
 
     ! [ LOCALS ]
     type (DATETIME_T), save     :: date_of_last_grid_update
-    real (c_float)         :: interim_inflow
+    real (c_double)         :: interim_inflow
 
     if ( .not. ( date_of_last_grid_update == SIM_DT%curr ) ) then
       call runoff_gridded_values_update_ratios( )
@@ -2240,12 +2240,12 @@ contains
     type (FSTRING_LIST_T)              :: slList
     type (FSTRING_LIST_T)              :: slRZ
     integer (c_int), allocatable :: iRZ_SeqNums(:)
-    real (c_float), allocatable  :: RZ(:)
+    real (c_double), allocatable  :: RZ(:)
     character (len=:), allocatable    :: sText
-    real (c_float), allocatable  :: water_capacity(:)
+    real (c_double), allocatable  :: water_capacity(:)
     integer (c_int)              :: iIndex
     type (GENERAL_GRID_T), pointer    :: pRooting_Depth
-    real (c_float), allocatable  :: fMax_Rooting_Depth(:,:)
+    real (c_double), allocatable  :: fMax_Rooting_Depth(:,:)
     character (len=10)                :: date_str
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
@@ -2414,13 +2414,13 @@ contains
     ! back-calculate awc to make it consistent with rooting_depth_max and given
     ! soil_storage_max gridded values
 
-    where ( .not. ( this%rooting_depth_max .approxequal. 0.0_c_float ) )
+    where ( .not. ( this%rooting_depth_max .approxequal. 0.0_c_double ) )
 
       this%awc = this%soil_storage_max / this%rooting_depth_max
 
     else where
 
-      this%awc = 0.0_c_float
+      this%awc = 0.0_c_double
 
     end where
 
@@ -2442,7 +2442,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    this%irrigation = 0.0_c_float
+    this%irrigation = 0.0_c_double
 
   end subroutine model_initialize_irrigation_none
 
@@ -2711,7 +2711,7 @@ contains
           date_str = SIM_DT%curr%prettydate()
           call grid_WriteArcGrid("Irrigation_mask__as_read_into_SWB__"     &
                                 //trim(date_str)//".asc", pIRR_MASK%pGrdBase )
-          this%irrigation_mask = pack( real(pIRR_MASK%pGrdBase%iData, c_float), this%active )
+          this%irrigation_mask = pack( real(pIRR_MASK%pGrdBase%iData, c_double), this%active )
 
         endif
 
@@ -2719,14 +2719,14 @@ contains
 
         if (SIM_DT%iDayOfSimulation < 1) then
           call pIRR_MASK%getvalues()
-          this%irrigation_mask = pack( real(pIRR_MASK%pGrdBase%iData, c_float), this%active )
+          this%irrigation_mask = pack( real(pIRR_MASK%pGrdBase%iData, c_double), this%active )
           call grid_WriteArcGrid("Irrigation_mask__as_read_into_SWB.asc", pIRR_MASK%pGrdBase )
         endif
 
       endif
 
-      if (   any(real(pIRR_MASK%pGrdBase%iData, c_float) < 0.0)   &
-        .or. any(real(pIRR_MASK%pGrdBase%iData, c_float) > 1.0))    then
+      if (   any(real(pIRR_MASK%pGrdBase%iData, c_double) < 0.0)   &
+        .or. any(real(pIRR_MASK%pGrdBase%iData, c_double) > 1.0))    then
 
           call die(sMessage = "Irrigation mask contains illegal values (outside range from 0-1)", &
           sHints="Check the values contained in your irrigation mask file(s).")
@@ -2735,7 +2735,7 @@ contains
 
     else ! no irrigation mask specified; default to irrigating every cell
 
-      this%irrigation_mask = 1.0_c_float
+      this%irrigation_mask = 1.0_c_double
 
     endif
 
@@ -2809,7 +2809,7 @@ contains
     allocate( this%gdd( count( this%active ) ), stat=status )
     call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
-    this%gdd = 0.0_c_float
+    this%gdd = 0.0_c_double
 
     call growing_degree_day_initialize( is_cell_active=this%active,                           &
                                         landuse_index=this%landuse_index )
@@ -2859,7 +2859,7 @@ contains
       allocate( this%gdd( count( this%active ) ), stat=status )
       call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
-      this%gdd = 0.0_c_float
+      this%gdd = 0.0_c_double
 
       call growing_degree_day_be_initialize( is_cell_active=this%active,                           &
                                              landuse_index=this%landuse_index )
@@ -2978,9 +2978,9 @@ contains
     integer (c_int) :: indx_end_l
     integer (c_int) :: indx
 
-    real (c_float)  :: previous_5_day_rain(6)
-    real (c_float)  :: monthly_runoff
-    real (c_float)  :: monthly_gross_precip
+    real (c_double)  :: previous_5_day_rain(6)
+    real (c_double)  :: monthly_runoff
+    real (c_double)  :: monthly_gross_precip
 
     previous_5_day_rain     = -9999.0
     monthly_runoff          = -9999.0
@@ -3106,7 +3106,7 @@ contains
 
 !    this%actual_et(indx) = ACTUAL_ET(indx)
     this%actual_et_soil(indx) = max(ACTUAL_ET(indx) - this%actual_et_interception(indx)                &
-                                                      * this%canopy_cover_fraction(indx), 0.0_c_float)
+                                                      * this%canopy_cover_fraction(indx), 0.0_c_double)
 
   end subroutine model_calculate_actual_et_gridded_values
 
@@ -3413,7 +3413,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    this%crop_coefficient_kcb = 1.0_c_float
+    this%crop_coefficient_kcb = 1.0_c_double
 
   end subroutine model_initialize_crop_coefficient_none
 
@@ -3472,7 +3472,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     !> Nothing here to see. Initialization not really needed for the "normal" method.
-    this%fog = 0.0_c_float
+    this%fog = 0.0_c_double
 
   end subroutine model_initialize_fog_none
 
@@ -3538,7 +3538,7 @@ contains
 
      class ( MODEL_DOMAIN_T ), intent(inout)   :: this
 
-     this%tmean = ( this%tmin + this%tmax ) / 2.0_c_float
+     this%tmean = ( this%tmin + this%tmax ) / 2.0_c_double
 
   end subroutine model_calculate_mean_air_temperature
 
@@ -3562,7 +3562,7 @@ contains
   if (this%reference_et0(cell_index) > this%actual_et(cell_index)) then
     this%climatic_deficit(cell_index) = this%reference_et0(cell_index) - this%actual_et(cell_index)
   else
-    this%climatic_deficit(cell_index) = 0.0_c_float
+    this%climatic_deficit(cell_index) = 0.0_c_double
   endif
 
 end subroutine model_calculate_climatic_water_deficit
@@ -3599,7 +3599,7 @@ end subroutine model_calculate_climatic_water_deficit
     use weather_data_tabular, only    : weather_data_tabular_get_tmax
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    real (kind=c_float)                    :: tmax_value
+    real (kind=c_double)                    :: tmax_value
 
     associate ( dt => SIM_DT%curr )
 
@@ -3645,7 +3645,7 @@ end subroutine model_calculate_climatic_water_deficit
     use weather_data_tabular, only    : weather_data_tabular_get_tmin
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    real (kind=c_float)                    :: tmin_value
+    real (kind=c_double)                    :: tmin_value
 
     associate ( dt => SIM_DT%curr )
 
@@ -3693,7 +3693,7 @@ end subroutine model_calculate_climatic_water_deficit
     use weather_data_tabular, only    : weather_data_tabular_get_precip
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    real (kind=c_float)                    :: precip_value
+    real (kind=c_double)                    :: precip_value
 
     associate ( dt => SIM_DT%curr )
 
@@ -3788,7 +3788,7 @@ end subroutine model_calculate_climatic_water_deficit
 
   subroutine minmaxmean_float( variable , varname, active_cells )
 
-    real (c_float), dimension(:)  :: variable
+    real (c_double), dimension(:)  :: variable
     character (len=*), intent(in)      :: varname
     logical, dimension(:), optional    :: active_cells
 
@@ -3906,8 +3906,8 @@ end subroutine model_calculate_climatic_water_deficit
     call minmaxmean( this%awc, "AWC")
 
     call minmaxmean( this%latitude, "Lat")
-    call minmaxmean( real(this%reference_ET0, c_float), "ET0")
-    call minmaxmean( real( this%actual_ET, c_float), "actET")
+    call minmaxmean( real(this%reference_ET0, c_double), "ET0")
+    call minmaxmean( real( this%actual_ET, c_double), "actET")
     call minmaxmean( this%inflow, "inflow")
     call minmaxmean( this%runon, "runon")
     call minmaxmean( this%runoff, "runoff")
@@ -3920,7 +3920,7 @@ end subroutine model_calculate_climatic_water_deficit
 
     call minmaxmean( this%interception_storage, "intcp_stor")
     call minmaxmean( this%snow_storage, "snow_stor")
-    call minmaxmean( real(this%soil_storage, c_float), "soil_stor")
+    call minmaxmean( real(this%soil_storage, c_double), "soil_stor")
     call minmaxmean( this%soil_storage_max, "soil_stor_max")
     call minmaxmean( this%net_infiltration, "net_infiltration")
 

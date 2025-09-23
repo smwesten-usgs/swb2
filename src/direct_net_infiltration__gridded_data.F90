@@ -33,18 +33,18 @@ module direct_net_infiltration__gridded_data
   type (DATA_CATALOG_ENTRY_T), pointer :: pWATER_MAIN
   type (DATA_CATALOG_ENTRY_T), pointer :: pANNUAL_RECHARGE_RATE
 
-  real (c_float), allocatable     :: fCESSPOOL(:)
-  real (c_float), allocatable     :: fDISPOSAL_WELL(:)
-  real (c_float), allocatable     :: fWATER_BODY_RECHARGE(:)
-  real (c_float), allocatable     :: fWATER_MAIN(:)
-  real (c_float), allocatable     :: fANNUAL_RECHARGE_RATE(:)
+  real (c_double), allocatable     :: fCESSPOOL(:)
+  real (c_double), allocatable     :: fDISPOSAL_WELL(:)
+  real (c_double), allocatable     :: fWATER_BODY_RECHARGE(:)
+  real (c_double), allocatable     :: fWATER_MAIN(:)
+  real (c_double), allocatable     :: fANNUAL_RECHARGE_RATE(:)
 
   ! ****_TABLE variables: will have same number of values as there are landuses
-  real (c_float), allocatable     :: fCESSPOOL_TABLE(:)
-  real (c_float), allocatable     :: fDISPOSAL_WELL_TABLE(:)
-  real (c_float), allocatable     :: fWATER_BODY_RECHARGE_TABLE(:)
-  real (c_float), allocatable     :: fWATER_MAIN_TABLE(:)
-  real (c_float), allocatable     :: fANNUAL_RECHARGE_RATE_TABLE(:)
+  real (c_double), allocatable     :: fCESSPOOL_TABLE(:)
+  real (c_double), allocatable     :: fDISPOSAL_WELL_TABLE(:)
+  real (c_double), allocatable     :: fWATER_BODY_RECHARGE_TABLE(:)
+  real (c_double), allocatable     :: fWATER_MAIN_TABLE(:)
+  real (c_double), allocatable     :: fANNUAL_RECHARGE_RATE_TABLE(:)
 
   type (T_NETCDF4_FILE), pointer       :: pNCFILE
 
@@ -296,13 +296,13 @@ contains
 
   subroutine direct_net_infiltration_calculate( direct_net_infiltration, indx, is_cell_active, nodata_fill_value )
 
-    real (c_float), intent(inout)     :: direct_net_infiltration
+    real (c_double), intent(inout)     :: direct_net_infiltration
     integer (c_int), intent(in)       :: indx
     logical (c_bool), intent(in)      :: is_cell_active(:,:)
-    real (c_float), intent(in)        :: nodata_fill_value(:,:)
+    real (c_double), intent(in)        :: nodata_fill_value(:,:)
 
     ! [ LOCALS ]
-    real (c_float)  :: fFactor
+    real (c_double)  :: fFactor
 
     if ( .not. DATE_OF_LAST_RETRIEVAL == SIM_DT%curr ) then
 
@@ -347,7 +347,7 @@ contains
 
     endif
 
-    direct_net_infiltration = 0.0_c_float
+    direct_net_infiltration = 0.0_c_double
 
     if ( allocated( fCESSPOOL ) )                                              &
       direct_net_infiltration = direct_net_infiltration + fCESSPOOL( indx )
@@ -364,7 +364,7 @@ contains
 !    if ( allocated( fSTORM_DRAIN ) )  direct_net_infiltration = direct_net_infiltration + fSTORM_DRAIN( indx )
 
     if ( allocated( fANNUAL_RECHARGE_RATE) )                                   &
-      direct_net_infiltration = direct_net_infiltration + fANNUAL_RECHARGE_RATE( indx ) / 365.25_c_float
+      direct_net_infiltration = direct_net_infiltration + fANNUAL_RECHARGE_RATE( indx ) / 365.25_c_double
 
   end subroutine direct_net_infiltration_calculate
 

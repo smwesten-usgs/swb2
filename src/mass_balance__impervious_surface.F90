@@ -8,7 +8,7 @@ module mass_balance__impervious_surface
 
   public :: calculate_impervious_surface_mass_balance
 
-  real (c_float), parameter   :: NEAR_ZERO = 1.0e-6_c_float
+  real (c_double), parameter   :: NEAR_ZERO = 1.0e-6_c_double
 
 contains
 
@@ -29,24 +29,24 @@ contains
 
     real (c_double), intent(inout)     :: surface_storage
     real (c_double), intent(inout)     :: actual_et_impervious
-    real (c_float), intent(inout)      :: paved_to_unpaved           ! 'wadd' in HWB
-    real (c_float), intent(inout)      :: storm_drain_capture
-    real (c_float), intent(in)         :: storm_drain_capture_fraction
-    real (c_float), intent(in)         :: surface_storage_max
-    real (c_float), intent(in)         :: net_rainfall
-    real (c_float), intent(in)         :: snowmelt
-    real (c_float), intent(in)         :: runon
-    real (c_float), intent(in)         :: runoff
-    real (c_float), intent(in)         :: fog
+    real (c_double), intent(inout)      :: paved_to_unpaved           ! 'wadd' in HWB
+    real (c_double), intent(inout)      :: storm_drain_capture
+    real (c_double), intent(in)         :: storm_drain_capture_fraction
+    real (c_double), intent(in)         :: surface_storage_max
+    real (c_double), intent(in)         :: net_rainfall
+    real (c_double), intent(in)         :: snowmelt
+    real (c_double), intent(in)         :: runon
+    real (c_double), intent(in)         :: runoff
+    real (c_double), intent(in)         :: fog
     real (c_double), intent(in)        :: reference_et0
-    real (c_float), intent(in)         :: pervious_fraction
+    real (c_double), intent(in)         :: pervious_fraction
 
     ! [ LOCALS ]
-    real (c_float) :: surface_storage_excess
-    real (c_float) :: impervious_fraction
-    real (c_float) :: surface_storage_l
+    real (c_double) :: surface_storage_excess
+    real (c_double) :: impervious_fraction
+    real (c_double) :: surface_storage_l
 
-!    if ( storm_drain_capture_fraction >= 0.0_c_float ) then
+!    if ( storm_drain_capture_fraction >= 0.0_c_double ) then
 
 
     ! NOTE: removed this conditional 16 May 2018: it appears that
@@ -58,7 +58,7 @@ contains
 
 !    if ( surface_storage_max > NEAR_ZERO ) then
 
-    impervious_fraction = 1.0_c_float - pervious_fraction
+    impervious_fraction = 1.0_c_double - pervious_fraction
 
     surface_storage = surface_storage                                        &
                       + net_rainfall                                         &
@@ -67,7 +67,7 @@ contains
                       - runoff
 
     ! **amount is reduced proportional to amount of impervious surface present**
-    surface_storage_excess = max( 0.0_c_float,                               &
+    surface_storage_excess = max( 0.0_c_double,                               &
                            ( surface_storage - surface_storage_max )         &
                             * impervious_fraction )
 
@@ -75,7 +75,7 @@ contains
 
     storm_drain_capture = surface_storage_excess * storm_drain_capture_fraction
 
-    paved_to_unpaved = max( 0.0_c_float,                                         &
+    paved_to_unpaved = max( 0.0_c_double,                                         &
                                   surface_storage_excess - storm_drain_capture )
 
     ! now allow for evaporation

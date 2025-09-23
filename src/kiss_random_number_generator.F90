@@ -1,6 +1,6 @@
 module kiss_random_number_generator
 
-  use iso_c_binding, only   : c_int, c_float
+  use iso_c_binding, only   : c_int, c_double
   use iso_fortran_env, only : int64, real128
   implicit none
 
@@ -130,7 +130,7 @@ contains
 
   function kiss64_uniform_rng()                     result(unif)
 
-    real (c_float)      :: unif
+    real (c_double)      :: unif
 
     ! [ LOCALS ]
     integer (int64)   :: x

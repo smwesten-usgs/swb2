@@ -16,9 +16,9 @@ contains
 
   subroutine initialize_continuous_frozen_ground_index( cfgi, cfgi_ll, cfgi_ul, active_cells )
 
-    real (c_float), intent(inout)  :: cfgi(:)
-    real (c_float), intent(inout)  :: cfgi_ll(:)
-    real (c_float), intent(inout)  :: cfgi_ul(:)
+    real (c_double), intent(inout)  :: cfgi(:)
+    real (c_double), intent(inout)  :: cfgi_ll(:)
+    real (c_double), intent(inout)  :: cfgi_ul(:)
 
     logical (c_bool), intent(in)   :: active_cells(:,:)
 
@@ -40,7 +40,7 @@ contains
         sHints="Check your control file to see that a valid INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX grid or"  &
           //" constant is specified.", lFatal=FALSE )
 
-        cfgi = 0.0_c_float
+        cfgi = 0.0_c_double
 
       endif  
 
@@ -52,7 +52,7 @@ contains
       cfgi = pack( pINITIAL_CFGI%pGrdBase%rData, active_cells )
 
      if ( minval( cfgi ) < fZERO &
-        .or. maxval( cfgi ) > 300.0_c_float )  &
+        .or. maxval( cfgi ) > 300.0_c_double )  &
        call warn(sMessage="One or more initial continuous frozen ground values outside of " &
          //"valid range (0 to 300)", lFatal=TRUE )
 
@@ -79,7 +79,7 @@ contains
       cfgi_ll = pack( pCFGI_LOWER_LIMIT%pGrdBase%rData, active_cells )
 
      if ( minval( cfgi_ll ) < fZERO                                             &
-        .or. maxval( cfgi_ll ) > 300.0_c_float )                                &
+        .or. maxval( cfgi_ll ) > 300.0_c_double )                                &
        call warn(sMessage="One or more CFGI lower limit values outside of "     &
          //"valid range (0 to 300)", lFatal=TRUE )
 
@@ -105,13 +105,13 @@ contains
       cfgi_ul = pack( pCFGI_UPPER_LIMIT%pGrdBase%rData, active_cells )
 
      if ( minval( cfgi_ul ) < fZERO                                            &
-        .or. maxval( cfgi_ul ) > 300.0_c_float )                               &
+        .or. maxval( cfgi_ul ) > 300.0_c_double )                               &
        call warn(sMessage="One or more CFGI upper limit values outside of "    &
          //"valid range (0 to 300)", lFatal=TRUE )
 
     endif
 
-    if (any(cfgi_ul - cfgi_ll <= 0.0_c_float)) then
+    if (any(cfgi_ul - cfgi_ll <= 0.0_c_double)) then
       call warn(sMessage="One or more CFGI upper limit values is less that its"     &
         //" corresponding CFGI lower limit values", lFatal=TRUE)
     endif
@@ -135,26 +135,26 @@ contains
   elemental subroutine update_continuous_frozen_ground_index( fCFGI, fTMax_F, fTMin_F, fSnowCover )
 
     ! [ ARGUMENTS ]
-    real (c_float), intent(inout)       :: fCFGI
-    real (c_float), intent(in)          :: fTMax_F
-    real (c_float), intent(in)          :: fTMin_F
-    real (c_float), intent(in)          :: fSnowCover
+    real (c_double), intent(inout)       :: fCFGI
+    real (c_double), intent(in)          :: fTMax_F
+    real (c_double), intent(in)          :: fTMin_F
+    real (c_double), intent(in)          :: fSnowCover
 
     ! [ LOCALS ]
-    real (c_float), parameter    :: fDecay_Coefficient_A                      = 0.97_c_float
-    real (c_float), parameter    :: fSnow_Reduction_Coefficient_Freezing      = 0.08_c_float
-    real (c_float), parameter    :: fSnow_Reduction_Coefficient_Thawing       = 0.5_c_float
-    real (c_float), parameter    :: fCM_PER_INCH                              = 2.54_c_float
-    real (c_float), parameter    :: FREEZING_POINT_DEG_C                      = 0.0_c_float
+    real (c_double), parameter    :: fDecay_Coefficient_A                      = 0.97_c_double
+    real (c_double), parameter    :: fSnow_Reduction_Coefficient_Freezing      = 0.08_c_double
+    real (c_double), parameter    :: fSnow_Reduction_Coefficient_Thawing       = 0.5_c_double
+    real (c_double), parameter    :: fCM_PER_INCH                              = 2.54_c_double
+    real (c_double), parameter    :: FREEZING_POINT_DEG_C                      = 0.0_c_double
 
-    real (c_float) :: fTAvg_C              ! temporary variable holding avg temp in C
-    real (c_float) :: fSnowDepthCM         ! snow depth in centimeters
+    real (c_double) :: fTAvg_C              ! temporary variable holding avg temp in C
+    real (c_double) :: fSnowDepthCM         ! snow depth in centimeters
 
 
-    fTAvg_C = F_to_C( (fTMax_F + fTMin_F) / 2.0_c_float )
+    fTAvg_C = F_to_C( (fTMax_F + fTMin_F) / 2.0_c_double )
 
     ! assuming snow depth is 10 times the water content of the snow in inches
-    fSnowDepthCM = fSnowCover * 10.0_c_float * fCM_PER_INCH
+    fSnowDepthCM = fSnowCover * 10.0_c_double * fCM_PER_INCH
 
     associate( Tavg => fTavg_C,                                              &
                A => fDecay_Coefficient_A,                                    &
@@ -164,11 +164,11 @@ contains
 
       if( Tavg > FREEZING_POINT_DEG_C ) then
 
-        CFGI = max( A * CFGI - Tavg * exp ( -0.4_c_float * K_thaw * fSnowDepthCM ), 0.0_c_float )
+        CFGI = max( A * CFGI - Tavg * exp ( -0.4_c_double * K_thaw * fSnowDepthCM ), 0.0_c_double )
 
       else ! temperature is below freezing
 
-        CFGI = max( A * CFGI - Tavg * exp ( -0.4_c_float * K_freeze * fSnowDepthCM ), 0.0_c_float )
+        CFGI = max( A * CFGI - Tavg * exp ( -0.4_c_double * K_freeze * fSnowDepthCM ), 0.0_c_double )
 
       end if
 

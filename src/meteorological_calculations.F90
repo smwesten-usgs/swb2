@@ -15,9 +15,9 @@ elemental function sat_vapor_pressure__e_0(rT) result (re_0)
     !!    Crop Evapotranspiration (Guidelines for computing crop water
     !!    requirements), Food and Agriculture Organization, Rome, Italy.
 
-  real (c_float), intent(in)   :: rT
+  real (c_double), intent(in)   :: rT
       !! Air temperature in &deg;C
-  real (c_float)               :: re_0
+  real (c_double)               :: re_0
       !! Saturation vapor pressure at given air temperature, in kilopascals
 
   re_0 = 0.6108_c_double * exp (17.27_c_double * rT      &
@@ -30,7 +30,7 @@ end function sat_vapor_pressure__e_0
 elemental function dewpoint_vapor_pressure__e_a(fTMin) result (fe_a)
     !! Estimate dewpoint vapor pressure given a minimum daily air temperature value
 
-  real (c_float), intent(in) :: fTMin
+  real (c_double), intent(in) :: fTMin
       !! Minimum daily air temperature, in &deg;C
   real (c_double) :: fe_a
       !! Dewpoint vapor pressure at given air temperature, in kiloPascals

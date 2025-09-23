@@ -41,14 +41,14 @@ module parameters
     generic              :: munge_file => munge_files_and_add_to_param_list_sub
 
     procedure            :: get_parameter_values_int
-    procedure            :: get_parameter_values_float
+    procedure            :: get_parameter_values_double
     procedure            :: get_parameter_values_logical
-    procedure            :: get_parameter_table_float
+    procedure            :: get_parameter_table_double
     procedure            :: get_parameter_values_string_list
 
     generic              :: get_parameters => get_parameter_values_int,         &
-                                              get_parameter_values_float,       &
-                                              get_parameter_table_float,        &
+                                              get_parameter_values_double,       &
+                                              get_parameter_table_double,        &
                                               get_parameter_values_logical,     &
                                               get_parameter_values_string_list
 
@@ -548,7 +548,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine get_parameter_values_float( this, fValues, slKeys, sKey, lFatal )
+  subroutine get_parameter_values_double( this, fValues, slKeys, sKey, lFatal )
 
     class (PARAMETERS_T)                                       :: this
     real (c_float),  intent(in out), allocatable               :: fValues(:)
@@ -584,11 +584,11 @@ contains
 
     endif
 
-  end subroutine get_parameter_values_float
+  end subroutine get_parameter_values_double
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine get_parameter_table_float( this, fValues, sPrefix, iNumRows, lFatal )
+  subroutine get_parameter_table_double( this, fValues, sPrefix, iNumRows, lFatal )
 
     use fstring
 
@@ -649,6 +649,6 @@ contains
 
     endif
 
-  end subroutine get_parameter_table_float
+  end subroutine get_parameter_table_double
 
 end module parameters

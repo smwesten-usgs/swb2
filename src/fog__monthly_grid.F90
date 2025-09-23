@@ -28,7 +28,7 @@ module fog__monthly_grid
   public :: fog_monthly_grid_initialize, fog_monthly_grid_calculate, pFOG_RATIO
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pFOG_RATIO
-  real (c_float), allocatable     :: fFOG_CATCH_EFFICIENCY(:)
+  real (c_double), allocatable     :: fFOG_CATCH_EFFICIENCY(:)
 
 contains
 
@@ -85,15 +85,15 @@ contains
 
   subroutine fog_monthly_grid_calculate( fRainfall, fFog, iLanduse_Index, lActive, nodata_fill_value )
 
-    real (c_float), intent(in)        :: fRainfall(:)
-    real (c_float), intent(inout)     :: fFog(:)
+    real (c_double), intent(in)        :: fRainfall(:)
+    real (c_double), intent(inout)     :: fFog(:)
     integer (c_int), intent(in)       :: iLanduse_Index(:)
     logical (c_bool), intent(in)      :: lActive(:,:)
-    real (c_float), intent(in)        :: nodata_fill_value(:,:)
+    real (c_double), intent(in)        :: nodata_fill_value(:,:)
 
     ! [ LOCALS ]
     integer (c_int) :: iIndex
-    real (c_float)  :: fFactor
+    real (c_double)  :: fFactor
 
     associate ( dt => SIM_DT%curr )
 

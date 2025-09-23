@@ -18,16 +18,16 @@ contains
                                                      soil_storage_max,      &
                                                      infiltration )
 
-    real (c_float), intent(inout)      :: net_infiltration
+    real (c_double), intent(inout)      :: net_infiltration
     real (c_double), intent(inout)     :: soil_storage
     real (c_double), intent(inout)     :: actual_et_soil
-    real (c_float), intent(inout)      :: runoff
-    real (c_float), intent(inout)      :: delta_soil_storage
+    real (c_double), intent(inout)      :: runoff
+    real (c_double), intent(inout)      :: delta_soil_storage
     real (c_double), intent(in)        :: reference_et0
-    real (c_float), intent(in)         :: soil_storage_max
-    real (c_float), intent(in)         :: infiltration
+    real (c_double), intent(in)         :: soil_storage_max
+    real (c_double), intent(in)         :: infiltration
 
-    real (c_float), parameter          :: NEAR_ZERO = 1.0E-6_c_float
+    real (c_double), parameter          :: NEAR_ZERO = 1.0E-6_c_double
 
 
     ! [ LOCALS ]
@@ -40,12 +40,12 @@ contains
     if ( soil_storage_max < NEAR_ZERO ) then
 
       actual_et_soil = min( reference_et0, infiltration )
-      net_infiltration = 0.0_c_float
+      net_infiltration = 0.0_c_double
       ! **** infiltration term includes the previously calculated runoff; add this back in
       !      before adjusting the runoff value
-      runoff = max( 0.0_c_float, infiltration + runoff - actual_et_soil )
-      soil_storage = 0.0_c_float
-      delta_soil_storage = 0.0_c_float
+      runoff = max( 0.0_c_double, infiltration + runoff - actual_et_soil )
+      soil_storage = 0.0_c_double
+      delta_soil_storage = 0.0_c_double
 
     ! new soil storage value exceeds soil_storage_max; net infiltration event
     elseif ( new_soil_storage > soil_storage_max ) then
@@ -54,7 +54,7 @@ contains
 
       ! should represent a positive change in storage
       delta_soil_storage  = soil_storage_max - soil_storage
-!      actual_et_soil      = max( 0.0_c_float, soil_storage + infiltration - net_infiltration )
+!      actual_et_soil      = max( 0.0_c_double, soil_storage + infiltration - net_infiltration )
       soil_storage        = soil_storage_max
 
     else
@@ -62,7 +62,7 @@ contains
       ! could be positive or negative
       delta_soil_storage  = new_soil_storage - soil_storage
       soil_storage = new_soil_storage
-      net_infiltration = 0.0_c_float
+      net_infiltration = 0.0_c_double
 
     endif
 

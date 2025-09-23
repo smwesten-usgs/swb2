@@ -22,7 +22,7 @@ module growing_season
   real (c_float), allocatable  :: KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON(:)
 
   character( len=2 ), parameter     :: DATE_DELIMS = "/-"
-  real (c_float), parameter    :: NODATA_VALUE = -9999._c_float
+  real (c_double), parameter    :: NODATA_VALUE = -9999._c_double
 
 contains
 
@@ -225,8 +225,8 @@ contains
                                               it_is_growing_season )
 
     integer (c_int), intent(in)      :: landuse_index
-    real (c_float), intent(in)       :: GDD
-    real (c_float), intent(in)       :: mean_air_temp
+    real (c_double), intent(in)       :: GDD
+    real (c_double), intent(in)       :: mean_air_temp
     logical (c_bool), intent(inout)  :: it_is_growing_season
 
     ! first growing season day > last if we are growing a winter crop, winter wheat for example
