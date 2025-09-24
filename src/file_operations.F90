@@ -145,9 +145,9 @@ contains
     logical (c_bool)   :: lIsComment
 
     ! [ LOCALS ]
-    integer (c_int) :: iIndex
-    integer (c_int) :: iLen
-    character (len=1)   :: sBufTemp
+    integer (c_int)                 :: iIndex
+    integer (c_int)                 :: iLen
+    character (len=:), allocatable  :: sBufTemp
 
     iLen = len_trim( this%sBuf )
 
@@ -157,7 +157,7 @@ contains
 
     lIsComment = FALSE
 
-    if ( iIndex == 0 .or. len_trim(this%sBuf) == 0 ) lIsComment = TRUE
+    if ( iIndex == 0 .or. iLen == 0 ) lIsComment = TRUE
 
   end function is_current_line_a_comment_fn
 
