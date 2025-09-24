@@ -78,7 +78,7 @@ contains
 
   subroutine summarize_by_polygon( cells )
 
-  	type ( MODEL_DOMAIN_T ), intent(inout) :: cells
+    type ( MODEL_DOMAIN_T ), intent(inout) :: cells
 
     ! [ LOCALS ]
     integer (c_int)  :: indx
