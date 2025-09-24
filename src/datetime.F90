@@ -1010,7 +1010,7 @@ function write_list_time_fn(this)                     result(sTimeText)
   class(DATETIME_T) :: this
   character (len=8) :: sTimeText
 
-  write(sTimeText,fmt="(i2.2,':',i2.2':',i2.2)") this%iHour, this%iMinute, this%iSecond
+  write(sTimeText,fmt="(i2.2,':',i2.2,':',i2.2)") this%iHour, this%iMinute, this%iSecond
 
 end function write_list_time_fn
 
@@ -1074,7 +1074,7 @@ function write_list_datetime_fn(this)    result(sDatetimeText)
      trim(sDATE_FORMAT)//"' for output", &
     __FILE__, __LINE__)
 
-  write(sBuf,fmt="(1x,i2.2,':',i2.2':',i2.2)") this%iHour, this%iMinute, this%iSecond
+  write(sBuf,fmt="(1x,i2.2,':',i2.2,':',i2.2)") this%iHour, this%iMinute, this%iSecond
 
 !  if(lListTime) then
     sDateTimeText = trim(sDateTimeText) // trim(sBuf)
