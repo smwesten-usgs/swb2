@@ -753,12 +753,12 @@ end function retrieve_values_as_logical_fn
   !       https://rosettacode.org/wiki/Sorting_algorithms/Quicksort#Fortran
 
   ! DUMMY ARGUMENTS
-  type (ALPHA_SORT_GROUP_T), dimension(nrec), intent(in out) :: sort_group
-  integer (c_int), intent(in)                                :: nrec
+  type (ALPHA_SORT_GROUP_T),  intent(inout) :: sort_group(:)
+  integer (c_int), intent(in)               :: nrec
 
   ! LOCAL VARIABLES
   integer (c_int)                  :: left, right
-  real (c_double)                   :: random
+  real (c_double)                  :: random
   character (len=:), allocatable   :: pivot
   type (ALPHA_SORT_GROUP_T)        :: temp
   integer (c_int)                  :: marker
@@ -807,8 +807,8 @@ end function retrieve_values_as_logical_fn
   !       https://rosettacode.org/wiki/Sorting_algorithms/Quicksort#Fortran
 
   ! DUMMY ARGUMENTS
-  type (INT_SORT_GROUP_T), dimension(nrec), intent(in out) :: sort_group
-  integer (c_int), intent(in)                              :: nrec
+  type (INT_SORT_GROUP_T), intent(inout) :: sort_group(:)
+  integer (c_int), intent(in)            :: nrec
 
   ! LOCAL VARIABLES
   integer (c_int)                  :: left, right
@@ -861,8 +861,8 @@ end function retrieve_values_as_logical_fn
   !       https://rosettacode.org/wiki/Sorting_algorithms/Quicksort#Fortran
 
   ! DUMMY ARGUMENTS
-  type (FLOAT_SORT_GROUP_T), dimension(nrec), intent(in out) :: sort_group
-  integer (c_int), intent(in)                                :: nrec
+  type (FLOAT_SORT_GROUP_T), intent(in out) :: sort_group(:)
+  integer (c_int), intent(in)               :: nrec
 
   ! LOCAL VARIABLES
   integer (c_int)                  :: left, right
