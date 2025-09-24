@@ -54,7 +54,7 @@ contains
 
 !----------------------------------------------------------------------------------------------------
 
-	elemental subroutine calculate_actual_et_fao56( actual_et,                         &
+  elemental subroutine calculate_actual_et_fao56( actual_et,                         &
                                                   adjusted_depletion_fraction_p,     &
                                                   soil_storage,                      &
                                                   depletion_fraction_p,              &

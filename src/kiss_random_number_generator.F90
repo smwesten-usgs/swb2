@@ -100,7 +100,7 @@ contains
 ! return; end
 ! ---------------------------------------------------------------
 !
-! Output from using the macro KISS or the function KISS()	is
+! Output from using the macro KISS or the function KISS()  is
 ! MWC+XSH+CNG mod 2^64.
 
 !-------------------------------------------------------------------------------

@@ -143,7 +143,7 @@ contains
 
     dDelta = 0.409_c_double &
              * sin( (TWOPI * real(iDayOfYear, c_double) / real(iNumDaysInYear, c_double) ) &
-  		          - 1.39_c_double)
+                - 1.39_c_double)
 
   end function solar_declination_simple__delta
 
@@ -535,18 +535,18 @@ contains
 
   !------------------------------------------------------------------------------------------------
 
-	!> Calculate solar zenith angle given latitude, declination, and (optionally) hour angle.
-	!!
+  !> Calculate solar zenith angle given latitude, declination, and (optionally) hour angle.
+  !!
   !! Calculate solar zenith. Solar zenith angle is the angle between a point directly overhead and
-	!! the center of the sun's disk.
-	!!
+  !! the center of the sun's disk.
+  !!
   !! @param[in]     rLatitude   Latitude of location for which estimate is being made, in RADIANS
-	!! @param[in]        rDelta   Solar declination angle, in RADIANS
+  !! @param[in]        rDelta   Solar declination angle, in RADIANS
   !! @param[in]        rOmega   [OPTIONAL] Hour angle, measured at the celestial pole between the observer's meridian
   !!                            and the solar meridian, in RADIANS.
   !!
-	!! @retval         rTheta_z   Solar zenith angle for given location and time, in RADIANS
-	!!
+  !! @retval         rTheta_z   Solar zenith angle for given location and time, in RADIANS
+  !!
   !! @note Implementation follows equation 9.67, Jacobson, 2005
   !!
   !! @note
@@ -554,14 +554,14 @@ contains
   !!   Jacobson, M.Z., 2005, Fundamentals of atmospheric modeling, Second Edition:
   !!   Cambridge University Press.
 
-	function zenith_angle__theta_z( dLatitude, dDelta, dOmega ) result( dTheta_z )     bind(c)
+  function zenith_angle__theta_z( dLatitude, dDelta, dOmega ) result( dTheta_z )     bind(c)
 
-	  real (c_double), intent(in)            :: dLatitude
-	  real (c_double), intent(in)            :: dDelta
+    real (c_double), intent(in)            :: dLatitude
+    real (c_double), intent(in)            :: dDelta
     real (c_double), intent(in), optional  :: dOmega
 
-	  ! [ LOCALS ]
-	  real (c_double) :: dTheta_z
+    ! [ LOCALS ]
+    real (c_double) :: dTheta_z
     real (c_double) :: dOmega_l
 
     if ( present( dOmega ) ) then
@@ -570,14 +570,14 @@ contains
       dOmega_l = 0.0_c_double
     endif
 
-	  call assert( dLatitude <= HALFPI .and. dLatitude >= -HALFPI , &
-	    "Internal programming error: Latitude must be expressed in RADIANS and range from -pi/2 to pi/2", &
-	    __FILE__, __LINE__ )
+    call assert( dLatitude <= HALFPI .and. dLatitude >= -HALFPI , &
+      "Internal programming error: Latitude must be expressed in RADIANS and range from -pi/2 to pi/2", &
+      __FILE__, __LINE__ )
 
 
-	  dTheta_z = acos( sin(dLatitude) * sin(dDelta) + cos(dLatitude) * cos(dDelta) * cos(dOmega_l ) )
+    dTheta_z = acos( sin(dLatitude) * sin(dDelta) + cos(dLatitude) * cos(dDelta) * cos(dOmega_l ) )
 
-	end function zenith_angle__theta_z
+  end function zenith_angle__theta_z
 
   !------------------------------------------------------------------------------------------------
 
