@@ -1,31 +1,17 @@
-*.Rhistory
+# OS-specific files
+.DS_Store
+
+# Build artifacts
 *.o
 *.obj
 *.mod
+
+# IDE and editor files
+*.Rhistory
 *.ini
-*.csv
-*.orig
-*.DS_Store
-*LOGFILE*.txt
-webpages/styles
-webpages/Templates
-webpages/Library
-webpages/includes
-webpages/images
-build
-doc/doxygen
-doc/doxygen/html
-doc/doxygen/html/*
-doc/doxygen/html/*.*
-share/Redistributables
-share/external
-share/related_codes/Hawaii_Water_Budget_Code/
-doc/src/raw/temp
-doc/src/temp
-doc/src/raw/tempfile.md
-doc/src/raw/tempfile.mde
-doc/src/raw/tempfile_utf.md
+
+# SWB outputs
+*LOGFILE*.md
+
+# auto-generated Fortran files
 version_control.F90
-doc/src/raw/temp_junk
-doc/src/to_docx
-doc/src/to_doxygen

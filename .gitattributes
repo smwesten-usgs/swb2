@@ -1,3 +1,6 @@
+# this is here to force GitHub to ignore the following file types
+# when assessing the language type of the SWB2 repo
+# without this, GitHub claims it is a Python project!
 *.asc linguist-detectable=false
 *.html linguist-detectable=false
 *.R linguist-detectable=false
