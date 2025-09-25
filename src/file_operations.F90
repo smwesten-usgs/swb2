@@ -145,19 +145,24 @@ contains
     logical (c_bool)   :: lIsComment
 
     ! [ LOCALS ]
-    integer (c_int)                 :: iIndex
-    integer (c_int)                 :: iLen
-    character (len=:), allocatable  :: sBufTemp
-
-    iLen = len_trim( this%sBuf )
-
-    sBufTemp = adjustl(this%sBuf)
-
-    iIndex = verify( sBufTemp , this%sCommentChars )
+    integer (c_int)                :: iIndex
+    integer (c_int)                :: iLen
+    character (len=:), allocatable :: sTrimmedInput
+    character (len=1)              :: sFirstChar
 
     lIsComment = FALSE
 
-    if ( iIndex == 0 .or. iLen == 0 ) lIsComment = TRUE
+    sTrimmedInput = adjustl(trim(this%sBuf))
+    iLen = len( sTrimmedInput )
+
+    if (iLen > 0) then
+
+      sFirstChar = sTrimmedInput(1:1)
+      ! If sFirstChar is found in sCommentChars, the result is zero
+      iIndex = verify( sFirstChar , this%sCommentChars )
+      if ( iIndex == 0 ) lIsComment = TRUE
+
+    endif
 
   end function is_current_line_a_comment_fn
 
