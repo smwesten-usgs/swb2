@@ -757,7 +757,7 @@ end function retrieve_values_as_logical_fn
   integer (c_int), intent(in)               :: nrec
 
   ! LOCAL VARIABLES
-  integer (c_int)                  :: left, right
+  integer (c_int)                  :: left_indx, right_indx
   real (c_float)                   :: random
   character (len=:), allocatable   :: pivot
   type (ALPHA_SORT_GROUP_T)        :: temp
@@ -767,29 +767,29 @@ end function retrieve_values_as_logical_fn
 
           call random_number(random)
           pivot = sort_group(int(random*real(nrec-1))+1)%alpha_value   ! random pivor (not best performance, but avoids worst-case)
-          left = 0
-          right = nrec + 1
+          left_indx = 0
+          right_indx = nrec + 1
 
-          do while (left < right)
-              right = right - 1
-              do while (sort_group(right)%alpha_value > pivot)
-                  right = right - 1
+          do while (left_indx < right_indx)
+              right_indx = right_indx - 1
+              do while (sort_group(right_indx)%alpha_value > pivot)
+                  right_indx = right_indx - 1
               end do
-              left = left + 1
-              do while (sort_group(left)%alpha_value < pivot)
-                  left = left + 1
+              left_indx = left_indx + 1
+              do while (sort_group(left_indx)%alpha_value < pivot)
+                  left_indx = left_indx + 1
               end do
-              if (left < right) then
-                  temp = sort_group(left)
-                  sort_group(left) = sort_group(right)
-                  sort_group(right) = temp
+              if (left_indx < right_indx) then
+                  temp = sort_group(left_indx)
+                  sort_group(left_indx) = sort_group(right_indx)
+                  sort_group(right_indx) = temp
               end if
           end do
 
-          if (left == right) then
-              marker = left + 1
+          if (left_indx == right_indx) then
+              marker = left_indx + 1
           else
-              marker = left
+              marker = left_indx
           end if
 
           call qsort_alpha(sort_group(:marker-1),marker-1)
@@ -811,7 +811,7 @@ end function retrieve_values_as_logical_fn
   integer (c_int), intent(in)            :: nrec
 
   ! LOCAL VARIABLES
-  integer (c_int)                  :: left, right
+  integer (c_int)                  :: left_indx, right_indx
   real (c_float)                   :: random
   integer (c_int)                  :: pivot
   type (INT_SORT_GROUP_T)          :: temp
@@ -821,29 +821,29 @@ end function retrieve_values_as_logical_fn
 
           call random_number(random)
           pivot = sort_group(int(random*real(nrec-1))+1)%int_value   ! random pivor (not best performance, but avoids worst-case)
-          left = 0
-          right = nrec + 1
+          left_indx = 0
+          right_indx = nrec + 1
 
-          do while (left < right)
-              right = right - 1
-              do while (sort_group(right)%int_value > pivot)
-                  right = right - 1
+          do while (left_indx < right_indx)
+              right_indx = right_indx - 1
+              do while (sort_group(right_indx)%int_value > pivot)
+                  right_indx = right_indx - 1
               end do
-              left = left + 1
-              do while (sort_group(left)%int_value < pivot)
-                  left = left + 1
+              left_indx = left_indx + 1
+              do while (sort_group(left_indx)%int_value < pivot)
+                  left_indx = left_indx + 1
               end do
-              if (left < right) then
-                  temp = sort_group(left)
-                  sort_group(left) = sort_group(right)
-                  sort_group(right) = temp
+              if (left_indx < right_indx) then
+                  temp = sort_group(left_indx)
+                  sort_group(left_indx) = sort_group(right_indx)
+                  sort_group(right_indx) = temp
               end if
           end do
 
-          if (left == right) then
-              marker = left + 1
+          if (left_indx == right_indx) then
+              marker = left_indx + 1
           else
-              marker = left
+              marker = left_indx
           end if
 
           call qsort_int(sort_group(:marker-1),marker-1)
@@ -865,7 +865,7 @@ end function retrieve_values_as_logical_fn
   integer (c_int), intent(in)               :: nrec
 
   ! LOCAL VARIABLES
-  integer (c_int)                  :: left, right
+  integer (c_int)                  :: left_indx, right_indx
   real (c_float)                   :: random
   real (c_float)                   :: pivot
   type (FLOAT_SORT_GROUP_T)        :: temp
@@ -875,29 +875,29 @@ end function retrieve_values_as_logical_fn
 
           call random_number(random)
           pivot = sort_group(int(random*real(nrec-1))+1)%float_value   ! random pivor (not best performance, but avoids worst-case)
-          left = 0
-          right = nrec + 1
+          left_indx = 0
+          right_indx = nrec + 1
 
-          do while (left < right)
-              right = right - 1
-              do while (sort_group(right)%float_value > pivot)
-                  right = right - 1
+          do while (left_indx < right_indx)
+              right_indx = right_indx - 1
+              do while (sort_group(right_indx)%float_value > pivot)
+                  right_indx = right_indx - 1
               end do
-              left = left + 1
-              do while (sort_group(left)%float_value < pivot)
-                  left = left + 1
+              left_indx = left_indx + 1
+              do while (sort_group(left_indx)%float_value < pivot)
+                  left_indx = left_indx + 1
               end do
-              if (left < right) then
-                  temp = sort_group(left)
-                  sort_group(left) = sort_group(right)
-                  sort_group(right) = temp
+              if (left_indx < right_indx) then
+                  temp = sort_group(left_indx)
+                  sort_group(left_indx) = sort_group(right_indx)
+                  sort_group(right_indx) = temp
               end if
           end do
 
-          if (left == right) then
-              marker = left + 1
+          if (left_indx == right_indx) then
+              marker = left_indx + 1
           else
-              marker = left
+              marker = left_indx
           end if
 
           call qsort_float(sort_group(:marker-1),marker-1)
