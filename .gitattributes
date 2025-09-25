@@ -1,6 +1,45 @@
+# ----------------------------------------
+# GitHub Linguist overrides
 *.asc linguist-detectable=false
 *.html linguist-detectable=false
 *.R linguist-detectable=false
 *.ctl linguist-detectable=false
 *.ipynb linguist-detectable=false
 *.py linguist-detectable=false
+
+# ----------------------------------------
+# Explicit line ending normalization for known text files
+*.f90 text eol=lf
+*.F90 text eol=lf
+*.f text eol=lf
+*.F text eol=lf
+*.c text eol=lf
+*.h text eol=lf
+*.sh text eol=lf
+*.R text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.csv text eol=lf
+*.ini text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+CMakeLists.txt text eol=lf
+*.cmake text eol=lf
+meson.build text eol=lf
+meson_options.txt text eol=lf
+
+# ----------------------------------------
+# Windows-specific scripts
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# ----------------------------------------
+# Binary files (no normalization)
+*.pdf binary
+*.png binary
+*.jpg binary
+*.zip binary
+*.exe binary
