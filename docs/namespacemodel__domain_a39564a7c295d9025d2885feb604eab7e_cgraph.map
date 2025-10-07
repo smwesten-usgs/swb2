@@ -1,0 +1,7 @@
+<map id="model_domain::model_initialize_continuous_frozen_ground_index" name="model_domain::model_initialize_continuous_frozen_ground_index">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,154,64"/>
+<area shape="rect" id="Node000002" href="$namespacecontinuous__frozen__ground__index.html#a5477d02f7996b4d043779a7488a77fcf" title=" " alt="" coords="202,5,386,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,32,186,32,186,37,154,37"/>
+<area shape="rect" id="Node000003" href="$namespaceexceptions.html#a865c266d00ec8abab13dc671fd1f2d84" title=" " alt="" coords="434,21,554,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="386,32,419,32,419,37,386,37"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="growing_season::growing_season_initialize" name="growing_season::growing_season_initialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,174,65"/>
+<area shape="rect" id="Node000002" href="$namespacedatetime.html#a38a22e5b5d41e7f379d45d060e9ae044" title=" " alt="" coords="222,5,365,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="173,31,206,27,207,32,174,36"/>
+<area shape="rect" id="Node000005" href="$namespaceexceptions.html#a865c266d00ec8abab13dc671fd1f2d84" title=" " alt="" coords="233,56,354,83"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="174,52,218,57,217,63,173,57"/>
+<area shape="rect" id="Node000003" href="$namespacedatetime.html#abc64e3b90a66519d1ae3b7387120729c" title=" " alt="" coords="413,5,550,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="365,16,398,16,398,21,365,21"/>
+<area shape="rect" id="Node000004" href="$namespacedatetime.html#ab1d9676d8eb0eb478a641392d74ee96b" title=" " alt="" coords="598,5,712,32"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="551,16,583,16,583,21,551,21"/>
+</map>

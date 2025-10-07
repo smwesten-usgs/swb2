@@ -1,0 +1,7 @@
+<map id="model_domain::model_domain_t::initialize_grid" name="model_domain::model_domain_t::initialize_grid">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,170,48"/>
+<area shape="rect" id="Node000002" href="$namespacemodel__domain.html#adae3121eb9897c82bcb124b571f7180e" title=" " alt="" coords="218,5,378,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,24,202,24,202,29,170,29"/>
+<area shape="rect" id="Node000003" href="$namespacegrid.html#a6b464622cb96e3543859add19e1137c1" title=" " alt="" coords="426,13,578,40"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="378,24,411,24,411,29,378,29"/>
+</map>

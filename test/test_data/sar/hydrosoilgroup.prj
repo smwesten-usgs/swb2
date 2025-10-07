@@ -1,0 +1,13 @@
+Projection    TRANSVERSE
+Datum         MOD
+Spheroid      INT1909
+Units         METERS
+Zunits        NO
+Xshift        0.0
+Yshift        0.0
+Parameters    
+0.9996 /* scale factor at central meridian
+   9  0  0.0 /* longitude of central meridian
+   0  0  0.0 /* latitude of origin
+1500000.0 /* false easting (meters)
+0.0 /* false northing (meters)

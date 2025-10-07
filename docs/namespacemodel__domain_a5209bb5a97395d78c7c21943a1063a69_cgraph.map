@@ -1,0 +1,7 @@
+<map id="model_domain::model_calculate_routing_d8" name="model_domain::model_calculate_routing_d8">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,154,81"/>
+<area shape="rect" id="Node000002" href="$namespacerouting____d8.html#ab2737c06c2bbfe695e55cf1fdc6451df" title=" " alt="" coords="208,5,350,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,45,193,38,194,44,155,50"/>
+<area shape="rect" id="Node000003" href="$namespacerouting____d8.html#a8c054640f102f6f4324d6998254b0c62" title=" " alt="" coords="202,72,356,115"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="155,70,187,75,186,81,154,75"/>
+</map>

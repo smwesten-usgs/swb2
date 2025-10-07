@@ -1,0 +1,7 @@
+<map id="model_domain::model_initialize_interception_bucket" name="model_domain::model_initialize_interception_bucket">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,155,64"/>
+<area shape="rect" id="Node000002" href="$namespaceinterception____bucket.html#ac38375085610e4aff3186aef6b786dbe" title=" " alt="" coords="203,5,345,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,32,188,32,188,37,155,37"/>
+<area shape="rect" id="Node000003" href="$namespaceexceptions.html#a865c266d00ec8abab13dc671fd1f2d84" title=" " alt="" coords="393,21,513,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="345,32,377,32,377,37,345,37"/>
+</map>

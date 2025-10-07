@@ -1,0 +1,18 @@
+<map id="model_initialize::initialize_latitude" name="model_initialize::initialize_latitude">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,73,171,116"/>
+<area shape="rect" id="Node000002" href="$namespacegrid.html#a731a63c3e56b5c445e8fc66ceb20f37d" title=" " alt="" coords="231,5,352,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,70,238,35,240,40,148,75"/>
+<area shape="rect" id="Node000003" href="$namespacegrid.html#a10433f650b8016e28ed95de584b7da52" title=" " alt="" coords="432,56,574,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="171,87,417,72,417,77,171,92"/>
+<area shape="rect" id="Node000006" href="$namespacegrid.html#ad28fa0e1e387c5e09c72c0fb194d349e" title="Call PROJ4 to transform coordinates." alt="" coords="225,107,358,133"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="171,102,210,107,209,112,171,108"/>
+<area shape="rect" id="Node000008" href="$namespacegrid.html#a73982fb822e4ddc14622870cc41ba371" title=" " alt="" coords="219,157,364,184"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="145,114,220,143,237,149,235,154,218,148,143,119"/>
+<area shape="rect" id="Node000004" href="$namespacegrid.html#ad6acbbea3b49f90b8c19179622737342" title=" " alt="" coords="642,31,767,57"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="574,58,627,51,627,56,574,63"/>
+<area shape="rect" id="Node000005" href="$namespacegrid.html#ac25f47e46ae1bb251b52182e51d7c625" title=" " alt="" coords="642,81,767,108"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="574,76,627,82,627,88,574,81"/>
+<area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="350,103,429,84,430,89,351,109"/>
+<area shape="rect" id="Node000007" href="$namespacegrid.html#ac8caedfc8d4e24943e8b77c92ede5314" title=" " alt="" coords="412,107,594,133"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="358,117,396,117,396,123,358,123"/>
+</map>

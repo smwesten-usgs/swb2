@@ -1,0 +1,22 @@
+<map id="netcdf4_support::nf_get_first_and_last" name="netcdf4_support::nf_get_first_and_last">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,188,139,231"/>
+<area shape="rect" id="Node000002" href="$namespacenetcdf4__support.html#aa5b55a0c9e7067c9da4b4bc96adede56" title=" " alt="" coords="205,5,346,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,186,127,131,154,101,185,74,190,70,193,75,188,78,158,105,131,135,90,189"/>
+<area shape="rect" id="Node000005" href="$namespacenetcdf4__support.html#a499f0ac196b5aa474979c9bf2474c93f" title=" " alt="" coords="189,88,362,131"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="106,185,185,140,198,135,200,140,188,145,109,190"/>
+<area shape="rect" id="Node000006" href="$namespacenetcdf4__support.html#acdc5c74f64679450a7d97c11ea1e4d7c" title=" " alt="" coords="194,155,356,197"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="139,196,178,189,179,194,139,201"/>
+<area shape="rect" id="Node000007" href="$namespacenetcdf4__support.html#aaef7ffa47bb7a162d8f1d59ee1b8087c" title=" " alt="" coords="187,221,364,264"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="139,218,172,223,171,228,139,223"/>
+<area shape="rect" id="Node000008" href="$namespacenetcdf4__support.html#a63e354e2aa43cc99b1b0f46c414ef3ec" title=" " alt="" coords="209,288,342,331"/>
+<area shape="poly" id="edge10_Node000001_Node000008" title=" " alt="" coords="109,229,188,274,200,279,198,284,185,278,106,234"/>
+<area shape="rect" id="Node000009" href="$namespaceexceptions.html#a865c266d00ec8abab13dc671fd1f2d84" title=" " alt="" coords="215,355,336,381"/>
+<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="88,230,128,285,156,315,188,340,202,348,199,353,185,345,153,319,124,289,84,233"/>
+<area shape="rect" id="Node000003" href="$namespacenetcdf4__support.html#a9331ff511628187408d8dec52f524ffd" title=" " alt="" coords="412,129,574,156"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="342,62,365,74,454,119,451,124,363,78,340,67"/>
+<area shape="rect" id="Node000004" href="$namespaceconstants__and__conversions.html#aea2fabe8e27f89ad63b773b444340415" title=" " alt="" coords="622,121,806,164"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="574,140,607,140,607,145,574,145"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="363,120,397,125,396,131,362,125"/>
+<area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="356,161,396,155,397,160,357,166"/>
+<area shape="poly" id="edge9_Node000007_Node000003" title=" " alt="" coords="336,218,363,207,453,162,455,166,365,212,338,223"/>
+</map>

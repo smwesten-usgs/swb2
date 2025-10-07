@@ -1,0 +1,16 @@
+# SWB version 2.0 land-use lookup table for Sardinia test case																								
+#			CURVE NUMBER						MAX RECHARGE						INTERCEPTION		ROOT DEPTH							
+#			B	B	B	B	B	B	DAP	ASO	DSP	ATG	MET	ATS			DAP	ASO	DSP	ATG	MET	ATS		
+LU_Code	Description	Assumed_pct_imperv	CN_1	CN_2	CN_3	CN_4	CN_5	CN_6	max_net_infil_1	max_net_infil_2	max_net_infil_3	max_net_infil_4	max_net_infil_5	max_net_infil_6	Interception_growing	Interception_nongrowing	RZ_1	RZ_2	RZ_3	RZ_4	RZ_5	RZ_6	First_day_of_growing_season	Last_day_of_growing_season
+51	corpi idrici	Not applicable	100	100	100	100	100	100	109.77	167.07	5.78	76.93	5.2	61.31	0	0	0	0	0	0	0	0	1	365
+74	suolo nudo	**	81	81	81	81	81	81	109.77	167.07	5.78	76.93	5.2	61.31	0	0	1.5	1.5	1.5	1.5	1.5	1.5	1	365
+31	sup naturale priva di vegetazione	**	79	79	79	79	79	79	109.77	167.07	5.78	76.93	5.2	61.31	0	0	0	0	0	0	0	0	1	365
+12	urbano	30	70	70	70	70	70	70	109.77	167.07	5.78	76.93	5.2	61.31	0	0	3.33	3.33	3.33	3.33	3.33	3.33	1	365
+11	urbano residenziale	65	73	73	73	73	73	73	109.77	167.07	5.78	76.93	5.2	61.31	0	0	3.33	3.33	3.33	3.33	3.33	3.33	1	365
+31	vegetazione arbusiva-macchia	**	58	58	58	58	58	58	109.77	167.07	5.78	76.93	5.2	61.31	0	0	1.5	1.5	1.5	1.5	1.5	1.5	1	365
+26	Moderately-Deep rooted crops	**	79	79	79	79	79	79	109.77	167.07	5.78	76.93	5.2	61.31	0	0	4.5	4.5	4.5	4.5	4.5	4.5	1	365
+62	vegetazione naturale rada	**	69	69	69	69	69	69	109.77	167.07	5.78	76.93	5.2	61.31	0	0	1.5	1.5	1.5	1.5	1.5	1.5	1	365
+22	Orchards	**	71	71	71	71	71	71	109.77	167.07	5.78	76.93	5.2	61.31	0	0	4	4	4	4	4	4	1	365
+17	superfici artificiali	30	70	70	70	70	70	70	109.77	167.07	5.78	76.93	5.2	61.31	0	0	3.33	3.33	3.33	3.33	3.33	3.33	1	365
+25	seminativi complessi	**	71	71	71	71	71	71	109.77	167.07	5.78	76.93	5.2	61.31	0	0	3.5	3.5	3.5	3.5	3.5	3.5	1	365
+72	spiagge	**	71	71	71	71	71	71	109.77	167.07	5.78	76.93	5.2	61.31	0	0	3.5	3.5	3.5	3.5	3.5	3.5	1	365

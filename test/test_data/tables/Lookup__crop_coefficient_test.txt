@@ -1,0 +1,12 @@
+#		Kcb	Kcb	Kcb	Kcb	planting	initial	dev	mid	late		initial	dev	mid	late	Base 	Max
+# LU	Description	initial	mid	late	min	"(DOY, or mm/dd)"	(DOY/GDD)	(DOY/GDD)	(DOY/GDD)	(DOY/GDD)		(DOY/GDD)	(DOY/GDD)	(DOY/GDD)	(DOY/GDD)	Temperature (F) 	Temperature (F)
+LU_Code	Description	KCB_ini	KCB_mid	KCB_end	KCB_min	Planting_date	L_ini	L_dev	L_mid	L_late	GDD_plant	GDD_ini	GDD_dev	GDD_mid	GDD_late	GDD_Base	GDD_Max
+1	Corn	0.2	0.96	0.6	0.19	05/01	20	50	40	30						50	130
+4	 Sorghum	0.15	1	0.55	0.14	05/01	20	35	40	30						50	130
+5	Soybeans	0.2	1.05	0.3	0.19	05/20	20	30	60	25						50	130
+6	Sunflower	0.15	1	0.35	0.14	05/01	25	35	45	25						50	130
+12	Sweet Corn	0.2	0.96	0.6	0.19						100	350	1000	1600	2000	50	130
+21	Barley	0.15	1.15	0.25	0.14	04/20	40	40	50	50		400	1100	1700	2200	50	130
+23	Spring Wheat	0.15	1.15	0.25	0.14	04/20	20	25	60	30						50	130
+24	Winter Wheat	0.4	1.15	0.25	0.2	10/01	160	75	75	25						50	130
+26	Dbl Crop WinWht/Soybeans	0.2	1.05	0.3	0.19	05/15	20	30	60	25						50	130

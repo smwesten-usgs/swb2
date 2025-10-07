@@ -1,0 +1,48 @@
+[
+  {
+    "name": "Soil-Water-Balance version 2.0",
+    "organization": "U.S. Geological Survey",
+    "description": "The Soil-Water-Balance (SWB) computer code has been developed to calculate spatial and temporal variations in groundwater recharge. The SWB model calculates recharge by use of commonly available geographic information system (GIS) data layers in combination with tabular climatological data. The code is based on a modified Thornthwaite-Mather soil-water-balance approach, with components of the soil-water balance calculated at a daily timestep. Recharge calculations are made on a rectangular grid of computational elements that may be easily imported into a regional groundwater-flow model.",
+    "version": "2.0",
+    "status": "APPROVED",
+
+    "permissions": {
+      "usageType": "openSource",
+      "licenses": [
+        {
+          "name": "Public Domain, CC0-1.0",
+          "URL": "https://code.usgs.gov/water/soil-water-balance/blob/swb2/LICENSE.md"
+        }
+      ]
+    },
+
+    "homepageURL": "https://pubs.er.usgs.gov/publication/tm6A59",
+    "downloadURL": "https://code.usgs.gov/water/soil-water-balance/-/archive/swb2/soil-water-balance-swb2.zip",
+    "disclaimerURL": "https://code.usgs.gov/water/soil-water-balance/blob/swb2/DISCLAIMER.md",
+    "repositoryURL": "https://code.usgs.gov/water/soil-water-balance/tree/swb2",
+    "vcs": "git",
+
+    "laborHours": 0,
+
+    "tags": [
+      "groundwater recharge",
+      "net infiltration",
+      "crop water demand",
+      "soil-water budget"
+    ],
+
+    "languages": [
+      "Fortran",
+      "C"
+    ],
+
+    "contact": {
+      "name": "Steve Westenbroek",
+      "email": "smwesten@usgs.gov"
+    },
+
+    "date": {
+      "metadataLastUpdated": "2018-09-06"
+    }
+  }
+]

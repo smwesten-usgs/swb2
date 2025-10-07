@@ -1,0 +1,19 @@
+<map id="grid::grid_gridtopoint_int" name="grid::grid_gridtopoint_int">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,81,165,108"/>
+<area shape="rect" id="Node000002" href="$namespaceexceptions.html#afd73029531ee5ba631b7838d2f6395dd" title=" " alt="" coords="248,5,358,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,78,212,41,234,34,236,39,214,47,119,83"/>
+<area shape="rect" id="Node000003" href="$namespacegrid.html#a8a8b59ec58be67932f6e0f171befea69" title=" " alt="" coords="213,56,393,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="165,83,197,79,197,84,166,88"/>
+<area shape="rect" id="Node000006" href="$namespacegrid.html#afe0ecfd8ec6209eb58e4f5d01bffe7b8" title=" " alt="" coords="218,107,388,133"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="166,101,202,106,202,111,165,107"/>
+<area shape="rect" id="Node000007" href="$namespacegrid.html#a10433f650b8016e28ed95de584b7da52" title=" " alt="" coords="232,157,374,184"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="119,106,214,143,236,150,234,155,212,148,117,111"/>
+<area shape="rect" id="Node000004" href="$namespacegrid.html#a040b87d24cdca06cf694edaa7bb81dbe" title=" " alt="" coords="443,19,602,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="385,53,427,45,428,51,385,58"/>
+<area shape="rect" id="Node000005" href="$namespacegrid.html#a6361fe051ca524fdcfef9b1439a5c923" title=" " alt="" coords="441,69,604,96"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="393,72,426,74,425,79,393,77"/>
+<area shape="rect" id="Node000008" href="$namespacegrid.html#ad6acbbea3b49f90b8c19179622737342" title=" " alt="" coords="460,132,585,159"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="374,160,445,152,445,157,374,165"/>
+<area shape="rect" id="Node000009" href="$namespacegrid.html#ac25f47e46ae1bb251b52182e51d7c625" title=" " alt="" coords="460,183,585,209"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="374,176,445,184,445,190,374,181"/>
+</map>

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 1296 648" width="108pc" height="54pc" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <metadata> Produced by OmniGraffle 7.4.3 
+    <dc:date>2017-09-25 18:55:16 +0000</dc:date>
+  </metadata>
+  <defs>
+    <font-face font-family="Univers" font-size="32" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="0" x-height="516" cap-height="737" ascent="953.0019" descent="-250.0005" font-weight="300" font-stretch="condensed">
+      <font-face-src>
+        <font-face-name name="Univers-CondensedLight"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="Univers" font-size="30" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="0" x-height="516" cap-height="738" ascent="989.002" descent="-250.0005" font-weight="700" font-stretch="condensed">
+      <font-face-src>
+        <font-face-name name="Univers-Condensed"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="Univers" font-size="21" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="0" x-height="516" cap-height="737" ascent="953.0019" descent="-250.0005" font-weight="300" font-stretch="condensed">
+      <font-face-src>
+        <font-face-name name="Univers-CondensedLight"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="Univers" font-size="30" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="0" x-height="516" cap-height="737" ascent="953.0019" descent="-250.0005" font-weight="300" font-stretch="condensed">
+      <font-face-src>
+        <font-face-name name="Univers-CondensedLight"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="Univers" font-size="30" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="-400" x-height="516" cap-height="737" ascent="953.0019" descent="-250.0005" font-style="italic" font-weight="300" font-stretch="condensed">
+      <font-face-src>
+        <font-face-name name="Univers-CondensedLightOblique"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="Univers" font-size="56" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="-214.28571" x-height="516" cap-height="738" ascent="989.002" descent="-250.0005" font-style="italic" font-weight="700" font-stretch="condensed">
+      <font-face-src>
+        <font-face-name name="Univers-CondensedOblique"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="Univers" font-size="32" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="-375" x-height="516" cap-height="737" ascent="953.0019" descent="-250.0005" font-style="italic" font-weight="300" font-stretch="condensed">
+      <font-face-src>
+        <font-face-name name="Univers-CondensedLightOblique"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="Univers" font-size="26" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="-461.53846" x-height="516" cap-height="737" ascent="953.0019" descent="-250.0005" font-style="italic" font-weight="300" font-stretch="condensed">
+      <font-face-src>
+        <font-face-name name="Univers-CondensedLightOblique"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="Univers" font-size="26" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="0" x-height="516" cap-height="737" ascent="953.0019" descent="-250.0005" font-weight="300" font-stretch="condensed">
+      <font-face-src>
+        <font-face-name name="Univers-CondensedLight"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <g stroke="none" stroke-opacity="1" stroke-dasharray="none" fill="none" fill-opacity="1">
+    <title>Canvas 1</title>
+    <rect fill="white" width="1296" height="648"/>
+    <g>
+      <title>Gridcells</title>
+      <rect x="99" y="399" width="96" height="96" fill="white"/>
+      <rect x="99" y="399" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(104 428)" fill="black">
+        <tspan font-family="Univers" font-size="32" font-weight="300" font-stretch="condensed" x="21.688" y="30" textLength="42.624">104</tspan>
+      </text>
+      <rect x="291" y="399" width="96" height="96" fill="white"/>
+      <rect x="291" y="399" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(296 428)" fill="black">
+        <tspan font-family="Univers" font-size="32" font-weight="300" font-stretch="condensed" x="21.688" y="30" textLength="42.624">108</tspan>
+      </text>
+      <rect x="195" y="399" width="96" height="96" fill="white"/>
+      <rect x="195" y="399" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(200 428)" fill="black">
+        <tspan font-family="Univers" font-size="32" font-weight="300" font-stretch="condensed" x="21.688" y="30" textLength="42.624">106</tspan>
+      </text>
+      <rect x="195" y="303" width="96" height="96" fill="white"/>
+      <rect x="195" y="303" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(200 332)" fill="#0096ff">
+        <tspan font-family="Univers" font-size="32" font-weight="300" font-stretch="condensed" fill="#0096ff" x="21.688" y="30" textLength="42.624">109</tspan>
+      </text>
+      <rect x="291" y="303" width="96" height="96" fill="white"/>
+      <rect x="291" y="303" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(296 332)" fill="black">
+        <tspan font-family="Univers" font-size="32" font-weight="300" font-stretch="condensed" x="21.688" y="30" textLength="42.624">109</tspan>
+      </text>
+      <rect x="99" y="303" width="96" height="96" fill="white"/>
+      <rect x="99" y="303" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(104 332)" fill="black">
+        <tspan font-family="Univers" font-size="32" font-weight="300" font-stretch="condensed" x="21.688" y="30" textLength="42.624">110</tspan>
+      </text>
+      <rect x="291" y="207" width="96" height="96" fill="white"/>
+      <rect x="291" y="207" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(296 236)" fill="black">
+        <tspan font-family="Univers" font-size="32" font-weight="300" font-stretch="condensed" x="21.688" y="30" textLength="42.624">111</tspan>
+      </text>
+      <rect x="195" y="207" width="96" height="96" fill="white"/>
+      <rect x="195" y="207" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(200 236)" fill="black">
+        <tspan font-family="Univers" font-size="32" font-weight="300" font-stretch="condensed" x="21.688" y="30" textLength="42.624">112</tspan>
+      </text>
+      <rect x="99" y="207" width="96" height="96" fill="white"/>
+      <rect x="99" y="207" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(104 236)" fill="black">
+        <tspan font-family="Univers" font-size="32" font-weight="300" font-stretch="condensed" x="21.688" y="30" textLength="42.624">114</tspan>
+      </text>
+      <text transform="translate(488.0625 170)" fill="black">
+        <tspan font-family="Univers" font-size="30" font-weight="700" font-stretch="condensed" x=".095" y="30" textLength="118.35">EXPLANA</tspan>
+        <tspan font-family="Univers" font-size="30" font-weight="700" font-stretch="condensed" x="116.225" y="30" textLength="61.68">TION</tspan>
+      </text>
+      <path d="M 546.0683 255.88893 L 541.10544 265.2227 L 503.1107 245.02052 L 500.62925 249.6874 L 487.93315 230.9642 L 510.55495 231.01987 L 508.0735 235.68675 Z" fill="#0096ff"/>
+      <path d="M 546.0683 255.88893 L 541.10544 265.2227 L 503.1107 245.02052 L 500.62925 249.6874 L 487.93315 230.9642 L 510.55495 231.01987 L 508.0735 235.68675 Z" stroke="#008ad5" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      <text transform="translate(569 244)" fill="black">
+        <tspan font-family="Univers" font-size="21" font-weight="300" font-stretch="condensed" x=".433" y="20" textLength="127.134">Direction of flow</tspan>
+      </text>
+      <text transform="translate(503.5 284)" fill="black">
+        <tspan font-family="Univers" font-size="30" font-weight="300" font-stretch="condensed" x=".02" y="29" textLength="39.96">117</tspan>
+      </text>
+      <text transform="translate(569 290)" fill="black">
+        <tspan font-family="Univers" font-size="21" font-weight="300" font-stretch="condensed" x=".077" y="20" textLength="195.846">Elevation of adjoining cell</tspan>
+      </text>
+      <text transform="translate(503.5 329)" fill="#0096ff">
+        <tspan font-family="Univers" font-size="30" font-weight="300" font-stretch="condensed" fill="#0096ff" x=".02" y="29" textLength="39.96">108</tspan>
+      </text>
+      <text transform="translate(569 333)" fill="black">
+        <tspan font-family="Univers" font-size="21" font-weight="300" font-stretch="condensed" x=".3025" y="20" textLength="178.395">Elevation of central cell</tspan>
+      </text>
+      <text transform="translate(510 374)" fill="black">
+        <tspan font-family="Univers" font-size="30" font-style="italic" font-weight="300" font-stretch="condensed" x=".18" y="29" textLength="26.64">16</tspan>
+      </text>
+      <text transform="translate(568.5 380)" fill="black">
+        <tspan font-family="Univers" font-size="21" font-weight="300" font-stretch="condensed" x=".3835" y="20" textLength="205.233">D8 flow-direction encoding</tspan>
+      </text>
+      <text transform="translate(514 402)" fill="#9437ff">
+        <tspan font-family="Univers" font-size="56" font-style="italic" font-weight="700" font-stretch="condensed" fill="#9437ff" x=".068" y="55" textLength="24.864">8</tspan>
+      </text>
+      <text transform="translate(569 425)" fill="black">
+        <tspan font-family="Univers" font-size="21" font-weight="300" font-stretch="condensed" x=".2955" y="20" textLength="206.409">Resulting D8 flow direction</tspan>
+      </text>
+      <rect x="882" y="399" width="96" height="96" fill="white"/>
+      <rect x="882" y="399" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(887 428)" fill="black">
+        <tspan font-family="Univers" font-size="32" font-style="italic" font-weight="300" font-stretch="condensed" x="35.896" y="30" textLength="14.208">8</tspan>
+      </text>
+      <rect x="1074" y="399" width="96" height="96" fill="white"/>
+      <rect x="1074" y="399" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(1079 428)" fill="black">
+        <tspan font-family="Univers" font-size="32" font-style="italic" font-weight="300" font-stretch="condensed" x="35.896" y="30" textLength="14.208">2</tspan>
+      </text>
+      <rect x="978" y="399" width="96" height="96" fill="white"/>
+      <rect x="978" y="399" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(983 428)" fill="black">
+        <tspan font-family="Univers" font-size="32" font-style="italic" font-weight="300" font-stretch="condensed" x="35.896" y="30" textLength="14.208">4</tspan>
+      </text>
+      <rect x="978" y="303" width="96" height="96" fill="white"/>
+      <rect x="978" y="303" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(983 316.5)" fill="#9437ff">
+        <tspan font-family="Univers" font-size="56" font-style="italic" font-weight="700" font-stretch="condensed" fill="#9437ff" x="30.568" y="55" textLength="24.864">8</tspan>
+      </text>
+      <rect x="1074" y="303" width="96" height="96" fill="white"/>
+      <rect x="1074" y="303" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(1079 332)" fill="black">
+        <tspan font-family="Univers" font-size="32" font-style="italic" font-weight="300" font-stretch="condensed" x="35.896" y="30" textLength="14.208">1</tspan>
+      </text>
+      <rect x="882" y="303" width="96" height="96" fill="white"/>
+      <rect x="882" y="303" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(887 332)" fill="black">
+        <tspan font-family="Univers" font-size="32" font-style="italic" font-weight="300" font-stretch="condensed" x="28.792" y="30" textLength="28.416">16</tspan>
+      </text>
+      <rect x="1074" y="207" width="96" height="96" fill="white"/>
+      <rect x="1074" y="207" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(1079 236)" fill="black">
+        <tspan font-family="Univers" font-size="32" font-style="italic" font-weight="300" font-stretch="condensed" x="21.688" y="30" textLength="42.624">128</tspan>
+      </text>
+      <rect x="978" y="207" width="96" height="96" fill="white"/>
+      <rect x="978" y="207" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(983 236)" fill="black">
+        <tspan font-family="Univers" font-size="32" font-style="italic" font-weight="300" font-stretch="condensed" x="28.792" y="30" textLength="28.416">64</tspan>
+      </text>
+      <rect x="882" y="207" width="96" height="96" fill="white"/>
+      <rect x="882" y="207" width="96" height="96" stroke="#797979" stroke-linecap="round" stroke-linejoin="round" stroke-width=".5"/>
+      <text transform="translate(887 236)" fill="black">
+        <tspan font-family="Univers" font-size="32" font-style="italic" font-weight="300" font-stretch="condensed" x="28.792" y="30" textLength="28.416">32</tspan>
+      </text>
+      <text transform="translate(996.0625 170)" fill="black">
+        <tspan font-family="Univers" font-size="30" font-weight="300" font-stretch="condensed" x=".175" y="29" textLength="61.65">North</tspan>
+      </text>
+      <text transform="translate(995.0625 498)" fill="black">
+        <tspan font-family="Univers" font-size="30" font-weight="300" font-stretch="condensed" x=".35" y="29" textLength="63.3">South</tspan>
+      </text>
+      <text transform="translate(1178.5625 333)" fill="black">
+        <tspan font-family="Univers" font-size="30" font-weight="300" font-stretch="condensed" x=".175" y="29" textLength="46.65">East</tspan>
+      </text>
+      <text transform="translate(817.0625 333)" fill="black">
+        <tspan font-family="Univers" font-size="30" font-weight="300" font-stretch="condensed" x=".11" y="29" textLength="24.99">W</tspan>
+        <tspan font-family="Univers" font-size="30" font-weight="300" font-stretch="condensed" x="24.56" y="29" textLength="33.33">est</tspan>
+      </text>
+      <text transform="translate(34.5625 599)" fill="black">
+        <tspan font-family="Univers" font-size="26" font-style="italic" font-weight="300" font-stretch="condensed" x=".386" y="25" textLength="14.456">A</tspan>
+        <tspan font-family="Univers" font-size="26" font-weight="300" font-stretch="condensed" x="14.842" y="25" textLength="5.772">)</tspan>
+      </text>
+      <text transform="translate(818.0625 599)" fill="black">
+        <tspan font-family="Univers" font-size="26" font-style="italic" font-weight="300" font-stretch="condensed" x=".114" y="25" textLength="13">B</tspan>
+        <tspan font-family="Univers" font-size="26" font-weight="300" font-stretch="condensed" x="13.114" y="25" textLength="5.772">)</tspan>
+      </text>
+    </g>
+    <g>
+      <title>Arrow</title>
+      <path d="M 210.3468 378.40156 L 217.82173 385.8765 L 187.3937 416.3045 L 191.13116 420.042 L 169.5141 426.7092 L 176.1813 405.09213 L 179.91877 408.8296 Z" fill="#0096ff"/>
+      <path d="M 210.3468 378.40156 L 217.82173 385.8765 L 187.3937 416.3045 L 191.13116 420.042 L 169.5141 426.7092 L 176.1813 405.09213 L 179.91877 408.8296 Z" stroke="#008ad5" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+    </g>
+    <g>
+      <title>Text</title>
+      <text transform="translate(213.0625 170)" fill="black">
+        <tspan font-family="Univers" font-size="30" font-weight="300" font-stretch="condensed" x=".175" y="29" textLength="61.65">North</tspan>
+      </text>
+      <text transform="translate(212.0625 498)" fill="black">
+        <tspan font-family="Univers" font-size="30" font-weight="300" font-stretch="condensed" x=".35" y="29" textLength="63.3">South</tspan>
+      </text>
+      <text transform="translate(395.5625 333)" fill="black">
+        <tspan font-family="Univers" font-size="30" font-weight="300" font-stretch="condensed" x=".175" y="29" textLength="46.65">East</tspan>
+      </text>
+      <text transform="translate(34.5625 333)" fill="black">
+        <tspan font-family="Univers" font-size="30" font-weight="300" font-stretch="condensed" x=".11" y="29" textLength="24.99">W</tspan>
+        <tspan font-family="Univers" font-size="30" font-weight="300" font-stretch="condensed" x="24.56" y="29" textLength="33.33">est</tspan>
+      </text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,8 @@
+<map id="data_catalog_entry::initialize_netcdf_data_object_sub" name="data_catalog_entry::initialize_netcdf_data_object_sub">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,21,137,80"/>
+<area shape="rect" id="Node000002" href="$namespacefile__operations.html#a34279c59c086d32d4a2c9962a373ef16" title=" " alt="" coords="185,29,322,72"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,48,169,48,169,53,137,53"/>
+<area shape="poly" id="edge3_Node000002_Node000002" title=" " alt="" coords="218,29,217,19,223,10,235,5,253,3,273,5,285,11,282,16,272,10,253,8,236,10,226,14,222,21,223,28"/>
+<area shape="rect" id="Node000003" href="$namespaceconstants__and__conversions.html#a033541136836ab3a090e3e1c31d7df33" title=" " alt="" coords="370,29,553,72"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="323,48,354,48,354,53,323,53"/>
+</map>

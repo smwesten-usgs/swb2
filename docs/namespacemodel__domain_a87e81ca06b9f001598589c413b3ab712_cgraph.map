@@ -1,0 +1,11 @@
+<map id="model_domain::model_initialize_gdd_be" name="model_domain::model_initialize_gdd_be">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,154,56"/>
+<area shape="rect" id="Node000002" href="$namespacegrowing__degree__day__baskerville__emin.html#a8a586df56bed960952294f175d44e5b9" title=" " alt="" coords="202,5,380,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,32,186,32,186,37,154,37"/>
+<area shape="rect" id="Node000003" href="$namespacedatetime.html#a38a22e5b5d41e7f379d45d060e9ae044" title=" " alt="" coords="428,21,571,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="380,32,412,32,412,37,380,37"/>
+<area shape="rect" id="Node000004" href="$namespacedatetime.html#abc64e3b90a66519d1ae3b7387120729c" title=" " alt="" coords="619,21,757,48"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="572,32,604,32,604,37,572,37"/>
+<area shape="rect" id="Node000005" href="$namespacedatetime.html#ab1d9676d8eb0eb478a641392d74ee96b" title=" " alt="" coords="805,21,918,48"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="757,32,789,32,789,37,757,37"/>
+</map>

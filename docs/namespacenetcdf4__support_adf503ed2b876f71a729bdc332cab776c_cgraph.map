@@ -1,0 +1,9 @@
+<map id="netcdf4_support::netcdf_update_time_starting_index" name="netcdf4_support::netcdf_update_time_starting_index">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,193,81"/>
+<area shape="rect" id="Node000002" href="$namespacenetcdf4__support.html#afb1ff03f2fec237a082d74832ded850d" title=" " alt="" coords="241,39,407,81"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="193,57,225,57,225,63,193,63"/>
+<area shape="rect" id="Node000003" href="$namespacenetcdf4__support.html#a8a1783d58caa9f47f1b91937447a6ca1" title=" " alt="" coords="455,5,618,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="407,44,439,39,440,44,408,50"/>
+<area shape="rect" id="Node000004" href="$namespacenetcdf4__support.html#a242184ef7b7f9bc1dd26cb3030ece843" title="We need two functions to convert from index to timeval, and timeval to JD; note that timeval refers t..." alt="" coords="466,72,608,115"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="408,70,450,77,450,82,407,76"/>
+</map>

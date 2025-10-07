@@ -1,0 +1,7 @@
+<map id="model_initialize::read_polygon_id" name="model_initialize::read_polygon_id">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,149,65"/>
+<area shape="rect" id="Node000002" href="$namespacegrid.html#a731a63c3e56b5c445e8fc66ceb20f37d" title=" " alt="" coords="209,5,330,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,32,193,26,194,31,149,37"/>
+<area shape="rect" id="Node000003" href="$namespacegrid.html#a73982fb822e4ddc14622870cc41ba371" title=" " alt="" coords="197,56,342,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="149,51,181,55,181,60,149,56"/>
+</map>

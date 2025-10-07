@@ -1,0 +1,39 @@
+<map id="netcdf4_support::netcdf_get_variable_slice" name="netcdf4_support::netcdf_get_variable_slice">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,208,164,251"/>
+<area shape="rect" id="Node000002" href="$namespaceexceptions.html#afd73029531ee5ba631b7838d2f6395dd" title=" " alt="" coords="241,53,350,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,206,144,148,175,117,210,90,225,82,228,86,213,94,178,121,148,152,102,209"/>
+<area shape="rect" id="Node000003" href="$namespacenetcdf4__support.html#a31d547fc6e0a8596b492cf5c99067c0f" title=" " alt="" coords="229,237,362,296"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="165,241,214,250,214,255,164,246"/>
+<area shape="rect" id="Node000008" href="$namespaceexceptions.html#a865c266d00ec8abab13dc671fd1f2d84" title=" " alt="" coords="435,320,555,347"/>
+<area shape="poly" id="edge23_Node000001_Node000008" title=" " alt="" coords="99,250,117,280,142,314,174,347,213,372,257,387,294,389,379,372,443,350,444,355,381,377,294,394,256,392,211,377,171,351,138,318,112,283,95,253"/>
+<area shape="rect" id="Node000009" href="$namespacenetcdf4__support.html#aba4c6ca6d89a89a3eeaa45561ab701b5" title=" " alt="" coords="214,320,378,363"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="119,249,213,306,224,311,222,316,210,310,116,254"/>
+<area shape="rect" id="Node000011" href="$namespacenetcdf4__support.html#aa7da573c4394ce6d79af0f3a2f00fa73" title=" " alt="" coords="219,104,372,147"/>
+<area shape="poly" id="edge13_Node000001_Node000011" title=" " alt="" coords="121,205,210,156,222,151,224,156,213,161,123,210"/>
+<area shape="rect" id="Node000013" href="$namespacenetcdf4__support.html#a3f14304460aa5d99abbd0cab0de2ee96" title=" " alt="" coords="212,171,380,213"/>
+<area shape="poly" id="edge18_Node000001_Node000013" title=" " alt="" coords="164,213,196,207,197,212,165,218"/>
+<area shape="rect" id="Node000004" href="$namespacenetcdf4__support.html#ad932efebd4e1fd911a3b53bbb8dd761a" title=" " alt="" coords="428,237,562,296"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="363,264,413,264,413,269,363,269"/>
+<area shape="rect" id="Node000007" href="$namespacenetcdf4__support.html#a31ba261bc28d189afe8b9c8ae02f9a40" title=" " alt="" coords="428,171,562,213"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="362,239,421,217,423,222,364,244"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="364,286,439,312,437,317,362,291"/>
+<area shape="rect" id="Node000005" href="$namespacenetcdf4__support.html#a9331ff511628187408d8dec52f524ffd" title=" " alt="" coords="610,179,773,205"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="562,239,639,209,641,214,564,244"/>
+<area shape="rect" id="Node000006" href="$namespaceconstants__and__conversions.html#aea2fabe8e27f89ad63b773b444340415" title=" " alt="" coords="821,171,1004,213"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="773,189,805,189,805,195,773,195"/>
+<area shape="poly" id="edge11_Node000009_Node000007" title=" " alt="" coords="362,317,378,306,394,286,402,266,410,245,426,224,429,221,432,225,430,227,414,248,407,268,399,289,382,310,365,322"/>
+<area shape="poly" id="edge12_Node000009_Node000008" title=" " alt="" coords="378,335,420,334,420,339,378,341"/>
+<area shape="rect" id="Node000010" href="$namespacenetcdf4__support.html#a0faa1edc9c9e46ba5f7c4e0285c1a518" title=" " alt="" coords="428,371,562,429"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="371,361,414,373,412,378,370,366"/>
+<area shape="poly" id="edge10_Node000010_Node000005" title=" " alt="" coords="546,368,561,357,595,322,625,284,672,217,676,220,630,287,599,325,564,361,550,372"/>
+<area shape="poly" id="edge16_Node000011_Node000007" title=" " alt="" coords="362,145,415,163,414,168,361,150"/>
+<area shape="poly" id="edge17_Node000011_Node000008" title=" " alt="" coords="368,145,382,157,396,176,403,196,407,233,410,270,416,288,430,306,433,309,429,313,426,310,412,290,404,271,401,234,398,197,391,179,378,160,365,149"/>
+<area shape="rect" id="Node000012" href="$namespacenetcdf4__support.html#aca1035fe7ee5d0b444a5f08c3058d06b" title=" " alt="" coords="428,5,562,64"/>
+<area shape="poly" id="edge14_Node000011_Node000012" title=" " alt="" coords="353,101,379,90,422,69,425,74,381,94,355,106"/>
+<area shape="poly" id="edge15_Node000012_Node000005" title=" " alt="" coords="548,62,564,74,621,122,668,166,664,170,617,126,561,78,544,67"/>
+<area shape="poly" id="edge21_Node000013_Node000007" title=" " alt="" coords="381,189,413,189,413,195,381,195"/>
+<area shape="poly" id="edge22_Node000013_Node000008" title=" " alt="" coords="365,212,382,223,399,245,406,266,414,286,430,306,435,310,432,314,426,310,409,289,401,268,394,247,378,227,362,216"/>
+<area shape="rect" id="Node000014" href="$namespacenetcdf4__support.html#a68136d1b2416a386c00f4f1b84a60797" title=" " alt="" coords="428,88,562,147"/>
+<area shape="poly" id="edge19_Node000013_Node000014" title=" " alt="" coords="354,168,413,145,415,150,356,172"/>
+<area shape="poly" id="edge20_Node000014_Node000005" title=" " alt="" coords="564,140,641,170,639,175,562,145"/>
+</map>

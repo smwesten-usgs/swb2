@@ -1,0 +1,11 @@
+<map id="model_initialize::initialize_percent_canopy_cover" name="model_initialize::initialize_percent_canopy_cover">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,73,171,116"/>
+<area shape="rect" id="Node000002" href="$namespaceexceptions.html#afd73029531ee5ba631b7838d2f6395dd" title=" " alt="" coords="237,5,346,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,70,218,42,235,35,237,40,220,46,145,75"/>
+<area shape="rect" id="Node000003" href="$namespacegrid.html#a731a63c3e56b5c445e8fc66ceb20f37d" title=" " alt="" coords="231,56,352,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="171,82,215,76,216,81,171,87"/>
+<area shape="rect" id="Node000004" href="$namespacegrid.html#a73982fb822e4ddc14622870cc41ba371" title=" " alt="" coords="219,107,364,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="171,102,204,106,203,112,171,108"/>
+<area shape="rect" id="Node000005" href="$namespaceexceptions.html#a865c266d00ec8abab13dc671fd1f2d84" title=" " alt="" coords="231,157,352,184"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="145,114,220,143,237,149,235,154,218,148,143,119"/>
+</map>

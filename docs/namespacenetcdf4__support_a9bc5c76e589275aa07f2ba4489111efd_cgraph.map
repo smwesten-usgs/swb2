@@ -1,0 +1,13 @@
+<map id="netcdf4_support::nf_populate_variable_struct" name="netcdf4_support::nf_populate_variable_struct">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,36,175,79"/>
+<area shape="rect" id="Node000002" href="$namespaceconstants__and__conversions.html#accfb417df8d62ce66272be93134af9f1" title=" " alt="" coords="404,5,587,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,33,222,13,307,7,389,11,389,16,307,13,223,19,149,38"/>
+<area shape="rect" id="Node000003" href="$namespacenetcdf4__support.html#aba6364ac6e620dfba9f25f511120f4ff" title=" " alt="" coords="223,28,356,87"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="175,55,207,55,207,60,175,60"/>
+<area shape="rect" id="Node000004" href="$namespacenetcdf4__support.html#a9331ff511628187408d8dec52f524ffd" title=" " alt="" coords="414,76,577,103"/>
+<area shape="poly" id="edge6_Node000001_Node000004" title=" " alt="" coords="149,77,223,96,313,102,399,99,399,104,313,108,222,101,147,82"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="356,45,388,40,389,45,357,50"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="357,65,399,72,399,77,356,70"/>
+<area shape="rect" id="Node000005" href="$namespaceconstants__and__conversions.html#aea2fabe8e27f89ad63b773b444340415" title=" " alt="" coords="635,68,819,111"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="577,87,620,87,620,92,577,92"/>
+</map>

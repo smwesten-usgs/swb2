@@ -1,0 +1,5 @@
+<map id="solar_calculations::solar_declination__delta" name="solar_calculations::solar_declination__delta">
+<area shape="rect" id="Node000001" title="Calculate the solar declination for a given day of the year." alt="" coords="5,5,132,64"/>
+<area shape="rect" id="Node000002" href="$namespacesolar__calculations.html#aafa5ae580c2811d38e2f345ccf8caf42" title="Calculate the day angle in RADIANS." alt="" coords="180,13,325,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,32,164,32,164,37,132,37"/>
+</map>

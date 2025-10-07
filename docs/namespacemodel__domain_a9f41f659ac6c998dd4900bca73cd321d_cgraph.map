@@ -1,0 +1,7 @@
+<map id="model_domain::model_get_maximum_air_temperature_tabular" name="model_domain::model_get_maximum_air_temperature_tabular">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,213,64"/>
+<area shape="rect" id="Node000002" href="$namespaceweather__data__tabular.html#a8cf0c98d9c214148633a6b9248151e79" title=" " alt="" coords="261,5,414,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="213,32,245,32,245,37,213,37"/>
+<area shape="rect" id="Node000003" href="$namespaceweather__data__tabular.html#a39c4845d056720514a18c48b67bd0e7a" title=" " alt="" coords="462,13,660,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="414,32,447,32,447,37,414,37"/>
+</map>

@@ -1,0 +1,15 @@
+<map id="test_kiss" name="test_kiss">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,72,80,99"/>
+<area shape="rect" id="Node000002" href="$namespacekiss__random__number__generator.html#a7f902993e4e05cf3a354e151be3d8718" title=" " alt="" coords="138,5,320,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,71,144,50,146,56,81,76"/>
+<area shape="rect" id="Node000003" href="$namespacekiss__random__number__generator.html#a47f3204621c8555bd9677f935a6ff238" title=" " alt="" coords="379,64,532,107"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="80,83,364,83,364,88,80,88"/>
+<area shape="rect" id="Node000006" href="$namespacekiss__random__number__generator.html#a194b100f7f2ab97efa587391159fe326" title=" " alt="" coords="128,123,331,165"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="81,94,146,115,144,120,79,99"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="315,46,364,59,363,64,313,51"/>
+<area shape="rect" id="Node000004" href="$namespacekiss__random__number__generator.html#a85959624cf679e486da91592c303cb09" title=" " alt="" coords="580,19,742,77"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="532,69,564,63,565,68,533,74"/>
+<area shape="rect" id="Node000005" href="$namespacekiss__random__number__generator.html#a12973f5d78dbf34c9000ce7956a6f7b1" title=" " alt="" coords="588,101,734,144"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="533,97,573,104,572,109,532,102"/>
+<area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="313,120,363,107,364,112,315,125"/>
+</map>

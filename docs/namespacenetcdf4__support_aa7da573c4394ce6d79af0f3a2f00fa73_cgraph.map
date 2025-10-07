@@ -1,0 +1,13 @@
+<map id="netcdf4_support::nf_get_variable_slice_int" name="netcdf4_support::nf_get_variable_slice_int">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,88,159,131"/>
+<area shape="rect" id="Node000002" href="$namespacenetcdf4__support.html#aca1035fe7ee5d0b444a5f08c3058d06b" title=" " alt="" coords="207,5,341,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="138,85,191,64,193,69,140,90"/>
+<area shape="rect" id="Node000005" href="$namespacenetcdf4__support.html#a31ba261bc28d189afe8b9c8ae02f9a40" title=" " alt="" coords="207,88,340,131"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="159,107,192,107,192,112,159,112"/>
+<area shape="rect" id="Node000006" href="$namespaceexceptions.html#a865c266d00ec8abab13dc671fd1f2d84" title=" " alt="" coords="214,155,334,181"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="155,129,214,147,212,152,153,134"/>
+<area shape="rect" id="Node000003" href="$namespacenetcdf4__support.html#a9331ff511628187408d8dec52f524ffd" title=" " alt="" coords="389,21,551,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="341,32,373,32,373,37,341,37"/>
+<area shape="rect" id="Node000004" href="$namespaceconstants__and__conversions.html#aea2fabe8e27f89ad63b773b444340415" title=" " alt="" coords="599,13,783,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="551,32,584,32,584,37,551,37"/>
+</map>

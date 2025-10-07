@@ -1,0 +1,9 @@
+<map id="datetime::day_of_year" name="datetime::day_of_year">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,156,57"/>
+<area shape="rect" id="Node000002" href="$namespacedatetime.html#a81e80e06718ecd2296881c61e61f8c9b" title=" " alt="" coords="204,5,368,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,32,188,28,188,33,156,37"/>
+<area shape="rect" id="Node000003" href="$namespacedatetime.html#abc64e3b90a66519d1ae3b7387120729c" title=" " alt="" coords="217,56,354,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="156,51,202,56,201,62,156,56"/>
+<area shape="rect" id="Node000004" href="$namespacedatetime.html#ab1d9676d8eb0eb478a641392d74ee96b" title=" " alt="" coords="416,56,529,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="355,67,401,67,401,72,355,72"/>
+</map>
