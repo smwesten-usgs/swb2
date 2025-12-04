@@ -145,17 +145,23 @@ swbstats2_src = files(
 
 subdir('proj4')
 
-if system == 'windows'
-  dependencies = [
-    meson.get_compiler('cpp').find_library('netcdf',  dirs : ['C:/Program Files/netCDF 4.9.0/lib/'])
-  ]
-else
-  dependencies = [
-    meson.get_compiler('c').find_library('netcdf', dirs : ['/opt/cray/pe/netcdf/4.8.1.1/intel/19.1/lib',
-                                                           '/opt/cray/pe/netcdf/4.9.0.5/intel/2022.2/lib',
-                                                           '/d/msys64/ucrt64/lib'])
-  ]
-endif  
+
+zlib = cc.find_library('zlib', dirs: [netcdf_root / 'lib'], required: true)
+hdf5 = cc.find_library('hdf5', dirs: [netcdf_root / 'lib'], required: true)
+hdf5_hl = cc.find_library('hdf5_hl', dirs: [netcdf_root / 'lib'], required: true)
+netcdf = cc.find_library('netcdf', dirs: [netcdf_root / 'lib'], required: true)
+
+# if system == 'windows'
+#   dependencies = [
+#     meson.get_compiler('cpp').find_library('netcdf',  dirs : ['C:/Program Files/netCDF 4.9.0/lib/'])
+#   ]
+# else
+#   dependencies = [
+#     meson.get_compiler('c').find_library('netcdf', dirs : ['/opt/cray/pe/netcdf/4.8.1.1/intel/19.1/lib',
+#                                                            '/opt/cray/pe/netcdf/4.9.0.5/intel/2022.2/lib',
+#                                                            '/d/msys64/ucrt64/lib'])
+#   ]
+# endif  
 
 swb_library = static_library('swb_library', swb_src, link_with: [swb_external])
 
@@ -163,12 +169,14 @@ executable('swb2',
             swb_src,
             link_with: [swb_external], 
             link_language : 'fortran',
-            dependencies : dependencies,
+            include_directories : inc_dirs,
+            dependencies : [zlib, hdf5, hdf5_hl, netcdf],
             install: true)
 
 executable('swbstats2', 
             swbstats2_src,
             link_with: [swb_external], 
             link_language : 'fortran',
-            dependencies : dependencies,
+            include_directories : inc_dirs,
+            dependencies : [zlib, hdf5, hdf5_hl, netcdf],
             install: true)

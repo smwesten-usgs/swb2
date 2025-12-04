@@ -32,6 +32,7 @@ conf_data.set('BUILD_NUMBER_STRING', build_number_str)
 swb_major_version = get_option('swb_major_version')
 swb_minor_version = get_option('swb_minor_version')
 swb_patch_version = get_option('swb_patch_version')
+netcdf_root = get_option('netcdf_root')
 
 conf_data.set('SWB_MAJOR_VERSION_STRING', swb_major_version)
 conf_data.set('SWB_MINOR_VERSION_STRING', swb_minor_version)
@@ -50,6 +51,8 @@ if get_option('optimization_level') == 2
 else
   profile = 'develop'
 endif
+
+inc_dirs = include_directories(netcdf_root / 'include')
 
 fc = meson.get_compiler('fortran')
 fc_id = fc.get_id()
