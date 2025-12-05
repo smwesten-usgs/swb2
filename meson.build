@@ -1,14 +1,14 @@
 project(
   'swb2',
-  'fortran','c','cpp',
-  meson_version: '>= 0.59.0',
-  default_options : [
-    'optimization=2',
-    'warning_level=0',    # nice in theory, but Meson doesn't appear to control warning levels on Windows with LLVM-Intel compiler?
-    'fortran_std=f2008'
-])
+  ['fortran','c','cpp'],
+  meson_version: '>= 1.6.0',
+)
 
 version = get_option('swb_version')
+
+# determine what kind of system we're building on
+# expected value is one of 'windows', 'darwin' (MacOS), or 'linux'
+system = build_machine.system()
 
 git_branch = run_command(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], capture : true, check : true)
 git_branch_str = '"' + git_branch.stdout().strip() + '"'
@@ -32,12 +32,26 @@ conf_data.set('BUILD_NUMBER_STRING', build_number_str)
 swb_major_version = get_option('swb_major_version')
 swb_minor_version = get_option('swb_minor_version')
 swb_patch_version = get_option('swb_patch_version')
-netcdf_root = get_option('netcdf_root')
 
 conf_data.set('SWB_MAJOR_VERSION_STRING', swb_major_version)
 conf_data.set('SWB_MINOR_VERSION_STRING', swb_minor_version)
 conf_data.set('SWB_PATCH_VERSION_STRING', swb_patch_version)
 
+# Attempt to gracefully handle netcdf dependency
+netcdf_root = get_option('netcdf_root')
+
+# Platform-specific defaults
+if netcdf_root == ''
+  if system == 'windows'
+    netcdf_root = 'C:/Program Files/netCDF 4.9.3'
+  elif system == 'darwin'
+    netcdf_root = '/opt/homebrew/opt/netcdf'
+  elif system == 'linux'
+    netcdf_root = '/usr/local'
+  else
+    error('Unsupported platform: ' + system)
+  endif
+endif
 
 add_global_arguments('-DDEBUG_PRINT', language : 'fortran')
 
@@ -54,6 +68,7 @@ endif
 
 inc_dirs = include_directories(netcdf_root / 'include')
 
+# get compiler information
 fc = meson.get_compiler('fortran')
 fc_id = fc.get_id()
 compile_args = []
@@ -63,7 +78,6 @@ link_args = []
 cc = meson.get_compiler('c')
 cc_id = cc.get_id()
 
-system = build_machine.system()
 if system == 'linux'
   conf_data.set('PLATFORM_NAME','"Linux"')
   conf_data.set('WINDOWS_SYSTEM', 'False')
@@ -79,6 +93,7 @@ elif system == 'windows'
 endif
 
 message('The compilation profile is:', profile)
+message('Using netcdf_root: ' + netcdf_root)
 message('Meson sees the compiler name as:' + fc_id)
 message('Meson sees the C compiler name as: ' + cc_id)
 message('Meson sees the build machine as: ' + system)

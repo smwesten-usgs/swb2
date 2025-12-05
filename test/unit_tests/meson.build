@@ -12,7 +12,7 @@ swbtest_src = files(
 
 executable('swbtest', 
             swbtest_src,
-            link_with: [swb_external, swb_library], 
+            link_with: [proj4, swb_library], 
             link_language: 'fortran',
             dependencies : [zlib, hdf5, hdf5_hl, netcdf],
             install: true)

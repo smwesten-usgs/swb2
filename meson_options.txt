@@ -2,9 +2,11 @@
 option('optimization_level', type : 'integer', min : 1, max : 2, value : 2)
 
 # this is critical for compilation to succeed!! modify for your system.
-option('netcdf_root', type: 'string',
-                      value: 'c:/Program Files/netCDF 4.9.3',
-                      description: 'Path to NetCDF installation root')
+option('netcdf_root',
+  type: 'string',
+  value: '',  # empty means "use platform default"
+  description: 'Path to NetCDF installation root (leave empty to use platform default)'
+)
 
 option('swb_major_version', type : 'string', value : '"2"', description : 'project major version number')
 option('swb_minor_version', type : 'string', value : '"3"', description : 'project minor version number')
