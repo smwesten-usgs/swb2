@@ -1,7 +1,21 @@
+# configure_file(
+#   input : 'version_control.tpl',
+#   output : 'version_control.F90',
+#   configuration : conf_data,
+#   install : true,
+#   install_dir : 'src/generated'
+# )
+
 configure_file(
   input : 'version_control.tpl',
   output : 'version_control.F90',
-  configuration : conf_data,
+  configuration : {'BUILD_NUMBER_STRING': conf_data.get('BUILD_NUMBER_STRING'), 
+                   'GIT_BRANCH_STRING': conf_data.get('GIT_BRANCH_STRING'),
+                   'GIT_HASH_STRING': conf_data.get('GIT_HASH_STRING'),
+                   'PLATFORM_NAME': conf_data.get('PLATFORM_NAME'),
+                   'SWB_MAJOR_VERSION_STRING': conf_data.get('SWB_MAJOR_VERSION_STRING'),
+                   'SWB_MINOR_VERSION_STRING': conf_data.get('SWB_MINOR_VERSION_STRING'),
+                   'SWB_PATCH_VERSION_STRING': conf_data.get('SWB_PATCH_VERSION_STRING')},
   install : true,
   install_dir : 'src/generated'
 )

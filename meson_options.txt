@@ -7,8 +7,3 @@ option('netcdf_root',
   value: '',  # empty means "use platform default"
   description: 'Path to NetCDF installation root (leave empty to use platform default)'
 )
-
-option('swb_major_version', type : 'string', value : '"2"', description : 'project major version number')
-option('swb_minor_version', type : 'string', value : '"3"', description : 'project minor version number')
-option('swb_patch_version', type : 'string', value : '"4"', description : 'project patch version number')
-option('swb_version', type : 'string', value : 'v2.3.4-rc0', description : 'project version')

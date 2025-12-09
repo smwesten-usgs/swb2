@@ -21,6 +21,9 @@ if "%LATEST_NETCDF%"=="" (
 
 echo Found NetCDF installation: %LATEST_NETCDF%
 
+echo Building tool to correct the linker entry in the 'ninja.build' file.
+icx fix_linker__ifx_windows.cpp -o fix_linker__ifx_windows.exe
+
 :: point Meson to new LLVM versions of intel compilers on Windows
 set FC=ifx
 set CC=icx
@@ -29,7 +32,13 @@ set CXX=icx
 rmdir /S /Q builddir
 mkdir builddir
 :: meson setup builddir -Dnetcdf_root="%LATEST_NETCDF%" ..\.. && cd builddir && meson compile --verbose
-meson setup builddir -Dnetcdf_root="%LATEST_NETCDF%" ..\.. && cd builddir && meson compile
+meson setup builddir -Dnetcdf_root="%LATEST_NETCDF%" "..\.." 
+
+:: custom C++ solution to fix meson's broken linker identification...
+fix_linker__ifx_windows.exe
+
+cd builddir && meson compile
+
 cd src
 copy /Y swb2.exe ..\..\..\..\bin\win_x64\swb2.exe
 copy /Y swbstats2.exe ..\..\..\..\bin\win_x64\swbstats2.exe

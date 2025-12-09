@@ -1,10 +1,14 @@
+# change from previous build files: swb version is only defined in the meson
+# 'project' call... the value should propagate through the build using
+# meson veriables
 project(
   'swb2',
-  ['fortran','c','cpp'],
+  ['fortran', 'c', 'cpp'],
+  version: 'v2.3.4-rc0',
   meson_version: '>= 1.6.0',
 )
 
-version = get_option('swb_version')
+version = meson.project_version()
 
 # determine what kind of system we're building on
 # expected value is one of 'windows', 'darwin' (MacOS), or 'linux'
@@ -29,13 +33,23 @@ conf_data.set('GIT_BRANCH_STRING', git_branch_str)
 conf_data.set('GIT_HASH_STRING', git_hash_str)
 conf_data.set('BUILD_NUMBER_STRING', build_number_str)
 
-swb_major_version = get_option('swb_major_version')
-swb_minor_version = get_option('swb_minor_version')
-swb_patch_version = get_option('swb_patch_version')
+# Parse version components
+version_core = version.substring(1)  # remove leading 'v'
+version_parts = version_core.split('.')  # ['2', '3', '4-rc0']
 
-conf_data.set('SWB_MAJOR_VERSION_STRING', swb_major_version)
-conf_data.set('SWB_MINOR_VERSION_STRING', swb_minor_version)
-conf_data.set('SWB_PATCH_VERSION_STRING', swb_patch_version)
+swb_major_version = version_parts[0]
+swb_minor_version = version_parts[1]
+swb_patch_and_suffix = version_parts[2].split('-')  # ['4', 'rc0']
+swb_patch_version = swb_patch_and_suffix[0]
+swb_suffix = swb_patch_and_suffix.length() > 1 ? swb_patch_and_suffix[1] : ''
+
+# Use in configuration
+conf_data.set('SWB_MAJOR_VERSION_STRING', '"' + swb_major_version + '"')
+conf_data.set('SWB_MAJOR_VERSION_STRING', '"' + swb_major_version + '"')
+conf_data.set('SWB_MINOR_VERSION_STRING', '"' + swb_minor_version + '"')
+conf_data.set('SWB_PATCH_VERSION_STRING', '"' + swb_patch_version + '"')
+conf_data.set('SWB_SUFFIX_STRING', '"' + swb_suffix + '"')
+conf_data.set('VERSION_STRING', '"' + version + '"')
 
 # Attempt to gracefully handle netcdf dependency
 netcdf_root = get_option('netcdf_root')
@@ -164,8 +178,9 @@ if (fc_id == 'intel-llvm-cl') and (system == 'windows')
                    '/Qdiag-disable:5268', # Line too long
                    '/Qdiag-error-limit:1',
                   ]
-  link_args += ['/Qdiag-disable:10441',
-               ]
+
+#  link_args += ['/Qdiag-disable:10441',
+#               ]
 
 elif fc_id == 'intel'
   # linux and macOS
