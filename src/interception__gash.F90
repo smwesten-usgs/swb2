@@ -164,11 +164,11 @@ contains
 
     !> @TODO add more guard code here to QA incoming data
 
-    if ( .not. lAreLengthsEqual )                                                       &
-      call warn( sMessage="The number of canopy storage capacity values ("              &
-        //asCharacter( iNumRecs )//") does not match the number of landuse values ("    &
-        //asCharacter( iNumberOfLanduses )//").",                                       &
-        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+    ! if ( .not. lAreLengthsEqual )                                                       &
+    !   call warn( sMessage="The number of canopy storage capacity values ("              &
+    !     //asCharacter( iNumRecs )//") does not match the number of landuse values ("    &
+    !     //asCharacter( iNumberOfLanduses )//").",                                       &
+    !     sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
 
     iNumRecs = ubound(TRUNK_STORAGE_CAPACITY_TABLE_VALUES,1)

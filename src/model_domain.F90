@@ -1736,13 +1736,13 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    call interception_gash_initialize( this%active, this%canopy_cover_fraction, this%landuse_index )
+
     where ( this%it_is_growing_season )
       this%interception_storage_max = GASH_INTERCEPTION_STORAGE_MAX_GROWING_SEASON( this%landuse_index )
     elsewhere 
       this%interception_storage_max = GASH_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON( this%landuse_index )
     end where
-
-    call interception_gash_initialize( this%active, this%canopy_cover_fraction, this%landuse_index )
 
   end subroutine model_initialize_interception_gash
 
