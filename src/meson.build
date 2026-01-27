@@ -159,10 +159,10 @@ swbstats2_src = files(
 
 subdir('proj4')
 
-zlib = cc.find_library('zlib', dirs: [netcdf_root / 'lib'], required: true)
-hdf5 = cc.find_library('hdf5', dirs: [netcdf_root / 'lib'], required: true)
-hdf5_hl = cc.find_library('hdf5_hl', dirs: [netcdf_root / 'lib'], required: true)
-netcdf = cc.find_library('netcdf', dirs: [netcdf_root / 'lib'], required: true)
+zlib = cc.find_library('zlib', dirs: [netcdf_root, netcdf_root / 'lib'], required: true)
+hdf5 = cc.find_library('hdf5', dirs: [netcdf_root, netcdf_root / 'lib'], required: true)
+hdf5_hl = cc.find_library('hdf5_hl', dirs: [netcdf_root, netcdf_root / 'lib'], required: true)
+netcdf = cc.find_library('netcdf', dirs: [netcdf_root, netcdf_root / 'lib'], required: true)
 
 swb_library = static_library('swb_library',
                               swb_src,
@@ -172,7 +172,7 @@ executable('swb2',
             swb_src,
             link_with: [proj4], 
             link_language : 'fortran',
-            include_directories : inc_dirs,
+            #include_directories : inc_dirs,
             dependencies : [zlib, hdf5, hdf5_hl, netcdf],
             install: true)
 
@@ -180,6 +180,6 @@ executable('swbstats2',
             swbstats2_src,
             link_with: [proj4], 
             link_language : 'fortran',
-            include_directories : inc_dirs,
+            #include_directories : inc_dirs,
             dependencies : [zlib, hdf5, hdf5_hl, netcdf],
             install: true)

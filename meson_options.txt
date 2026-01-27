@@ -1,5 +1,5 @@
 # optimization_level 1: DEBUG; optimization_level 2: RELEASE
-option('optimization_level', type : 'integer', min : 1, max : 2, value : 2)
+option('optimization_level', type : 'integer', min : 1, max : 2, value : 1)
 
 # this is critical for compilation to succeed!! modify for your system.
 option('netcdf_root',

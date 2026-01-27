@@ -80,7 +80,7 @@ else
   profile = 'develop'
 endif
 
-inc_dirs = include_directories(netcdf_root / 'include')
+#inc_dirs = include_directories(netcdf_root / 'include')
 
 # get compiler information
 fc = meson.get_compiler('fortran')
