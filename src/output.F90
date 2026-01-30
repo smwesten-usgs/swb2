@@ -9,15 +9,12 @@ module output
   use fstring, only               : asCharacter
   implicit none
 
-  real( c_double ), allocatable      :: RECHARGE_ARRAY(:)
-
   type, public :: NETCDF_FILE_COLLECTION_T
     type (T_NETCDF4_FILE), pointer :: ncfile
   end type NETCDF_FILE_COLLECTION_T
 
   type (NETCDF_FILE_COLLECTION_T), allocatable, public :: NC_OUT(:)
   type (NETCDF_FILE_COLLECTION_T), allocatable, public :: NC_MULTI_SIM_OUT(:,:)
-
 
   integer (c_int), parameter   :: NCDF_NUM_OUTPUTS = 32
 
@@ -389,7 +386,6 @@ contains
         endif
 
       enddo
-
 
       if ( OUTSPECS( NCDF_GROSS_PRECIPITATION )%is_active ) then
 
@@ -899,7 +895,7 @@ contains
     real (c_float)                         :: new_maximum
 
     new_maximum = max(current_maximum, maxval(values))
-
+    
   end function update_maximum_value
 
 end module output

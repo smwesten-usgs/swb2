@@ -3751,7 +3751,7 @@ end subroutine model_calculate_climatic_water_deficit
       call pPRCP%getvalues( dt )
 
     end associate
-
+    
     if (.not. associated(pPRCP%pGrdBase) ) &
       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer.", __FILE__, __LINE__)
 

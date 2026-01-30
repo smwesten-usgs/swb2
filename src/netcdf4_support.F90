@@ -25,6 +25,7 @@
 module netcdf4_support
 
   use iso_c_binding
+  use, intrinsic :: ieee_exceptions
   use constants_and_conversions
   use exceptions
   use logfiles
@@ -206,29 +207,29 @@ module netcdf4_support
 
   type T_NETCDF4_FILE
     integer (c_int) :: iNCID
-    character (len=256)  :: sFilename
-    integer (c_int) :: iFileFormat
-    integer (c_int) :: iNumberOfDimensions
-    integer (c_int) :: iNumberOfVariables
-    integer (c_int) :: iNumberOfAttributes
-    integer (c_int) :: iNC3_UnlimitedDimensionNumber
+    character (len=256)  :: sFilename = ''
+    integer (c_int) :: iFileFormat = 0
+    integer (c_int) :: iNumberOfDimensions = 0
+    integer (c_int) :: iNumberOfVariables = 0
+    integer (c_int) :: iNumberOfAttributes = 0
+    integer (c_int) :: iNC3_UnlimitedDimensionNumber = 0
     integer (c_int) :: iOriginJD   = NC_NA_INT
     integer (c_int) :: iFirstDayJD = NC_NA_INT
     integer (c_int) :: iLastDayJD  = NC_NA_INT
-    integer (c_int) :: iOriginMonth
-    integer (c_int) :: iOriginDay
-    integer (c_int) :: iOriginYear
-    integer (c_int) :: iOriginHH
-    integer (c_int) :: iOriginMM
-    integer (c_int) :: iOriginSS
+    integer (c_int) :: iOriginMonth = 0
+    integer (c_int) :: iOriginDay = 0
+    integer (c_int) :: iOriginYear = 0
+    integer (c_int) :: iOriginHH = 0
+    integer (c_int) :: iOriginMM = 0
+    integer (c_int) :: iOriginSS = 0
     integer (c_int) :: lLeapYearTreatment = LEAP_YEAR
-    integer (c_size_t), dimension(0:3) :: iStart
-    integer (c_size_t), dimension(0:3) :: iCount
+    integer (c_size_t), dimension(0:3) :: iStart = 0
+    integer (c_size_t), dimension(0:3) :: iCount = 0
     integer (c_size_t), dimension(0:3) :: iStride = 1
-    integer (c_size_t), dimension(0:1) :: iColBounds
-    integer (c_size_t), dimension(0:1) :: iRowBounds
-    integer (c_int) :: iNX
-    integer (c_int) :: iNY
+    integer (c_size_t), dimension(0:1) :: iColBounds = 0
+    integer (c_size_t), dimension(0:1) :: iRowBounds = 0
+    integer (c_int) :: iNX = 0
+    integer (c_int) :: iNY = 0
     character (len=3) :: sVariableOrder = "tyx"
     real (c_double), dimension(0:1) :: rX
     real (c_double), dimension(0:1) :: rY
@@ -237,7 +238,7 @@ module netcdf4_support
     logical (c_bool)  :: lY_IncreasesWithIndex = FALSE
     logical (c_bool)  :: lAllowAutomaticDataFlipping = TRUE
 
-    real (c_double), dimension(0:1) :: dpFirstAndLastTimeValues
+    real (c_double), dimension(0:1) :: dpFirstAndLastTimeValues = 0.
     character (len=64), dimension(0:3) :: sVarName = ["time","y   ","x   ","z   "]
     integer (c_int), dimension(0:3) :: iVarID = NC_NA_INT
     integer (c_int), dimension(0:3) :: iVarIndex = NC_NA_INT
@@ -246,8 +247,8 @@ module netcdf4_support
     integer (c_int), dimension(0:3, 0:3) :: iVar_DimID = NC_NA_INT
     real (c_double), dimension(0:3) :: rScaleFactor = 1.0_c_double
     real (c_double), dimension(0:3) :: rAddOffset = 0.0_c_double
-    integer (c_int), dimension(0:2) :: iRowIter
-    integer (c_int), dimension(0:2) :: iColIter
+    integer (c_int), dimension(0:2) :: iRowIter = 0
+    integer (c_int), dimension(0:2) :: iColIter = 0
     logical (c_bool) :: lFlipHorizontal = FALSE
     logical (c_bool) :: lFlipVertical = FALSE
 
@@ -3299,10 +3300,31 @@ subroutine nf_create(NCFILE, sFilename, iLU)
   character (len=*) :: sFilename
   integer (c_int), optional :: iLU
 
-   call nf_trap(nc_create(path=trim(fortran_to_c_string(sFilename)), &
-                  cmode=NC_NETCDF4, &
-                  ncidp=NCFILE%iNCID), &
-                  __FILE__, __LINE__)
+  logical :: old_invalid, old_div0, old_overflow
+
+  NCFILE%sFilename = trim(sFilename)
+  NCFILE%iFileFormat = NC_FORMAT_NETCDF4
+
+  ! attempting to keep code from choking on NaN comparisons during 
+  ! file initialization
+  call ieee_get_halting_mode(ieee_invalid,        old_invalid)
+  call ieee_get_halting_mode(ieee_divide_by_zero, old_div0)
+  call ieee_get_halting_mode(ieee_overflow,       old_overflow)
+  
+  ! Mask traps before calling into NetCDF/HDF5:
+  call ieee_set_halting_mode(ieee_invalid,        .false.)
+  call ieee_set_halting_mode(ieee_divide_by_zero, .false.)
+  call ieee_set_halting_mode(ieee_overflow,       .false.)
+
+  call nf_trap(nc_create(path=trim(sFilename)//c_null_char, &
+                         cmode=NC_NETCDF4, &
+                         ncidp=NCFILE%iNCID), &
+                         __FILE__, __LINE__)
+
+  ! Restore previous behavior:
+  call ieee_set_halting_mode(ieee_invalid,        old_invalid)
+  call ieee_set_halting_mode(ieee_divide_by_zero, old_div0)
+  call ieee_set_halting_mode(ieee_overflow,       old_overflow)
 
 !
 ! had read somewhere that the interface:
@@ -3318,8 +3340,8 @@ subroutine nf_create(NCFILE, sFilename, iLU)
 !                  __FILE__, __LINE__)
 
 
-  NCFILE%sFilename = trim(sFilename)
-  NCFILE%iFileFormat = NC_FORMAT_NETCDF4
+  ! NCFILE%sFilename = trim(sFilename)
+  ! NCFILE%iFileFormat = NC_FORMAT_NETCDF4
 
   if (present(iLU) ) then
     call LOGS%write("Created netCDF file for output. Filename: " &

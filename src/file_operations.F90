@@ -158,9 +158,11 @@ contains
     if (iLen > 0) then
 
       sFirstChar = sTrimmedInput(1:1)
-      ! If sFirstChar is found in sCommentChars, the result is zero
-      iIndex = verify( sFirstChar , this%sCommentChars )
-      if ( iIndex == 0 ) lIsComment = TRUE
+      !-- why 'verify' and not 'scan' in older code??
+      !-----
+      ! SCAN(STRING, SET): If no character of SET is found in STRING, the result is zero. 
+      iIndex = scan( sFirstChar , this%sCommentChars )
+      if ( iIndex > 0 ) lIsComment = TRUE
 
     endif
 
@@ -195,6 +197,8 @@ contains
       call die( "PROGRAMMING ERROR--file already open: "//dquote( fully_qualified_filename( sFilename_l ) )//"." )
 
     else
+
+      this%sFilename = fully_qualified_filename(sFilename_l)
 
       open(newunit=this%iUnitNum, file=fully_qualified_filename( sFilename_l ), iostat=this%iStat, action='READ')
       call assert(this%iStat == 0, "Failed to open file "//dquote( fully_qualified_filename( sFilename_l ) )//"."  &
@@ -237,7 +241,7 @@ contains
     endif
 
     if (.not. this%isOpen() ) then
-
+      this%sFilename = trim(sFilename_l)
       open(newunit=this%iUnitNum, file=sFilename_l, iostat=this%iStat, action='WRITE')
       call assert(this%iStat == 0, "Failed to open file "//dquote(sFilename_l)//".", __FILE__, __LINE__)
 
