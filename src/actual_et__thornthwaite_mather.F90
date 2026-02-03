@@ -9,9 +9,8 @@ module actual_et__thornthwaite_mather
 
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
+  use constants_and_conversions, only   : NEAR_ZERO
   implicit none
-
-  real (c_float), parameter :: NEAR_ZERO = 1.0e-9_c_float
 
 contains
 

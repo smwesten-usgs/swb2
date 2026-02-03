@@ -10,7 +10,7 @@ module crop_coefficients__fao56
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
   use constants_and_conversions, only : M_PER_FOOT, TRUE, FALSE, fTINYVAL,       &
                                         iTINYVAL, asInt, asFloat, fZERO, in_to_mm, &
-                                        TRUE, FALSE, clip
+                                        TRUE, FALSE, clip, NEAR_ZERO
   use data_catalog, only              : DAT
   use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
   use datetime
@@ -131,8 +131,6 @@ contains
 
     real (c_float)                    :: fKcb_initial
     real (c_float)                    :: fRz_initial
-
-    real (c_float), parameter         :: NEAR_ZERO = 1.0e-9_c_float
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_PERCENT_SOIL_MOISTURE
 

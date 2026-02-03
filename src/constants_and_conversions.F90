@@ -33,11 +33,12 @@ module constants_and_conversions
   ! [ common 'magic' numbers and logicals ]
   public :: TRUE, FALSE
   public :: rBIGVAL, iBIGVAL, dBIGVAL, iTINYVAL, rTINYVAL, dTINYVAL
-  public :: rFREEZING, dFREEZING
+  public :: rFREEZING, dFREEZING, NEAR_ZERO
   public :: rZERO
   logical (c_bool), parameter   :: TRUE = .true._c_bool
   logical (c_bool), parameter   :: FALSE = .false._c_bool
 
+  real (c_float), parameter     :: NEAR_ZERO = epsilon(1.0_c_float)
   real (c_float), parameter     :: rBIGVAL = HUGE(0.0_c_float)
   real (c_double), parameter    :: dBIGVAL = HUGE(0.0_c_double)
   integer(c_int), parameter     :: iBIGVAL = HUGE(0_c_int)
@@ -55,7 +56,7 @@ module constants_and_conversions
 
     ! [ evil global variables ]
   character (len=1)            :: OS_NATIVE_PATH_DELIMITER
-  integer (c_long)             :: RANDOM_START = 0
+  integer (c_int)              :: RANDOM_START = 0
 
   ! [ select conversion factors ]
   real (c_double), parameter, public :: C_PER_F    = 5.0_c_double / 9.0_c_double

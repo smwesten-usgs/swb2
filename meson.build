@@ -121,19 +121,22 @@ if fc_id == 'gcc'
                    '-std=gnu',
                    '-fallow-argument-mismatch',
                    '-Wcharacter-truncation',
+                   '-ffree-line-length-none',
+                   '-Wno-error=line-truncation',
                    '-Wno-unused-dummy-argument', # This makes problems with OOP
                    '-Wno-intrinsic-shadow',      # We shadow intrinsics with methods, which should be fine
                    '-Wno-maybe-uninitialized',   # "Uninitialized" flags produce false positives with allocatables
                    '-Wno-uninitialized',
+                   '-Wno-conversion',
                    ]
 
   # Options specific to profile
   if profile == 'release'
     compile_args += ['-ffpe-summary=overflow', '-ffpe-trap=overflow,zero,invalid']
   elif profile == 'develop'
-    compile_args += ['-fcheck=all', '-ffpe-trap=overflow,zero,invalid,denormal', '-finit-real=nan', '-g', '-fbacktrace' ]
+    #compile_args += ['-fcheck=all', '-finit-real=nan', '-ffpe-trap=overflow,zero,invalid', '-g', '-fbacktrace' ]
     #compile_args += ['-fcheck=all', '-finit-real=nan', '-g', '-fbacktrace' ]
-    #compile_args += ['-fcheck=all', '-g', '-fbacktrace' ]
+    compile_args += ['-fcheck=all', '-g', '-fbacktrace' ]
   endif
 
   # Define OS with gfortran for OS specific code

@@ -9,12 +9,11 @@
 module actual_et__fao56
 
   use iso_c_binding, only               : c_short, c_int, c_float, c_double
-  use constants_and_conversions, only   : in_to_mm, TRUE, FALSE
+  use constants_and_conversions, only   : in_to_mm, TRUE, FALSE, NEAR_ZERO
   use parameters, only                  : PARAMS
   implicit none
 
   real (c_float), allocatable   :: DEPLETION_FRACTION(:)
-  real (c_float), parameter     :: NEAR_ZERO = 3.0_c_float * tiny( 0.0_c_float )
 
 contains
 

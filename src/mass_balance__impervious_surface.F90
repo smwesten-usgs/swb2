@@ -8,8 +8,6 @@ module mass_balance__impervious_surface
 
   public :: calculate_impervious_surface_mass_balance
 
-  real (c_float), parameter   :: NEAR_ZERO = 1.0e-6_c_float
-
 contains
 
    elemental subroutine calculate_impervious_surface_mass_balance(      &
