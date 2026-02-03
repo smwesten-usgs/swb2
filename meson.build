@@ -181,25 +181,12 @@ if (fc_id == 'intel-llvm-cl') and (system == 'windows')
                    '/Qdiag-error-limit:1',
                   ]
 
-#  link_args += ['/Qdiag-disable:10441',
-#               ]
-
-elif fc_id == 'intel'
-  # linux and macOS
-  compile_args += ['-fpe0',              # Activate all floating point exceptions
-                   '-fpp',
-                   '-fpmodel=precise',
-                   '-no-heap-arrays',
-                   '-traceback',
-                   '-diag-disable:7416',  # f2008 warning
-                   '-diag-disable:7025',  # f2008 warning
-                   '-diag-disable:5268',  # Line too long
-                  ]
-  link_args += '-static-intel'
 
 elif fc_id == 'intel-llvm'
   # linux and macOS
-  compile_args += ['-fpe0',              # Activate all floating point exceptions
+
+  if profile == 'release'
+  compile_args += ['-fpe-all=0',              # Activate all floating point exceptions
                    '-fpp',
                    '-fp-model=precise',
                    '-no-heap-arrays',
@@ -208,7 +195,22 @@ elif fc_id == 'intel-llvm'
                    '-diag-disable:7025',  # f2008 warning
                    '-diag-disable:5268',  # Line too long
                   ]
-  link_args += '-static-intel'
+
+  elif profile == 'develop'
+  compile_args += ['-fpe-all=0',              # Activate all floating point exceptions
+                   '-fpp',
+                   '-fp-model=strict',
+                   '-check=all',
+                   '-no-heap-arrays',
+                   '-traceback',
+                   '-diag-disable:7416',  # f2008 warning
+                   '-diag-disable:7025',  # f2008 warning
+                   '-diag-disable:5268',  # Line too long
+                  ]
+  endif
+
+link_args += '-static-intel'
+  
 endif
 
 add_project_arguments(fc.get_supported_arguments(compile_args), language: 'fortran')

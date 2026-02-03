@@ -159,10 +159,17 @@ swbstats2_src = files(
 
 subdir('proj4')
 
-zlib = cc.find_library('zlib', dirs: [netcdf_root, netcdf_root / 'lib'], required: true)
-hdf5 = cc.find_library('hdf5', dirs: [netcdf_root, netcdf_root / 'lib'], required: true)
-hdf5_hl = cc.find_library('hdf5_hl', dirs: [netcdf_root, netcdf_root / 'lib'], required: true)
-netcdf = cc.find_library('netcdf', dirs: [netcdf_root, netcdf_root / 'lib'], required: true)
+zlib = cc.find_library('zlib', dirs: [netcdf_root, netcdf_root / 'lib'],
+                        required: false)
+hdf5 = cc.find_library('hdf5', dirs: [netcdf_root, netcdf_root / 'lib',
+                                     '/opt/cray/pe/hdf5/1.12.2.5/GNU/10.3/lib'], 
+                        required: true)
+hdf5_hl = cc.find_library('hdf5_hl', dirs: [netcdf_root, netcdf_root / 'lib',
+                                           '/opt/cray/pe/hdf5/1.12.2.5/GNU/10.3/lib'],
+                          required: true)
+netcdf = cc.find_library('netcdf', dirs: [netcdf_root, netcdf_root / 'lib', 
+                                         '/opt/cray/pe/netcdf/4.9.0.5/GNU/10.3/lib'], 
+                          required: true)
 
 swb_library = static_library('swb_library',
                               swb_src,
