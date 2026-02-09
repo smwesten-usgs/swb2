@@ -1,11 +1,13 @@
 # change from previous build files: swb version is only defined in the meson
 # 'project' call... the value should propagate through the build using
-# meson veriables
+# meson variables
 project(
   'swb2',
   ['fortran', 'c', 'cpp'],
   version: 'v2.3.4-rc0',
   meson_version: '>= 1.6.0',
+  default_options : ['optimization=2',     #meson understands: {plain, 0, g, 1, 2, 3, s}
+                     'debug=true']         # whether or not to compile with debug symbols enabled
 )
 
 version = meson.project_version()
@@ -69,12 +71,7 @@ endif
 
 add_global_arguments('-DDEBUG_PRINT', language : 'fortran')
 
-
-if get_option('optimization_level') == 3
-  error('Only optimization levels <= 2 are supported')
-endif
-
-if get_option('optimization_level') == 2
+if get_option('optimization') == '2'
   profile = 'release'
 else
   profile = 'develop'
@@ -189,7 +186,7 @@ elif fc_id == 'intel-llvm'
   # linux and macOS
 
   if profile == 'release'
-  compile_args += ['-fpe-all=0',              # Activate all floating point exceptions
+  compile_args += ['-fpe0',               # Activate subset of floating point exceptions
                    '-fpp',
                    '-fp-model=precise',
                    '-no-heap-arrays',
