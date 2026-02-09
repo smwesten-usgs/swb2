@@ -1145,12 +1145,13 @@ contains
 
           else
 
-            call warn( "Did not find a valid "//dquote(sKey)//" option. Value supplied was: "//dquote(sArgText_1), &
-              lFatal = TRUE, sHints="Valid options include "//dquote("ARC_ASCII")//", "//dquote("ARC_GRID") &
-              //", "//dquote("SURFER")//", or "//dquote("NETCDF") )
+            call warn( "Did not find a valid "//dquote(sKey)//" option. Value supplied was: "//dquote(sArgText_1),  &
+              lFatal = TRUE, sHints="Valid options include "//dquote("CONSTANT")//", "                              &
+              //dquote("ARC_ASCII")//", "//dquote("ARC_GRID")                                                       &
+              //", "//dquote("SURFER")//", or "//dquote("NETCDF"),                                                  &
+              lEcho = TRUE )
 
           endif
-
 
         elseif ( sCmdText .containssimilar. "_USE_MAJORITY_FILTER" ) then
 

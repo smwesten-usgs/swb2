@@ -1736,13 +1736,13 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    call interception_gash_initialize( this%active, this%canopy_cover_fraction, this%landuse_index )
+
     where ( this%it_is_growing_season )
       this%interception_storage_max = GASH_INTERCEPTION_STORAGE_MAX_GROWING_SEASON( this%landuse_index )
     elsewhere 
       this%interception_storage_max = GASH_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON( this%landuse_index )
     end where
-
-    call interception_gash_initialize( this%active, this%canopy_cover_fraction, this%landuse_index )
 
   end subroutine model_initialize_interception_gash
 
@@ -3000,7 +3000,7 @@ contains
     if (allocated(this%monthly_runoff) )  monthly_runoff = this%monthly_runoff( cell_indx )
     if (allocated(this%monthly_gross_precip) )  monthly_gross_precip = this%monthly_gross_precip( cell_indx )
 
-      write( unit=unitnum, fmt="(i4,'-',i2.2,'-'i2.2,',',i2,',',i2,',',i4,',',8(i6,','),66(g20.12,','),g20.12)")  &
+      write( unit=unitnum, fmt="(i4,'-',i2.2,'-',i2.2,',',i2,',',i2,',',i4,',',8(i6,','),66(g20.12,','),g20.12)")  &
         SIM_DT%curr%iYear, SIM_DT%curr%iMonth, SIM_DT%curr%iDay,  &
         SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,  &
         this%landuse_code( cell_indx ),  & 
@@ -3751,7 +3751,7 @@ end subroutine model_calculate_climatic_water_deficit
       call pPRCP%getvalues( dt )
 
     end associate
-
+    
     if (.not. associated(pPRCP%pGrdBase) ) &
       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer.", __FILE__, __LINE__)
 

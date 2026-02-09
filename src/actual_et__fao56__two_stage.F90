@@ -8,9 +8,13 @@
 module actual_et__fao56__two_stage
 
   use iso_c_binding, only              : c_short, c_int, c_float, c_double, c_bool
-  use constants_and_conversions, only  : TRUE, FALSE, M_PER_FOOT, in_to_mm, clip
+  use logfiles, only                   : LOGS, LOG_ALL
+  use constants_and_conversions, only  : TRUE, FALSE, M_PER_FOOT, in_to_mm, clip,                 &
+                                         NEAR_ZERO
+  use fstring, only                    : asCharacter
   use fstring_list, only               : FSTRING_LIST_T, create_list
   use parameters, only                 : PARAMS
+
   use exceptions
   use crop_coefficients__FAO56, only   : KCB_l, KCB_MIN, KCB_INI, KCB_MID, KCB_END,               &
                                          JAN, DEC, KCB_METHOD_MONTHLY_VALUES,                     &
@@ -244,7 +248,7 @@ end subroutine calculate_total_available_water
 
 !> This function updates the plant height by scaling values relative to the 
 !> position of the current Kcb value on the Kcb curve
-elemental function update_plant_height( landuse_index, it_is_growing_season, Kcb)  result(plant_height)
+impure elemental function update_plant_height( landuse_index, it_is_growing_season, Kcb)  result(plant_height)
 
   integer (c_int), intent(in)  :: landuse_index
   logical (c_bool), intent(in) :: it_is_growing_season
@@ -252,7 +256,7 @@ elemental function update_plant_height( landuse_index, it_is_growing_season, Kcb
   real (c_float)               :: plant_height
 
   ! [ LOCALS ]
-  real (c_float) :: plant_height_minimum_m
+  real (c_float)  :: plant_height_minimum_m
   real (c_double) :: numerator
   real (c_double) :: denominator
   real (c_double) :: exponent
@@ -262,12 +266,19 @@ elemental function update_plant_height( landuse_index, it_is_growing_season, Kcb
   numerator = Kcb - KCB_l( KCB_MIN, landuse_index)
   denominator =  KCB_l( KCB_MID, landuse_index)  -  KCB_l( KCB_MIN, landuse_index)
 
-  if ( it_is_growing_season ) then
+  if (denominator < NEAR_ZERO) then 
+
+    plant_height = real(MEAN_PLANT_HEIGHT( landuse_index ) * M_PER_FOOT, kind=c_float)
+
+  elseif ( it_is_growing_season ) then
+
     ! FAO documentation suggests limiting the plant height range to a value between 1 and 10 meters
     plant_height = clip(real( numerator/denominator *  MEAN_PLANT_HEIGHT( landuse_index ) * M_PER_FOOT, kind=c_float),  &
                         minval=plant_height_minimum_m, maxval=10.)
   else
+
     plant_height = plant_height_minimum_m
+    
   endif
 
 end function update_plant_height

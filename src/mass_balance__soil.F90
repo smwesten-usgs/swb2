@@ -1,6 +1,7 @@
 module mass_balance__soil
 
-  use iso_c_binding, only        : c_float, c_double
+  use iso_c_binding, only              : c_float, c_double
+  use constants_and_conversions, only  : NEAR_ZERO
   implicit none
 
   private
@@ -26,9 +27,6 @@ contains
     real (c_double), intent(in)        :: reference_et0
     real (c_float), intent(in)         :: soil_storage_max
     real (c_float), intent(in)         :: infiltration
-
-    real (c_float), parameter          :: NEAR_ZERO = 1.0E-6_c_float
-
 
     ! [ LOCALS ]
     real (c_double) :: new_soil_storage

@@ -145,19 +145,26 @@ contains
     logical (c_bool)   :: lIsComment
 
     ! [ LOCALS ]
-    integer (c_int) :: iIndex
-    integer (c_int) :: iLen
-    character (len=1)   :: sBufTemp
-
-    iLen = len_trim( this%sBuf )
-
-    sBufTemp = adjustl(this%sBuf)
-
-    iIndex = verify( sBufTemp , this%sCommentChars )
+    integer (c_int)                :: iIndex
+    integer (c_int)                :: iLen
+    character (len=:), allocatable :: sTrimmedInput
+    character (len=1)              :: sFirstChar
 
     lIsComment = FALSE
 
-    if ( iIndex == 0 .or. len_trim(this%sBuf) == 0 ) lIsComment = TRUE
+    sTrimmedInput = adjustl(trim(this%sBuf))
+    iLen = len( sTrimmedInput )
+
+    if (iLen > 0) then
+
+      sFirstChar = sTrimmedInput(1:1)
+      !-- why 'verify' and not 'scan' in older code??
+      !-----
+      ! SCAN(STRING, SET): If no character of SET is found in STRING, the result is zero. 
+      iIndex = scan( sFirstChar , this%sCommentChars )
+      if ( iIndex > 0 ) lIsComment = TRUE
+
+    endif
 
   end function is_current_line_a_comment_fn
 
@@ -190,6 +197,8 @@ contains
       call die( "PROGRAMMING ERROR--file already open: "//dquote( fully_qualified_filename( sFilename_l ) )//"." )
 
     else
+
+      this%sFilename = fully_qualified_filename(sFilename_l)
 
       open(newunit=this%iUnitNum, file=fully_qualified_filename( sFilename_l ), iostat=this%iStat, action='READ')
       call assert(this%iStat == 0, "Failed to open file "//dquote( fully_qualified_filename( sFilename_l ) )//"."  &
@@ -232,7 +241,7 @@ contains
     endif
 
     if (.not. this%isOpen() ) then
-
+      this%sFilename = trim(sFilename_l)
       open(newunit=this%iUnitNum, file=sFilename_l, iostat=this%iStat, action='WRITE')
       call assert(this%iStat == 0, "Failed to open file "//dquote(sFilename_l)//".", __FILE__, __LINE__)
 

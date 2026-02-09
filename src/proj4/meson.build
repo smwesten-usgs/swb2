@@ -163,4 +163,4 @@ proj4_src = files(
     'vector1.c'
 )
 
-swb_external = static_library('swb_external', proj4_src)
+proj4 = static_library('proj4', proj4_src)

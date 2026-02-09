@@ -822,6 +822,13 @@ contains
 
   subroutine precipitation_method_of_fragments_calculate( lActive )
 
+    use ieee_exceptions, only        : ieee_invalid,          &
+                                       ieee_divide_by_zero,   &
+                                       ieee_overflow,         &
+                                       ieee_set_halting_mode, &
+                                       ieee_get_halting_mode
+    use ieee_arithmetic, only        : ieee_is_nan
+
     logical (c_bool), intent(in)     :: lActive(:,:)
 
     ! [ LOCALS ]
@@ -831,7 +838,18 @@ contains
     logical (c_bool), save       :: lFirstCall = TRUE
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR
+    logical :: old_invalid, old_div0, old_overflow
 
+    ! attempting to keep code from choking on NaN comparisons during 
+    ! file initialization
+    call ieee_get_halting_mode(ieee_invalid,        old_invalid)
+    call ieee_get_halting_mode(ieee_divide_by_zero, old_div0)
+    call ieee_get_halting_mode(ieee_overflow,       old_overflow)
+    
+    ! Mask traps before calling into NetCDF/HDF5:
+    call ieee_set_halting_mode(ieee_invalid,        .false.)
+    call ieee_set_halting_mode(ieee_divide_by_zero, .false.)
+    call ieee_set_halting_mode(ieee_overflow,       .false.)
 
     !! if it is the first day of the month, update the rainfall adjustment factor grid
     !! and update the fragments
@@ -849,6 +867,9 @@ contains
       ! map the 2D array of RAINFALL_ADJUST_FACTOR values to the vector of active cells
       RAINFALL_ADJUST_FACTOR = pack( pRAINFALL_ADJUST_FACTOR%pGrdBase%rData, lActive )
 
+      call assert(.not. any(ieee_is_nan(RAINFALL_ADJUST_FACTOR)),  &
+                 sMessage="NaN detected in rainfall adjustment factor grid.") 
+
       call update_fragments( lShuffle = TRUE)
       lFirstCall = FALSE
 
@@ -857,6 +878,11 @@ contains
       call update_fragments( lShuffle = FALSE )
 
     endif
+
+    ! Restore your preferred behavior afterwards:
+    call ieee_set_halting_mode(ieee_invalid,        old_invalid)
+    call ieee_set_halting_mode(ieee_divide_by_zero, old_div0)
+    call ieee_set_halting_mode(ieee_overflow,       old_overflow)
 
   end subroutine precipitation_method_of_fragments_calculate
 

@@ -1,7 +1,21 @@
+# configure_file(
+#   input : 'version_control.tpl',
+#   output : 'version_control.F90',
+#   configuration : conf_data,
+#   install : true,
+#   install_dir : 'src/generated'
+# )
+
 configure_file(
   input : 'version_control.tpl',
   output : 'version_control.F90',
-  configuration : conf_data,
+  configuration : {'BUILD_NUMBER_STRING': conf_data.get('BUILD_NUMBER_STRING'), 
+                   'GIT_BRANCH_STRING': conf_data.get('GIT_BRANCH_STRING'),
+                   'GIT_HASH_STRING': conf_data.get('GIT_HASH_STRING'),
+                   'PLATFORM_NAME': conf_data.get('PLATFORM_NAME'),
+                   'SWB_MAJOR_VERSION_STRING': conf_data.get('SWB_MAJOR_VERSION_STRING'),
+                   'SWB_MINOR_VERSION_STRING': conf_data.get('SWB_MINOR_VERSION_STRING'),
+                   'SWB_PATCH_VERSION_STRING': conf_data.get('SWB_PATCH_VERSION_STRING')},
   install : true,
   install_dir : 'src/generated'
 )
@@ -145,30 +159,34 @@ swbstats2_src = files(
 
 subdir('proj4')
 
-if system == 'windows'
-  dependencies = [
-    meson.get_compiler('cpp').find_library('netcdf',  dirs : ['C:/Program Files/netCDF 4.9.0/lib/'])
-  ]
-else
-  dependencies = [
-    meson.get_compiler('c').find_library('netcdf', dirs : ['/opt/cray/pe/netcdf/4.8.1.1/intel/19.1/lib',
-                                                           '/opt/cray/pe/netcdf/4.9.0.5/intel/2022.2/lib',
-                                                           '/d/msys64/ucrt64/lib'])
-  ]
-endif  
+zlib = cc.find_library('zlib', dirs: [netcdf_root, netcdf_root / 'lib'],
+                        required: false)
+hdf5 = cc.find_library('hdf5', dirs: [netcdf_root, netcdf_root / 'lib',
+                                     '/opt/cray/pe/hdf5/1.12.2.5/GNU/10.3/lib'], 
+                        required: true)
+hdf5_hl = cc.find_library('hdf5_hl', dirs: [netcdf_root, netcdf_root / 'lib',
+                                           '/opt/cray/pe/hdf5/1.12.2.5/GNU/10.3/lib'],
+                          required: true)
+netcdf = cc.find_library('netcdf', dirs: [netcdf_root, netcdf_root / 'lib', 
+                                         '/opt/cray/pe/netcdf/4.9.0.5/GNU/10.3/lib'], 
+                          required: true)
 
-swb_library = static_library('swb_library', swb_src, link_with: [swb_external])
+swb_library = static_library('swb_library',
+                              swb_src,
+                              link_with: [proj4])
 
 executable('swb2', 
             swb_src,
-            link_with: [swb_external], 
+            link_with: [proj4], 
             link_language : 'fortran',
-            dependencies : dependencies,
+            #include_directories : inc_dirs,
+            dependencies : [zlib, hdf5, hdf5_hl, netcdf],
             install: true)
 
 executable('swbstats2', 
             swbstats2_src,
-            link_with: [swb_external], 
+            link_with: [proj4], 
             link_language : 'fortran',
-            dependencies : dependencies,
+            #include_directories : inc_dirs,
+            dependencies : [zlib, hdf5, hdf5_hl, netcdf],
             install: true)

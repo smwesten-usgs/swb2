@@ -8,19 +8,17 @@ module mass_balance__impervious_surface
 
   public :: calculate_impervious_surface_mass_balance
 
-  real (c_float), parameter   :: NEAR_ZERO = 1.0e-6_c_float
-
 contains
 
    elemental subroutine calculate_impervious_surface_mass_balance(      &
                                           surface_storage,              &
                                           actual_et_impervious,         &
-   	                                      paved_to_unpaved,             &
-   	                                      surface_storage_max,          &
+                                           paved_to_unpaved,             &
+                                           surface_storage_max,          &
                                           storm_drain_capture,          &
                                           storm_drain_capture_fraction, &
-   	                                      net_rainfall,                 &
-   	                                      snowmelt,                     &
+                                           net_rainfall,                 &
+                                           snowmelt,                     &
                                           runon,                        &
                                           runoff,                       &
                                           fog,                          &

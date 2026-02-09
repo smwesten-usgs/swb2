@@ -92,7 +92,7 @@ module runoff__gridded_values
     call RUNOFF_RATIO_FILE%open( sFilename = sFilename, &
                   sCommentChars = "#%!", &
                   sDelimiters = "WHITESPACE", &
-                  lHasHeader = .false._c_bool )
+                  lHasHeader = .true._c_bool )
 
     iNumLines = RUNOFF_RATIO_FILE%numLines()
 

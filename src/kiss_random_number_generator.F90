@@ -100,7 +100,7 @@ contains
 ! return; end
 ! ---------------------------------------------------------------
 !
-! Output from using the macro KISS or the function KISS()	is
+! Output from using the macro KISS or the function KISS()  is
 ! MWC+XSH+CNG mod 2^64.
 
 !-------------------------------------------------------------------------------
@@ -179,7 +179,9 @@ contains
     endif
 
     x = t + x
-    y = bitwise_exclusive_or_operation(bitwise_exclusive_or_operation(bitwise_exclusive_or_operation(y,13_int64),-17_int64), 43_int64)
+    y = bitwise_exclusive_or_operation(                                        &
+          bitwise_exclusive_or_operation(                                      &
+            bitwise_exclusive_or_operation(y,13_int64),-17_int64), 43_int64)
     z = 6906969069_int64 * z + 1234567
     pseudorandom_value = x + y + z
   

@@ -135,10 +135,10 @@ impure elemental function et_hargreaves_calculate( iDayOfYear, iNumDaysInYear, f
 
   fOmega_s = sunrise_sunset_angle__omega_s(dLatitude_radians, fDelta)
 
-	! NOTE that the following equation returns extraterrestrial radiation in
-	! MJ / m**2 / day.  The Hargreaves equation requires extraterrestrial
-	! radiation to be expressed in units of mm / day.
-	fRa = extraterrestrial_radiation__Ra(dLatitude_radians, fDelta, fOmega_s, fD_r)
+  ! NOTE that the following equation returns extraterrestrial radiation in
+  ! MJ / m**2 / day.  The Hargreaves equation requires extraterrestrial
+  ! radiation to be expressed in units of mm / day.
+  fRa = extraterrestrial_radiation__Ra(dLatitude_radians, fDelta, fOmega_s, fD_r)
 
   fReferenceET0 = ET0_hargreaves( equivalent_evaporation(fRa), fTMin, fTMax)
 

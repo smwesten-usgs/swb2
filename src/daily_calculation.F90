@@ -222,7 +222,7 @@ contains
         !       is enabled.
 
         ! rejected net_infiltration + runoff will be routed downslope if routing option is turned on
-        call cells%calc_routing( index=indx )
+        call cells%calc_routing( index=jndx )  !use jndx instead of indx for correct order of flow routing calculations
 
       end associate
 
