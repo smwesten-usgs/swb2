@@ -4,7 +4,7 @@
 project(
   'swb2',
   ['fortran', 'c', 'cpp'],
-  version: 'v2.3.4-rc0',
+  version: 'v2.3.5-rc0',
   meson_version: '>= 1.6.0',
   default_options : ['optimization=2',     #meson understands: {plain, 0, g, 1, 2, 3, s}
                      'debug=true']         # whether or not to compile with debug symbols enabled
