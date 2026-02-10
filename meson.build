@@ -127,6 +127,9 @@ if fc_id == 'gcc'
                    '-Wno-conversion',
                    ]
 
+  link_args += ['-static-libgfortran', '-static-libquadmath', '-static-libgcc']
+
+
   # Options specific to profile
   if profile == 'release'
     compile_args += ['-ffpe-summary=overflow', '-ffpe-trap=overflow,zero,invalid']
