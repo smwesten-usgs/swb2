@@ -132,11 +132,11 @@ if fc_id == 'gcc'
 
   # Options specific to profile
   if profile == 'release'
-    compile_args += ['-ffpe-summary=overflow', '-ffpe-trap=overflow,zero,invalid']
+    #compile_args += ['-ffpe-summary=overflow', '-ffpe-trap=overflow,zero', '-g', '-fbacktrace']
+    compile_args += ['-ffpe-trap=overflow,zero', '-g', '-fbacktrace']
   elif profile == 'develop'
     #compile_args += ['-fcheck=all', '-finit-real=nan', '-ffpe-trap=overflow,zero,invalid', '-g', '-fbacktrace' ]
-    #compile_args += ['-fcheck=all', '-finit-real=nan', '-g', '-fbacktrace' ]
-    compile_args += ['-fcheck=all', '-g', '-fbacktrace' ]
+    compile_args += ['-fcheck=all', '-finit-real=nan', '-ffpe-trap=overflow,zero', '-g', '-fbacktrace' ]
   endif
 
   # Define OS with gfortran for OS specific code
