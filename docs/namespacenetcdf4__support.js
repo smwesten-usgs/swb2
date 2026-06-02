@@ -1,9 +1,9 @@
 var namespacenetcdf4__support =
 [
-    [ "t_netcdf4_file", "structnetcdf4__support_1_1t__netcdf4__file.html", "structnetcdf4__support_1_1t__netcdf4__file" ],
-    [ "t_netcdf_attribute", "structnetcdf4__support_1_1t__netcdf__attribute.html", "structnetcdf4__support_1_1t__netcdf__attribute" ],
     [ "t_netcdf_dimension", "structnetcdf4__support_1_1t__netcdf__dimension.html", "structnetcdf4__support_1_1t__netcdf__dimension" ],
+    [ "t_netcdf_attribute", "structnetcdf4__support_1_1t__netcdf__attribute.html", "structnetcdf4__support_1_1t__netcdf__attribute" ],
     [ "t_netcdf_variable", "structnetcdf4__support_1_1t__netcdf__variable.html", "structnetcdf4__support_1_1t__netcdf__variable" ],
+    [ "t_netcdf4_file", "structnetcdf4__support_1_1t__netcdf4__file.html", "structnetcdf4__support_1_1t__netcdf4__file" ],
     [ "netcdf_close_file", "namespacenetcdf4__support.html#a5d81148c90e6eef289f6cd6f590b3eed", null ],
     [ "netcdf_coord_to_col_row", "namespacenetcdf4__support.html#ae1177d76687d41b780c4030ef8445909", null ],
     [ "netcdf_date_within_range", "namespacenetcdf4__support.html#a98aa3d4d10aac3c7aa3486ebc2d28e03", null ],

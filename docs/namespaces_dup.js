@@ -4,8 +4,7 @@ var namespaces_dup =
       [ "adjust_depletion_fraction_p", "namespaceactual__et____fao56.html#ac5459aa126b07f29c771221fd17b2297", null ],
       [ "calculate_actual_et_fao56", "namespaceactual__et____fao56.html#a279c33dd7fe6168cfa4a2f1cba054253", null ],
       [ "initialize_actual_et_fao56", "namespaceactual__et____fao56.html#a4c4fbb5724ac3fc854c21d6d6f1b4083", null ],
-      [ "depletion_fraction", "namespaceactual__et____fao56.html#ad94a55323d3c0d70f770ab7fb6fe2b91", null ],
-      [ "near_zero", "namespaceactual__et____fao56.html#a6e32277efd202eea7bde5df46038335a", null ]
+      [ "depletion_fraction", "namespaceactual__et____fao56.html#ad94a55323d3c0d70f770ab7fb6fe2b91", null ]
     ] ],
     [ "actual_et__fao56__two_stage", "namespaceactual__et____fao56____two__stage.html", [
       [ "actual_et_fao56_two_stage_initialize", "namespaceactual__et____fao56____two__stage.html#ab523715d0103f450c51ba2933d79e622", null ],
@@ -17,7 +16,7 @@ var namespaces_dup =
       [ "calculate_total_available_water", "namespaceactual__et____fao56____two__stage.html#a5ca6e96aa217849c3e545542fbff4468", null ],
       [ "calculate_water_stress_coefficient_ks", "namespaceactual__et____fao56____two__stage.html#a813969f340b581bf800357bea36617d0", null ],
       [ "update_evaporable_water_storage", "namespaceactual__et____fao56____two__stage.html#a8be8682bb1cc3e01a5f9da40836cf06b", null ],
-      [ "update_plant_height", "namespaceactual__et____fao56____two__stage.html#a02abd8e98508ccbf1084f7398c7b66c4", null ],
+      [ "update_plant_height", "namespaceactual__et____fao56____two__stage.html#a209a8ec04b7602e960bd1755064dcfe4", null ],
       [ "depletion_fraction", "namespaceactual__et____fao56____two__stage.html#af9dc16681b6ee65a836fd9f6c9f4818b", null ],
       [ "mean_plant_height", "namespaceactual__et____fao56____two__stage.html#a0b06bf263abe3ce0710d436d51e6ba9a", null ],
       [ "min_fraction_covered_soil", "namespaceactual__et____fao56____two__stage.html#a32a73f84f8cd5159f0a02b441205546f", null ],
@@ -32,8 +31,7 @@ var namespaces_dup =
       [ "paet_grid", "namespaceactual__et____gridded__values.html#a75615d74ffc6ec40fb135edca46aa2db", null ]
     ] ],
     [ "actual_et__thornthwaite_mather", "namespaceactual__et____thornthwaite__mather.html", [
-      [ "calculate_actual_et_thornthwaite_mather", "namespaceactual__et____thornthwaite__mather.html#a9082db197e8dcdfe5b0a2a9a747484cd", null ],
-      [ "near_zero", "namespaceactual__et____thornthwaite__mather.html#a61bc150c85a5886ce1c531846b5af351", null ]
+      [ "calculate_actual_et_thornthwaite_mather", "namespaceactual__et____thornthwaite__mather.html#a9082db197e8dcdfe5b0a2a9a747484cd", null ]
     ] ],
     [ "awc__depth_integrated", "namespaceawc____depth__integrated.html", [
       [ "awc_depth_integrated_initialize", "namespaceawc____depth__integrated.html#a22eddb87657ec47bc8c1fe6b728fc0ed", null ],
@@ -239,8 +237,7 @@ var namespaces_dup =
     ] ],
     [ "logfiles", "namespacelogfiles.html", "namespacelogfiles" ],
     [ "mass_balance__impervious_surface", "namespacemass__balance____impervious__surface.html", [
-      [ "calculate_impervious_surface_mass_balance", "namespacemass__balance____impervious__surface.html#a2a92b08ef9a20d2972914f908e6343c5", null ],
-      [ "near_zero", "namespacemass__balance____impervious__surface.html#adb37e469eb706069b38ef8c076cac9d8", null ]
+      [ "calculate_impervious_surface_mass_balance", "namespacemass__balance____impervious__surface.html#a2a92b08ef9a20d2972914f908e6343c5", null ]
     ] ],
     [ "mass_balance__interception", "namespacemass__balance____interception.html", [
       [ "calculate_interception_mass_balance", "namespacemass__balance____interception.html#a2371c7ec191129d66719e65d540d5246", null ]

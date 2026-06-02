@@ -15,6 +15,7 @@ var exceptions_8_f90 =
     [ "exceptions::warn", "namespaceexceptions.html#a865c266d00ec8abab13dc671fd1f2d84", null ],
     [ "exceptions::false", "namespaceexceptions.html#a704e6d1dc804d40d9c95a8e02e3dee16", null ],
     [ "exceptions::halt_upon_fatal_error", "namespaceexceptions.html#a618cc1c55d18593087bdf1a940ca3ac2", null ],
+    [ "exceptions::hint_text", "namespaceexceptions.html#ab681017159c8b9e386f4ef463f7b03fc", null ],
     [ "exceptions::max_fatal_warnings", "namespaceexceptions.html#a19dfbe81ab0383be7f6c4c6baefc5d42", null ],
     [ "exceptions::number_of_fatal_warnings", "namespaceexceptions.html#a2b28e1efd72a7f1efba46bd8e40f64e3", null ],
     [ "exceptions::true", "namespaceexceptions.html#af1b9a41ae82e486e4ee935946d2b5ce2", null ],

@@ -1,9 +1,9 @@
 var namespaceprecipitation____method__of__fragments =
 [
-    [ "fragments_sequence_t", "structprecipitation____method__of__fragments_1_1fragments__sequence__t.html", "structprecipitation____method__of__fragments_1_1fragments__sequence__t" ],
-    [ "fragments_set_t", "structprecipitation____method__of__fragments_1_1fragments__set__t.html", "structprecipitation____method__of__fragments_1_1fragments__set__t" ],
     [ "fragments_t", "structprecipitation____method__of__fragments_1_1fragments__t.html", "structprecipitation____method__of__fragments_1_1fragments__t" ],
     [ "ptr_fragments_t", "structprecipitation____method__of__fragments_1_1ptr__fragments__t.html", "structprecipitation____method__of__fragments_1_1ptr__fragments__t" ],
+    [ "fragments_set_t", "structprecipitation____method__of__fragments_1_1fragments__set__t.html", "structprecipitation____method__of__fragments_1_1fragments__set__t" ],
+    [ "fragments_sequence_t", "structprecipitation____method__of__fragments_1_1fragments__sequence__t.html", "structprecipitation____method__of__fragments_1_1fragments__sequence__t" ],
     [ "normalize_february_fragment_sequence", "namespaceprecipitation____method__of__fragments.html#af3f2efa5c9f85bdccc41f8ed6a0082db", null ],
     [ "precipitation_method_of_fragments_calculate", "namespaceprecipitation____method__of__fragments.html#a21e98f9e400f9ca056e46d4291bf0b1d", null ],
     [ "precipitation_method_of_fragments_initialize", "namespaceprecipitation____method__of__fragments.html#a4d0a7fd5f83ff361ebf94c8bde158aa1", null ],

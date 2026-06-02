@@ -17,6 +17,5 @@ var output_8_f90 =
     [ "output::nc_out", "namespaceoutput.html#ac55232c85712daaadd44aa8cb983199b", null ],
     [ "output::ncdf_num_outputs", "namespaceoutput.html#a32c9eae8081ec33317061863c18a2c21", null ],
     [ "output::output_includes_latlon", "namespaceoutput.html#a4a33eb848aef1f42af1e88b1bdb55366", null ],
-    [ "output::outspecs", "namespaceoutput.html#a73547aef02c0319f1e14a44cb7ee964a", null ],
-    [ "output::recharge_array", "namespaceoutput.html#a43525f797ae50b1c3621a937fd4acfcc", null ]
+    [ "output::outspecs", "namespaceoutput.html#a73547aef02c0319f1e14a44cb7ee964a", null ]
 ];

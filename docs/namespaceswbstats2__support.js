@@ -1,9 +1,9 @@
 var namespaceswbstats2__support =
 [
-    [ "file_collection_t", "structswbstats2__support_1_1file__collection__t.html", "structswbstats2__support_1_1file__collection__t" ],
     [ "length_unit_t", "structswbstats2__support_1_1length__unit__t.html", "structswbstats2__support_1_1length__unit__t" ],
-    [ "swbstats_t", "structswbstats2__support_1_1swbstats__t.html", "structswbstats2__support_1_1swbstats__t" ],
     [ "volume_unit_t", "structswbstats2__support_1_1volume__unit__t.html", "structswbstats2__support_1_1volume__unit__t" ],
+    [ "file_collection_t", "structswbstats2__support_1_1file__collection__t.html", "structswbstats2__support_1_1file__collection__t" ],
+    [ "swbstats_t", "structswbstats2__support_1_1swbstats__t.html", "structswbstats2__support_1_1swbstats__t" ],
     [ "calc_multizonal_stats", "namespaceswbstats2__support.html#abf0b85035d6592bc9576183c2378eb0b", null ],
     [ "calc_zonal_stats", "namespaceswbstats2__support.html#aef52306ec66db3359788597634d9e4b6", null ],
     [ "calculate_monthly_statistics", "namespaceswbstats2__support.html#a2b7f55d6a25d854b192ecc55ea02b30c", null ],

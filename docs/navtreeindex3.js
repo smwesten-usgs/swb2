@@ -1,7 +1,6 @@
 var NAVTREEINDEX3 =
 {
-"namespaceconstants__and__conversions.html#af1d9b68bed3e34c2744f307873c5d5db":[2,0,6,61],
-"namespaceconstants__and__conversions.html#af58a7fa6c703306bf5d6d2cfc583b39f":[2,0,6,94],
+"namespaceconstants__and__conversions.html#af58a7fa6c703306bf5d6d2cfc583b39f":[2,0,6,95],
 "namespaceconstants__and__conversions.html#af9fb8b68989819a16f45a566443eff85":[2,0,6,19],
 "namespaceconstants__and__conversions.html#afaad2b38043a04954fc8fddfda84af4c":[2,0,6,65],
 "namespaceconstants__and__conversions.html#afe139aab601a30f569b6a0908051fe8a":[2,0,6,18],
@@ -249,5 +248,6 @@ var NAVTREEINDEX3 =
 "namespaceet____hargreaves__samani.html#a77b1c6dd3a4c112c6192becc9f879893":[2,0,18,1],
 "namespaceet____hargreaves__samani.html#a7dde6cb8f3282f642bf47a1dd2d3984f":[2,0,18,4],
 "namespaceet____hargreaves__samani.html#a8512a837baefd57047e55c7a53b03cf3":[2,0,18,2],
-"namespaceet____hargreaves__samani.html#a87aaaab114756b2e907badf129812bee":[2,0,18,5]
+"namespaceet____hargreaves__samani.html#a87aaaab114756b2e907badf129812bee":[2,0,18,5],
+"namespaceet____hargreaves__samani.html#aa4970400403cd4ba4c201a15d7c62b8d":[2,0,18,0]
 };

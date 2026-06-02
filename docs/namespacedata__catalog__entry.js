@@ -1,7 +1,7 @@
 var namespacedata__catalog__entry =
 [
-    [ "apply_scale_and_offset", "interfacedata__catalog__entry_1_1apply__scale__and__offset.html", "interfacedata__catalog__entry_1_1apply__scale__and__offset" ],
     [ "data_catalog_entry_t", "structdata__catalog__entry_1_1data__catalog__entry__t.html", "structdata__catalog__entry_1_1data__catalog__entry__t" ],
+    [ "apply_scale_and_offset", "interfacedata__catalog__entry_1_1apply__scale__and__offset.html", "interfacedata__catalog__entry_1_1apply__scale__and__offset" ],
     [ "apply_scale_and_offset_float", "namespacedata__catalog__entry.html#ab5b38b6897ce414e155662ef1c1fd5b9", null ],
     [ "apply_scale_and_offset_int", "namespacedata__catalog__entry.html#a3222c5d224936143fb72a709072fdbc5", null ],
     [ "calc_project_boundaries_sub", "namespacedata__catalog__entry.html#a5f28f53607be9d1ea7b5593f09c71f80", null ],

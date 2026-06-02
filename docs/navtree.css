@@ -21,7 +21,7 @@
 
 #nav-tree .selected {
   position: relative;
-  background-color: #B9DDFF;
+  background-color: var(--nav-menu-active-bg);
   border-radius: 0 6px 6px 0;
   /*margin-right: 5px;*/
 }
@@ -42,7 +42,7 @@
 #nav-tree .label {
   margin:0px;
   padding:0px;
-  font: 12px 'Lucida Grande',Geneva,Helvetica,Arial,sans-serif;
+  font: 12px var(--font-family-nav);
   line-height: 22px;
 }
 
@@ -52,7 +52,7 @@
 
 #nav-tree .selected a {
   text-decoration:none;
-  color:#004789;
+  color:var(--page-link-color);
 }
 
 #nav-tree .children_ul {
@@ -95,7 +95,7 @@
 
 .ui-resizable-e {
   transition: opacity 0.5s ease;
-  background-color: #B9DDFF;
+  background-color: var(--nav-splitbar-bg-color);
   opacity:0;
   cursor:col-resize;
   height:100%;
@@ -112,8 +112,8 @@
   left: 1px;
   width: 2px;
   height: 15px;
-  border-left: 1px solid #43A4FF;
-  border-right: 1px solid #43A4FF;
+  border-left: 1px solid var(--nav-splitbar-handle-color);
+  border-right: 1px solid var(--nav-splitbar-handle-color);
   position: absolute;
 }
 
@@ -133,10 +133,10 @@
 }
 
 #nav-tree {
-  background-color: #F3F9FE;
+  background-color: var(--nav-background-color);
   -webkit-overflow-scrolling : touch; /* iOS 5+ */
   scrollbar-width: thin;
-  border-right: 1px solid #8DC8FF;
+  border-right: 1px solid var(--nav-border-color);
   padding-left: 5px;
 }
 
@@ -159,20 +159,20 @@ div.nav-sync-icon {
 	top: -1px;
 	opacity: 0.7;
 	display: inline-block;
-	background-color: #F3F9FE;
-	border: 1px solid #8DC8FF;
+	background-color: var(--sync-icon-background-color);
+	border: 1px solid var(--sync-icon-border-color);
 	box-sizing: content-box;
 }
 
 div.nav-sync-icon:hover {
-	background-color: #DDEEFE;
+	background-color: var(--sync-icon-selected-background-color);
 	opacity: 1.0;
 }
 
 div.nav-sync-icon.active:after {
 	content: '';
-	background-color: #F3F9FE;
-	border-top: 2px solid #8DC8FF;
+	background-color: var(--sync-icon-background-color);
+	border-top: 2px solid var(--sync-icon-color);
 	position: absolute;
 	width: 16px;
 	height: 0px;
@@ -181,7 +181,7 @@ div.nav-sync-icon.active:after {
 }
 
 div.nav-sync-icon.active:hover:after {
-	border-top: 2px solid #0078EA;
+	border-top: 2px solid var(--sync-icon-selected-color);
 }
 
 span.sync-icon-left {
@@ -193,8 +193,8 @@ span.sync-icon-left {
 	display: inline-block;
 	width: 8px;
 	height: 8px;
-	border-left: 2px solid #8DC8FF;
-	border-top: 2px solid #8DC8FF;
+	border-left: 2px solid var(--sync-icon-color);
+	border-top: 2px solid var(--sync-icon-color);
 	transform: rotate(-45deg);
 }
 
@@ -207,23 +207,23 @@ span.sync-icon-right {
 	display: inline-block;
 	width: 8px;
 	height: 8px;
-	border-right: 2px solid #8DC8FF;
-	border-bottom: 2px solid #8DC8FF;
+	border-right: 2px solid var(--sync-icon-color);
+	border-bottom: 2px solid var(--sync-icon-color);
 	transform: rotate(-45deg);
 }
 
 div.nav-sync-icon:hover span.sync-icon-left {
-	border-left: 2px solid #0078EA;
-	border-top: 2px solid #0078EA;
+	border-left: 2px solid var(--sync-icon-selected-color);
+	border-top: 2px solid var(--sync-icon-selected-color);
 }
 
 div.nav-sync-icon:hover span.sync-icon-right {
-	border-right: 2px solid #0078EA;
-	border-bottom: 2px solid #0078EA;
+	border-right: 2px solid var(--sync-icon-selected-color);
+	border-bottom: 2px solid var(--sync-icon-selected-color);
 }
 
 #nav-path ul {
-  border-top: 1px solid #8DC8FF;
+  border-top: 1px solid var(--nav-breadcrumb-separator-color);
 }
 
 @media print
@@ -240,12 +240,12 @@ div.nav-sync-icon:hover span.sync-icon-right {
 }
 
 #page-nav {
-	background: #F3F9FE;
+	background: var(--nav-background-color);
 	display: block;
 	width: 250px;
 	box-sizing: content-box;
         position: relative;
-	border-left: 1px solid #8DC8FF;
+	border-left: 1px solid var(--nav-border-color);
 }
 
 #page-nav-tree {
@@ -254,7 +254,7 @@ div.nav-sync-icon:hover span.sync-icon-right {
 
 #page-nav-resize-handle {
   transition: opacity 0.5s ease;
-  background-color: #B9DDFF;
+  background-color: var(--nav-splitbar-bg-color);
   opacity:0;
   cursor:col-resize;
   height:100%;
@@ -273,8 +273,8 @@ div.nav-sync-icon:hover span.sync-icon-right {
   left: 1px;
   width: 2px;
   height: 15px;
-  border-left: 1px solid #43A4FF;
-  border-right: 1px solid #43A4FF;
+  border-left: 1px solid var(--nav-splitbar-handle-color);
+  border-right: 1px solid var(--nav-splitbar-handle-color);
   position: absolute;
 }
 
@@ -309,7 +309,7 @@ ul.page-outline {
 }
 
 ul.page-outline div.item {
-  font: 12px 'Lucida Grande',Geneva,Helvetica,Arial,sans-serif;
+  font: 12px var(--font-family-nav);
   line-height: 22px;
 }
 
@@ -318,7 +318,7 @@ ul.page-outline li {
 }
 
 ul.page-outline li.vis {
-  background-color: #DDEEFE;
+  background-color: var(--nav-breadcrumb-active-bg);
 }
 
 #container.resizing {

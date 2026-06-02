@@ -17,6 +17,5 @@ var namespaceoutput =
     [ "nc_out", "namespaceoutput.html#ac55232c85712daaadd44aa8cb983199b", null ],
     [ "ncdf_num_outputs", "namespaceoutput.html#a32c9eae8081ec33317061863c18a2c21", null ],
     [ "output_includes_latlon", "namespaceoutput.html#a4a33eb848aef1f42af1e88b1bdb55366", null ],
-    [ "outspecs", "namespaceoutput.html#a73547aef02c0319f1e14a44cb7ee964a", null ],
-    [ "recharge_array", "namespaceoutput.html#a43525f797ae50b1c3621a937fd4acfcc", null ]
+    [ "outspecs", "namespaceoutput.html#a73547aef02c0319f1e14a44cb7ee964a", null ]
 ];

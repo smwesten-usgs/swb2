@@ -7,6 +7,7 @@ var searchData=
   ['hargreaves_5fet0_5fexponent_4',['hargreaves_et0_exponent',['../structmodel__domain_1_1model__domain__t.html#aca07c2bf023fce23eae64ecdb2a24a3d',1,'model_domain::model_domain_t']]],
   ['hargreaves_5fet0_5fslope_5',['hargreaves_et0_slope',['../structmodel__domain_1_1model__domain__t.html#afc3f0243a7e5b7a19ebaf3716e2ee0de',1,'model_domain::model_domain_t']]],
   ['have_5fwe_5freached_5fthe_5feof_5ffn_6',['have_we_reached_the_eof_fn',['../structfile__operations_1_1ascii__file__t.html#aca1d2f3fd166891c5f9e87fd7f851842',1,'file_operations::ascii_file_t::have_we_reached_the_eof_fn()'],['../namespacefile__operations.html#a6bed88b3310e213ec00b123a3edea270',1,'file_operations::have_we_reached_the_eof_fn()']]],
-  ['hours_7',['hours',['../structtimer_1_1timer__t.html#a6f734c0204471112bbf6cdf29fbdd0e1',1,'timer::timer_t']]],
-  ['hydrologic_20soil_20group_8',['Hydrologic Soil Group',['../index.html#hydrologic-soil-group',1,'']]]
+  ['hint_5ftext_7',['hint_text',['../namespaceexceptions.html#ab681017159c8b9e386f4ef463f7b03fc',1,'exceptions']]],
+  ['hours_8',['hours',['../structtimer_1_1timer__t.html#a6f734c0204471112bbf6cdf29fbdd0e1',1,'timer::timer_t']]],
+  ['hydrologic_20soil_20group_9',['Hydrologic Soil Group',['../index.html#hydrologic-soil-group',1,'']]]
 ];

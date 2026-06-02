@@ -38,7 +38,7 @@ SWB requires a combination of gridded and tabular files as input and produces se
 Several different input files must be in place for an SWB simulation to work. The most important of these files is the SWB control file. The control file specifies the location of input data grids and climate datasets and is the place where the user may select specific program options. A lookup table, or possibly several lookup tables, are required to relate SWB model parameters to the land use or hydrologic soil group, or both. Input-data grids are used to provide SWB with a map of land-use and soil-related information. Finally, daily weather data must be provided in either tabular or gridded form. These input files are discussed in greater detail in the following sections.
 ### Control File
 The SWB control file contains all details about the grid specifications, gridded and tabular datasets to be used, and the location and name of lookup tables. SWB does not require the control file entries to be made in any particular order. The control file statements do not need to be in uppercase letters; `Lookup_table` works as well as `LOOKUP_TABLE`. Note that in SWB version 2.0, the cartographic projection of the SWB project grid is required to be supplied by means of the `BASE_PROJECTION_DEFINITION` directive in the form of a PROJ string (fig. 2).
-```
+```bash
 ## SWB 2 will ignore lines that begin with one of the following:  #%!+=
 ## also, SWB doesn't care about blank lines
 ## the order of lines makes no difference to SWB; however, it is useful for
