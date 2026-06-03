@@ -1,3 +1,6 @@
+# DEPRECATED: This CMake build is no longer maintained.
+# Use Meson instead. See CONTRIBUTING.md for build instructions.
+
 cmake_minimum_required(VERSION 3.7)
 
 project( swb2 LANGUAGES C Fortran )
