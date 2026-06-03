@@ -1,3 +1,0 @@
-FROM ubuntu:latest 
-RUN  apt-get -y update                                                 && \
-     apt-get -y install libnetcdf-dev gfortran cmake make git 
