@@ -1,4 +1,4 @@
-## Third-party Licenses
+# Third-party Licenses
 -----------------------
 The Soil-Water-Balance code makes use of several open source projects in order to improve functionality for users. These projects and their license details are given below.
 
@@ -13,7 +13,7 @@ The Soil-Water-Balance code makes use of several open source projects in order t
 
 `netCDF`, `HDF5`, and `zlib` are either linked statically or dynamically depending on the platform. Generally static linking is possible using `gfortran` on Windows platforms. Dynamic linking of these libraries is often easier on Macintosh and Linux platforms.
 
-### PROJ.4 License (MIT-like)
+## PROJ.4 License (MIT-like)
 
 Frank Warmerdam wrote of this version: PROJ.4 has been placed under an MIT license. I believe this to be as close as possible to public domain while satisfying those who say that a copyright notice is required in some countries. The COPYING file read as follows:
 
@@ -41,7 +41,7 @@ Though I have put my own name as copyright holder, I don’t mean to imply I did
 > FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 > DEALINGS IN THE SOFTWARE.
 
-### netCDF License (3-Clause BSD License)
+## netCDF License (3-Clause BSD License)
 
 Copyright 2025 Unidata
 
@@ -55,7 +55,7 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-### HDF5 License (3-Clause BSD License)
+## HDF5 License (3-Clause BSD License)
 
 Copyright Notice and License Terms for
 HDF5 (Hierarchical Data Format 5) Software Library and Utilities
@@ -168,7 +168,7 @@ Foundation under Federal Award No. 2534078.
 
 -----------------------------------------------------------------------------
 
-### ZLib License
+## ZLib License
 
 zlib.h -- interface of the 'zlib' general purpose compression library
 version 1.3.2, February 17th, 2026
