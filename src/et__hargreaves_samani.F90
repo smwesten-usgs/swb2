@@ -27,6 +27,8 @@ module et__hargreaves_samani
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
   use constants_and_conversions
+  use fstring, only                   : asCharacter
+  use logfiles, only                  : LOGS, LOG_ALL
   use meteorological_calculations
   use parameters, only                : PARAMS
   use solar_calculations
@@ -79,12 +81,12 @@ subroutine et_hargreaves_initialize( ) !pConfig, sRecord )
     ET_CONSTANT = 17.8_c_double
   endif
 
-  print *, "****************************************************************************"
-  print *, "initializing Hargreaves ET parameters"
-  print *, "****************************************************************************"
-  print *, "  ET_SLOPE     = ", ET_SLOPE
-  print *, "  ET_EXPONENT  = ", ET_EXPONENT
-  print *, "  ET_CONSTANT  = ", ET_CONSTANT
+  call LOGS%write("****************************************************************************")
+  call LOGS%write("initializing Hargreaves ET parameters")
+  call LOGS%write("****************************************************************************")
+  call LOGS%write("  ET_SLOPE     = "//asCharacter(real(ET_SLOPE, c_float)))
+  call LOGS%write("  ET_EXPONENT  = "//asCharacter(real(ET_EXPONENT, c_float)))
+  call LOGS%write("  ET_CONSTANT  = "//asCharacter(real(ET_CONSTANT, c_float)))
 
   !  write(UNIT=LU_LOG,FMT=*) "Configuring Hargreaves PET model"
 

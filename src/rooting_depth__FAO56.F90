@@ -10,6 +10,7 @@ module rooting_depth__FAO56
   use constants_and_conversions, only  : TRUE, FALSE 
   use fstring_list
   use fstring, only                    : operator(.containssimilar.), asCharacter
+  use logfiles, only                   : LOGS, LOG_ALL
   use parameters, only                 : PARAMS
   use exceptions, only                 : assert, warn
   use crop_coefficients__FAO56, only   : KCB_l, KCB_MIN, KCB_INI, KCB_MID, KCB_END,               &
@@ -56,7 +57,7 @@ subroutine initialize_rooting_depth( )
   number_of_records = sl_variable_rooting_depth%count
   list_lengths_are_equal = ( number_of_records == number_of_landuses )
 
-  print *, "INITIALIZING ROOTING DEPTH data structures:", trim(__FILE__), "  ", __LINE__
+  call LOGS%write("INITIALIZING ROOTING DEPTH data structures: "//trim(__FILE__))
 
   if ( .not. list_lengths_are_equal ) then
 
@@ -81,7 +82,7 @@ subroutine initialize_rooting_depth( )
         VARIABLE_ROOTING_DEPTH(indx) = FALSE
       endif
 
-      print *, "SETTING 'allow_variable_rooting_depth' for landuse index "//asCharacter(indx)//" to "//trim(temp_str)
+      call LOGS%write("SETTING 'allow_variable_rooting_depth' for landuse index "//asCharacter(indx)//" to "//trim(temp_str))
 
     enddo
   

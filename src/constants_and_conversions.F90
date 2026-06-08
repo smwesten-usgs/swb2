@@ -154,6 +154,7 @@ module constants_and_conversions
     module procedure char2int
     module procedure real2int
     module procedure dbl2int
+    module procedure bool2int
   end interface asInt
 
   public asLogical
@@ -717,6 +718,19 @@ elemental function dbl2int(rValue)  result(iValue)
 end function dbl2int
 
 !--------------------------------------------------------------------------------------------------
+
+!> Convert a boolean value into a int
+elemental pure function bool2int(lValue)   result(iValue)
+  logical (c_bool), intent(in) :: lValue
+  integer (c_int)              :: iValue
+
+  if (lValue) then
+    iValue = 1_c_int
+  else
+    iValue = 0_c_int
+  end if
+
+end function bool2int
 
 !> Convert a character value into a real
 

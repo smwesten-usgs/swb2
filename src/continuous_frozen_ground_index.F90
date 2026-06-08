@@ -63,6 +63,11 @@ contains
     ! locate the data structure associated with the gridded CFGI_LOWER_LIMIT
     pCFGI_LOWER_LIMIT => DAT%find("CFGI_LOWER_LIMIT")
 
+    ! figure 4-21 shows an alternate syntax
+    if ( .not. associated( pCFGI_LOWER_LIMIT ) ) then
+      pCFGI_LOWER_LIMIT => DAT%find("LOWER_LIMIT_CFGI")
+    endif  
+
     if ( .not. associated( pCFGI_LOWER_LIMIT ) ) then
 
       call warn(sMessage="No value supplied for CONTINUOUS_FROZEN_GROUND_INDEX_LOWER_LIMIT.",             &
@@ -88,6 +93,11 @@ contains
 
     ! locate the data structure associated with the gridded CFGI_UPPER_LIMIT
     pCFGI_UPPER_LIMIT => DAT%find("CFGI_UPPER_LIMIT")
+
+    ! figure 4-21 shows an alternate syntax; accomodate this
+    if ( .not. associated( pCFGI_UPPER_LIMIT ) ) then
+      pCFGI_UPPER_LIMIT => DAT%find("UPPER_LIMIT_CFGI")
+    endif  
 
     if ( .not. associated( pCFGI_UPPER_LIMIT ) ) then
 
