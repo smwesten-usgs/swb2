@@ -70,10 +70,35 @@ module crop_coefficients__fao56
   real (c_float), allocatable   :: GROWTH_STAGE_LENGTH_IN_DAYS(:,:)
   real (c_float), allocatable   :: GROWTH_STAGE_GDD(:,:)
   type (DATETIME_T), allocatable     :: GROWTH_STAGE_DATE(:,:)
+  type (FSTRING_LIST_T)         :: SL_PLANTING_DATE
 
   integer (c_int)               :: LU_SOILS_CSV
 
 contains
+
+
+  function crop_coefficients_calculate_planting_date(sPlantingDate, iYear)   result(dtNewPlantingDate)
+    character(len=*), intent(in)      :: sPlantingDate
+    integer (c_int), intent(in)       :: iYear
+    type (DATETIME_T)                 :: dtNewPlantingDate
+
+    ! [ LOCAL ]
+    character (len=10)                :: sMMDDYYYY
+
+    if ( sPlantingDate .contains. "/" ) then
+      sMMDDYYYY = trim(sPlantingDate)//"/"//asCharacter( iYear )
+      call dtNewPlantingDate%parsedate( sMMDDYYYY, __FILE__, __LINE__ )
+
+    else
+      ! assume the value is a day-of-year value
+      sMMDDYYYY = "01/01/"//asCharacter( iYear )
+      call dtNewPlantingDate%parsedate( sMMDDYYYY, __FILE__, __LINE__ )
+      dtNewPlantingDate = dtNewPlantingDate + ( asFloat( sPlantingDate ) - 1.0_c_float )
+      call dtNewPlantingDate%calcJulianDay()
+    endif
+
+  end function crop_coefficients_calculate_planting_date
+
 
   subroutine crop_coefficients_FAO56_initialize()
 
@@ -93,7 +118,7 @@ contains
     character (len=10)                :: sMMDDYYYY
     character (len=:), allocatable    :: sText
 
-    type (FSTRING_LIST_T)             :: slPlantingDate
+    !type (FSTRING_LIST_T)             :: slPlantingDate
     type (DATETIME_T)                 :: dtPlantingDate
     character (len=:), allocatable    :: PlantingDate_str
 
@@ -155,7 +180,7 @@ contains
    !!       REW_1, REW_3, REW_5, only the values associated with "REW_1" would be retrieved.
    !!       Needless to say, this would be catastrophic.
 
-   call PARAMS%get_parameters( sKey="Planting_date", slValues=slPlantingDate )
+   call PARAMS%get_parameters( sKey="Planting_date", slValues=SL_PLANTING_DATE )
 
    call PARAMS%get_parameters( sKey="L_ini", fValues=L_ini_l)
    call PARAMS%get_parameters( sKey="L_dev", fValues=L_dev_l)
@@ -236,30 +261,34 @@ contains
     call Logs%write("-------------|---------------|--------------|--------------" &
       //"|--------------|---------------|-----------------")
 
-    if ( slPlantingDate%count == iNumberOfLanduses .and. slPlantingDate%count > 0 ) then
+    if ( SL_PLANTING_DATE%count == iNumberOfLanduses .and. SL_PLANTING_DATE%count > 0 ) then
 
-      do iIndex=1, slPlantingDate%count
+      do iIndex=1, SL_PLANTING_DATE%count
 
-        PlantingDate_str = slPlantingDate%get( iIndex )
+        PlantingDate_str = SL_PLANTING_DATE%get( iIndex )
 
         ! if there is no planting date entry, assume user is specifying
         ! a planting GDD for this landuse code
         if ( len_trim(PlantingDate_str) == 0 ) cycle
 
-        if ( PlantingDate_str .contains. "/" ) then
+        ! if ( PlantingDate_str .contains. "/" ) then
 
-          ! append current year to the end of the user-entered planting date in mm/dd
-          sMMDDYYYY = trim(PlantingDate_str)//"/"//asCharacter( SIM_DT%start%iYear )
-          call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY, __FILE__, __LINE__ )
+        !   ! append current year to the end of the user-entered planting date in mm/dd
+        !   sMMDDYYYY = trim(PlantingDate_str)//"/"//asCharacter( SIM_DT%start%iYear )
+        !   call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY, __FILE__, __LINE__ )
 
-          GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)
+        !   GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)
 
-        else
-          ! assume the value is a day-of-year value
-          dtPlantingDate = SIM_DT%start + asFloat( PlantingDate_str)
-          call dtPlantingDate%calcJulianDay()
-          GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = dtPlantingDate
-        endif
+        ! else
+        !   ! assume the value is a day-of-year value
+        !   dtPlantingDate = SIM_DT%start + asFloat( PlantingDate_str)
+        !   call dtPlantingDate%calcJulianDay()
+        !   GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = dtPlantingDate
+        ! endif
+
+        GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) =                                     &
+            crop_coefficients_calculate_planting_date(sPlantingDate=PlantingDate_str,   &
+                                                      iYear=SIM_DT%start%iYear)
 
         ! march forward through time calculating the various dates on the Kcb curve
         ! GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) + L_ini_l( iIndex )
@@ -270,15 +299,15 @@ contains
 
         ! if any of the L_* length values is missing, a value of zero will be used, resulting in a wierd looking Kcb curve
         GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )                        &
-                                                   + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_INI, iIndex )
+                                                   + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_INI, iIndex ) )
         GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )                          &
-                                                   + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_DEV, iIndex )
+                                                   + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_DEV, iIndex ) )
         GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )                          &
-                                                   + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_MID, iIndex )
+                                                   + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_MID, iIndex ) )
         GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )                         &
-                                                   + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_LATE, iIndex )
+                                                   + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_LATE, iIndex ) )
         GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )                      &
-                                                     + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_FALLOW, iIndex )
+                                                     + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_FALLOW, iIndex ) )
 
         call LOGS%write( "| "//asCharacter( LANDUSE_CODE( iIndex ))//" | "                                    &
            //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )                                  &
@@ -409,21 +438,21 @@ contains
 
       ! now calculate Kcb for the given landuse
 
-      if( current_date > Date_late ) then
+      if( current_date >= Date_late ) then
 
         Kcb = Kcb_min
 
-      elseif ( current_date > Date_mid ) then
+      elseif ( current_date >= Date_mid ) then
 
         fFrac = ( current_date - Date_mid ) / ( Date_late - Date_mid )
 
         Kcb =  Kcb_mid * (1.0_c_double - fFrac) + Kcb_end * fFrac
 
-      elseif ( current_date > Date_dev ) then
+      elseif ( current_date >= Date_dev ) then
 
         Kcb = Kcb_mid
 
-      elseif ( current_date > Date_ini ) then
+      elseif ( current_date >= Date_ini ) then
 
         fFrac = ( current_date - Date_ini ) / ( Date_dev - Date_ini )
 
@@ -573,43 +602,69 @@ end function update_crop_coefficient_GDD_as_threshold
 !      print *, "a) ",SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate()
 
       ! it's possible that the planting date might be later in the current calendar year
-      call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%setYear( SIM_DT%curr%iYear )
+      !call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%setYear( SIM_DT%curr%iYear )
 
 !      print *, "b) ",SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate()
 
-      ! however, if we are already past that point in the year, planting date must be
+      ! if we are already past the planting doy, planting date must be
       ! next calendar year
-      if ( SIM_DT%iDOY > GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%getDayOfYear() )  &
-        call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%addYear()
+      if ( SIM_DT%iDOY > GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%getDayOfYear() )  then
 
-!      print *, "c) ",SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate()
+        GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) =                                                &
+            crop_coefficients_calculate_planting_date(sPlantingDate = SL_PLANTING_DATE%get(iIndex), &
+                                                      iYear=SIM_DT%curr%iYear + 1)
+
+      else
+
+        ! allow for planting date to be later in the current year
+        GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) =                                                &
+            crop_coefficients_calculate_planting_date(sPlantingDate = SL_PLANTING_DATE%get(iIndex), &
+                                                      iYear=SIM_DT%curr%iYear )
+        
+      endif 
 
       ! now calculate dates associated with the rest of the Kcb curve
       GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) &
-                                                + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_INI, iIndex )
+                                                + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_INI, iIndex ) )
       GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )&
-                                                + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_DEV, iIndex )
+                                                + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_DEV, iIndex ) )
       GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )&
-                                                + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_MID, iIndex )
+                                                + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_MID, iIndex ) )
       GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )&
-                                                + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_LATE, iIndex )
+                                                + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_LATE, iIndex ) )
       GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )&
-                                                + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_FALLOW, iIndex )
+                                                + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_FALLOW, iIndex ) )
 
-      call LOGS%write("## Updating Kcb Date Values ##", iLinesAfter=1, lEcho=FALSE )
+      call LOGS%write("## Updated Crop Kcb Curve Summary ##", iLinesAfter=1, lEcho=FALSE )
       call LOGS%write("Landuse Code | Planting Date | End of 'ini' | End of 'dev' " &
         //"| End of 'mid' | End of 'late' | End of 'fallow' ", lEcho=FALSE )
       call Logs%write("-------------|---------------|--------------|--------------" &
         //"|--------------|---------------|-----------------", lEcho=FALSE )
 
-      call LOGS%write( asCharacter( LANDUSE_CODE( iIndex ))//" | "                &
-         //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )//" | " &
-         //trim( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%prettydate() )//" | "   &
-         //trim( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%prettydate() )//" | "   &
-         //trim( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%prettydate() )//" | "   &
-         //trim( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate() )//" | "  &
-         //trim( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%prettydate() ),      &
-         lEcho=FALSE, iLogLevel=LOG_ALL )
+      ! call LOGS%write( asCharacter( LANDUSE_CODE( iIndex ))//" | "                &
+      !    //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )//" | " &
+      !    //trim( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%prettydate() )//" | "   &
+      !    //trim( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%prettydate() )//" | "   &
+      !    //trim( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%prettydate() )//" | "   &
+      !    //trim( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate() )//" | "  &
+      !    //trim( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%prettydate() ),      &
+      !    lEcho=FALSE, iLogLevel=LOG_ALL )
+
+
+        call LOGS%write( "| "//asCharacter( LANDUSE_CODE( iIndex ))//" | "                                    &
+           //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )                                  &
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%getDayOfYear() )//") | "     &
+           //trim( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%prettydate() )//" | "                             &
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%getDayOfYear() )//") | "       &
+           //trim( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%prettydate() )//" | "                             &
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%getDayOfYear() )//") | "       &
+           //trim( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%prettydate() )//" | "                             &
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%getDayOfYear() )//") | "       &
+           //trim( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate() )//" | "                            &
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%getDayOfYear() )//") | "      &
+           //trim( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%prettydate() )                                 &
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%getDayOfYear() )//") | ",   &
+           lEcho=FALSE, iLogLevel=LOG_ALL)
 
     enddo
 
