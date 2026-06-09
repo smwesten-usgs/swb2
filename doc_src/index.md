@@ -99,8 +99,8 @@ TMIN_MISSING_VALUES_ACTION     mean
 % Continuous Forzen Ground Index initial value and upper and lower limits
 %-----------------------------------------------------------------------------
 INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX CONSTANT 100.0
-UPPER_LIMIT_CFGI 83.
-LOWER_LIMIT_CFGI 55.
+UPPER_LIMIT_CFGI CONSTANT 83.
+LOWER_LIMIT_CFGI CONSTANT 55.
 
 % Define flow direction, hydrologic soils group, land-use, available
 % water-content grids
