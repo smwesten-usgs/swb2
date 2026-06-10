@@ -579,9 +579,9 @@ contains
     this%direct_net_infiltration             = 0.0_c_float
     this%direct_soil_moisture                = 0.0_c_float
     this%number_of_days_since_planting       = 0_c_int
-    this%evap_reduction_coef_kr              = 0.0_c_float
+    this%evap_reduction_coef_kr              = 1.0_c_float
     this%surf_evap_coef_ke                   = 0.0_c_float
-    this%plant_stress_coef_ks                = 0.0_c_float
+    this%plant_stress_coef_ks                = 1.0_c_float
     this%total_available_water_taw           = 0.0_c_float
     this%readily_available_water_raw         = 0.0_c_float
     this%fraction_exposed_and_wetted_soil    = 0.0_c_float
