@@ -1,6 +1,18 @@
-# this is critical for compilation to succeed!! modify for your system.
+# Path to NetCDF installation root. Leave empty to use platform default.
 option('netcdf_root',
   type: 'string',
-  value: '',  # empty means "use platform default"
+  value: '',
   description: 'Path to NetCDF installation root (leave empty to use platform default)'
+)
+
+# Build profile:
+#   release         - optimized, FPE traps, backtrace (default)
+#   develop         - runtime checks, NaN init, FPE traps
+#   static_analysis - pedantic warnings from both compilers; compilation continues
+#                     even with non-conforming code so you get a comprehensive report
+option('profile',
+  type: 'combo',
+  choices: ['release', 'develop', 'static_analysis'],
+  value: 'release',
+  description: 'Build profile controlling compiler flags'
 )
