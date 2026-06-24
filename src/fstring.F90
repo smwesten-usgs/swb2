@@ -339,7 +339,7 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  function is_string2_present_in_string1_case_insensitive_fn(sText1, sText2)   result(lBool)
+  pure function is_string2_present_in_string1_case_insensitive_fn(sText1, sText2)   result(lBool)
 
     character (len=*), intent(in)      :: sText1
     character (len=*), intent(in)      :: sText2
@@ -360,7 +360,7 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  function is_string2_present_in_string1_case_sensitive_fn(sText1, sText2)   result(lBool)
+  pure function is_string2_present_in_string1_case_sensitive_fn(sText1, sText2)   result(lBool)
 
     character (len=*), intent(in)      :: sText1
     character (len=*), intent(in)      :: sText2
@@ -402,7 +402,7 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-   function is_char_equal_to_char_case_insensitive_fn(sText1, sText2)   result(lBool)
+   pure function is_char_equal_to_char_case_insensitive_fn(sText1, sText2)   result(lBool)
 
     character (len=*), intent(in)      :: sText1
     character (len=*), intent(in)      :: sText2
@@ -629,7 +629,7 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-   function char_to_uppercase_fn ( s )                    result(sText)
+   pure function char_to_uppercase_fn ( s )                    result(sText)
 
     ! ARGUMENTS
     character (len=*), intent(in) :: s
@@ -655,7 +655,7 @@ contains
 
   !--------------------------------------------------------------------------
 
-   function char_to_lowercase_fn ( s )                               result(sText)
+   pure function char_to_lowercase_fn ( s )                               result(sText)
 
     ! ARGUMENTS
     character (len=*), intent(in) :: s

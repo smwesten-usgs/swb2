@@ -101,7 +101,7 @@ contains
       ! ENTIRE DAY at PET
       if ( root_constant_ci  <= 0.0_c_float ) then
 
-        actual_et = min( crop_etc, interim_soil_storage )
+        actual_et = min( real(crop_etc, c_double), interim_soil_storage )
 
       ! ALL or PARTIAL DAY at PET
       elseif ( interim_soil_storage > root_constant_ci ) then

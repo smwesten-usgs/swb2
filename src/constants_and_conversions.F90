@@ -308,7 +308,7 @@ contains
     real (c_float), intent(in)    :: degrees
     real (c_float)                :: radians
 
-    radians = degrees * DEGREES_TO_RADIANS
+    radians = real(degrees * DEGREES_TO_RADIANS, c_float)
 
   end function deg_to_rad_sgl_fn
 
@@ -340,7 +340,7 @@ contains
     real (c_float), intent(in)    :: radians
     real (c_float)                :: degrees
 
-    degrees = radians * RADIANS_TO_DEGREES
+    degrees = real(radians * RADIANS_TO_DEGREES, c_float)
 
   end function rad_to_deg_sgl_fn
 
@@ -371,7 +371,7 @@ contains
     real (c_float),intent(in) :: degrees_F
     real (c_float) :: degrees_C
 
-    degrees_C = (degrees_F - rFREEZING) * C_PER_F
+    degrees_C = real((degrees_F - rFREEZING) * C_PER_F, c_float)
 
   end function FtoC_sgl_fn
 
@@ -403,7 +403,7 @@ contains
     real (c_float),intent(in) :: degrees_C
     real (c_float) :: degrees_F
 
-    degrees_F = degrees_C * F_PER_C + dFREEZING
+    degrees_F = real(degrees_C * F_PER_C + dFREEZING, c_float)
 
   end function CtoF_sgl_fn
 
@@ -435,7 +435,7 @@ contains
     real (c_float),intent(in) :: degrees_F
     real (c_float) :: degrees_K
 
-    degrees_K = (degrees_F - dFREEZING) * C_PER_F + 273.15_c_double
+    degrees_K = real((degrees_F - dFREEZING) * C_PER_F + 273.15_c_double, c_float)
 
   end function FtoK_sgl_fn
 
@@ -467,7 +467,7 @@ contains
     real (c_float), intent(in) :: degrees_C
     real (c_float) :: degrees_K
 
-    degrees_K = degrees_C + 273.15_c_double
+    degrees_K = real(degrees_C + 273.15_c_double, c_float)
 
   end function CtoK_sgl_fn
 
@@ -498,7 +498,7 @@ contains
     real (c_float),intent(in) :: inches
     real (c_float)            :: mm
 
-    mm = inches * 25.4_c_double
+    mm = real(inches * 25.4_c_double, c_float)
 
   end function inches_to_mm_sgl_fn
 
@@ -528,7 +528,7 @@ contains
     real (c_float),intent(in) :: mm
     real (c_float) :: inches
 
-    inches = mm / 25.4_c_double
+    inches = real(mm / 25.4_c_double, c_float)
 
   end function mm_to_inches_sgl_fn
 

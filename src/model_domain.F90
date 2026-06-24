@@ -3108,7 +3108,7 @@ contains
 
 !    this%actual_et(indx) = ACTUAL_ET(indx)
     this%actual_et_soil(indx) = max(ACTUAL_ET(indx) - this%actual_et_interception(indx)                &
-                                                      * this%canopy_cover_fraction(indx), 0.0_c_float)
+                                                      * this%canopy_cover_fraction(indx), 0.0_c_double)
 
   end subroutine model_calculate_actual_et_gridded_values
 
@@ -3223,7 +3223,7 @@ contains
               soil_storage=this%soil_storage( indx ),                                           &
               soil_storage_max=this%soil_storage_max( indx ),                                   &
               reference_et0=max(this%reference_et0( indx )                                      &
-                                - this%actual_et_interception( indx ), 0.0),                    &
+                                - this%actual_et_interception( indx ), 0.0_c_double),                    &
               infiltration=this%infiltration( indx ) )
 
   end subroutine model_calculate_actual_et_fao56__two_stage

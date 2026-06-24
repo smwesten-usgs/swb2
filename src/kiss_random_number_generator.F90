@@ -139,7 +139,7 @@ contains
     range = 2.0_real128 * real(huge(1_int64), kind=real128)
 
     x = kiss64_rng()
-    unif = ( real(x, kind=real128) + real(huge(1_int64), kind=real128)) / range
+    unif = real(( real(x, kind=real128) + real(huge(1_int64), kind=real128)) / range, c_float)
 
   end function kiss64_uniform_rng
 

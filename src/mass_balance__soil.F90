@@ -37,11 +37,11 @@ contains
     ! open water cell
     if ( soil_storage_max < NEAR_ZERO ) then
 
-      actual_et_soil = min( reference_et0, infiltration )
+      actual_et_soil = min( reference_et0, real(infiltration, c_double) )
       net_infiltration = 0.0_c_float
       ! **** infiltration term includes the previously calculated runoff; add this back in
       !      before adjusting the runoff value
-      runoff = max( 0.0_c_float, infiltration + runoff - actual_et_soil )
+      runoff = real(max( 0.0_c_double, real(infiltration, c_double) + runoff - actual_et_soil ), c_float)
       soil_storage = 0.0_c_float
       delta_soil_storage = 0.0_c_float
 

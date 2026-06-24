@@ -34,8 +34,8 @@ contains
       interception_storage = temp_storage
     endif
 
-    actual_et_interception = min( reference_et0, interception_storage )
-    interception_storage = max( 0.0_c_float, interception_storage - actual_et_interception )
+    actual_et_interception = min( reference_et0, real(interception_storage, c_double) )
+    interception_storage = real(max( 0.0_c_double, real(interception_storage, c_double) - actual_et_interception ), c_float)
 
    end subroutine calculate_interception_mass_balance
 

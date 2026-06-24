@@ -540,9 +540,9 @@ contains
       ! not by any other modules; need to just calculate depletion fraction based on
       ! total soil moisture storage capacity in this case
       if ( total_available_water > 0.0_c_float ) then
-        depletion_fraction = min( ( soil_storage_max - soil_storage ) / total_available_water, 1.0_c_float )
+        depletion_fraction = real(min( ( soil_storage_max - soil_storage ) / total_available_water, 1.0_c_double ), c_float)
       else
-        depletion_fraction = min( ( soil_storage_max - soil_storage ) / soil_storage_max, 1.0_c_float )
+        depletion_fraction = real(min( ( soil_storage_max - soil_storage ) / soil_storage_max, 1.0_c_double ), c_float)
       endif
 
       option = APPLICATION_METHOD_CODE( landuse_index )
@@ -552,15 +552,15 @@ contains
         case ( APP_FIELD_CAPACITY )
 
           if ( depletion_fraction >= MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( landuse_index ) )      &
-            interim_irrigation_amount = max( 0.0_c_float, soil_storage_max - soil_storage )
+            interim_irrigation_amount = real(max( 0.0_c_double, real(soil_storage_max, c_double) - soil_storage ), c_float)
 
         case ( APP_DEFINED_DEFICIT )
 
           ! @TODO check this calculation
 
           if ( depletion_fraction >= MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( landuse_index ) )      &
-            interim_irrigation_amount = max( 0.0_c_float, APPLICATION_AMOUNT( landuse_index )     &
-                                        * soil_storage_max - soil_storage )
+            interim_irrigation_amount = real(max( 0.0_c_double, real(APPLICATION_AMOUNT( landuse_index ), c_double)     &
+                                        * soil_storage_max - soil_storage ), c_float)
 
         case ( APP_CONSTANT_AMOUNT )
 
