@@ -185,7 +185,7 @@ module et__zone_values
 
         do iLineNum = lbound(ET_TABLE_VALUES, 1), ubound(ET_TABLE_VALUES, 1)
 
-          iET_zone_id = ET_TABLE_VALUES(iLineNum, 1)
+          iET_zone_id = int(ET_TABLE_VALUES(iLineNum, 1), c_int)
           iCount = iCount + count( ET_ZONE == iFieldNum )
 
           where ( ET_ZONE == iET_zone_id )

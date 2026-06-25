@@ -371,7 +371,7 @@ contains
         temp_str = sl_monthly_irrigation_schedule%get( index )
         if ( is_numeric( temp_str ) ) then
           do i=1, ubound(MONTHLY_IRRIGATION_SCHEDULE, 2)
-            MONTHLY_IRRIGATION_SCHEDULE( index, i ) = asInt( temp_str(i:i) )
+            MONTHLY_IRRIGATION_SCHEDULE( index, i ) = int(asInt( temp_str(i:i) ), c_short)
           enddo
         endif
       enddo

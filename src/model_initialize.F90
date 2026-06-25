@@ -1358,7 +1358,7 @@ contains
       rY1 = asDouble( myOptions%get(6) )
       rGridCellSize = asDouble( myOptions%get(7) )
 
-      fTempVal = ( rX1 - rX0 ) / real(iNX, c_double)
+      fTempVal = real(( rX1 - rX0 ) / real(iNX, c_double), c_float)
 
       call MODEL%initialize_grid(iNX, iNY, rX0, rY0, rGridCellSize)
 
@@ -1826,14 +1826,14 @@ contains
     call grid_Transform(pGrd=pCOORD_GRD, sFromPROJ4=MODEL%PROJ4_string, &
         sToPROJ4="+proj=lonlat +ellps=GRS80 +datum=WGS84 +no_defs" )
 
-    MODEL%latitude = pack( pCOORD_GRD%rY, MODEL%active )
+    MODEL%latitude = real(pack( pCOORD_GRD%rY, MODEL%active ), c_float)
 
     MODEL%X_lon = pCOORD_GRD%rX
     MODEL%Y_lat = pCOORD_GRD%rY
 
-    pCOORD_GRD%rData=pCOORD_GRD%rX
+    pCOORD_GRD%rData=real(pCOORD_GRD%rX, c_float)
     call grid_WriteArcGrid( sFilename="Longitude__calculated.asc", pGrd=pCOORD_GRD )
-    pCOORD_GRD%rData=pCOORD_GRD%rY
+    pCOORD_GRD%rData=real(pCOORD_GRD%rY, c_float)
     call grid_WriteArcGrid( sFilename="Latitude__calculated.asc", pGrd=pCOORD_GRD )
 
     call grid_Destroy( pCOORD_GRD )

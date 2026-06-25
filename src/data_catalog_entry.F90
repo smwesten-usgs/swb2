@@ -626,7 +626,7 @@ elemental subroutine apply_scale_and_offset_float(fResult, fValue, dUserScaleFac
   real (c_double), intent(in)   :: dUserSubOffset
   real (c_double), intent(in)   :: dUserAddOffset
 
-  fResult = ( (fValue - dUserSubOffset) * dUserScaleFactor ) + dUserAddOffset
+  fResult = real(( (fValue - dUserSubOffset) * dUserScaleFactor ) + dUserAddOffset, c_float)
 
 end subroutine apply_scale_and_offset_float
 
@@ -640,7 +640,7 @@ elemental subroutine apply_scale_and_offset_int(iResult, iValue, dUserScaleFacto
   real (c_double), intent(in)   :: dUserSubOffset
   real (c_double), intent(in)   :: dUserAddOffset
 
-  iResult = ( ( real( iValue, c_float) - dUserSubOffset ) * dUserScaleFactor ) + dUserAddOffset
+  iResult = int(( ( real( iValue, c_float) - dUserSubOffset ) * dUserScaleFactor ) + dUserAddOffset, c_int)
 
 end subroutine apply_scale_and_offset_int
 
@@ -1605,7 +1605,7 @@ end subroutine set_constant_value_real
         dAddOffset = this%NCFILE%rAddOffset(NC_Z)
         dScaleFactor = this%NCFILE%rScaleFactor(NC_Z)
 
-        this%pGrdNative%rData = this%pGrdNative%rData * dScaleFactor + dAddOffset
+        this%pGrdNative%rData = real(this%pGrdNative%rData * dScaleFactor + dAddOffset, c_float)
 
         call this%handle_missing_values(this%pGrdNative%rData)
         call this%enforce_limits(this%pGrdNative%rData)
@@ -1803,7 +1803,7 @@ end subroutine set_constant_value_real
 
     dAddOffset = this%NCFILE%rAddOffset(NC_Z)
     dScaleFactor = this%NCFILE%rScaleFactor(NC_Z)
-    this%pGrdNative%rData = this%pGrdNative%rData * dScaleFactor + dAddOffset
+    this%pGrdNative%rData = real(this%pGrdNative%rData * dScaleFactor + dAddOffset, c_float)
 
     call this%handle_missing_values(this%pGrdNative%rData)
 

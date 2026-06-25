@@ -2,6 +2,33 @@
 
 ---
 
+## 2026-06-25
+
+### Fixed: Implicit narrowing conversions (52 of 89 instances)
+
+Added explicit `real(..., c_float)`, `int(..., c_int)`, or `int(..., c_short)` wrappers to make intentional precision reductions explicit. Files completed:
+
+- `datetime.F90` (18) — `c_int` → `c_short` member assignments
+- `simulation_datetime.F90` (5) — `c_double` date arithmetic → `c_int`
+- `mass_balance__soil.F90` (3) — `c_double` storage → `c_float` delta
+- `crop_coefficients__fao56.F90` (5) — `c_double` interpolation → `c_float` Kcb
+- `model_domain.F90` (4) — coordinates and date arithmetic
+- `model_initialize.F90` (4) — grid calculations
+- `data_catalog_entry.F90` (4) — scale/offset operations
+- `actual_et__fao56.F90` (2) — ET calculations
+- `actual_et__fao56__two_stage.F90` (2) — bare soil evap
+- Others (5) — 1 each in meteorological_calculations, et__zone_values, irrigation, growing_degree_day_baskerville_emin, model_iterate_multiple_simulations
+
+### Completed: Unused variables — ALL Fortran instances eliminated
+
+All 289 unused variable warnings resolved (automated script + manual multi-var edits).
+
+### Status: 540 → 124 gfortran warnings remaining
+
+Remaining: 37 conversions (grid.F90, netcdf4_support.F90, test files), 31 unused functions, 13 maybe-uninitialized, 11 unused module values, 10 stack-to-static, 10 float comparisons, and small items.
+
+---
+
 ## 2026-06-24
 
 ### Fixed: Mixed-kind min/max intrinsic errors (18 instances)

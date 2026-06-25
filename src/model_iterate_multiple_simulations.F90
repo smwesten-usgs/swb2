@@ -239,7 +239,7 @@ contains
                                                + cells%net_infiltration
 
     MONTHLY_ACTUAL_ET_STATS(:,month) = MONTHLY_ACTUAL_ET_STATS(:,month)    &
-                                               + cells%actual_et
+                                               + real(cells%actual_et, c_float)
 
     MONTHLY_RAINFALL_STATS(:,month) = MONTHLY_RAINFALL_STATS(:,month)    &
                                                + cells%rainfall

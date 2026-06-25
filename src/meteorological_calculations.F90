@@ -20,8 +20,8 @@ elemental function sat_vapor_pressure__e_0(rT) result (re_0)
   real (c_float)               :: re_0
       !! Saturation vapor pressure at given air temperature, in kilopascals
 
-  re_0 = 0.6108_c_double * exp (17.27_c_double * rT      &
-                                / ( rT + 237.3_c_double)  )
+  re_0 = real(0.6108_c_double * exp (17.27_c_double * rT      &
+                                / ( rT + 237.3_c_double)  ), c_float)
 
 end function sat_vapor_pressure__e_0
 

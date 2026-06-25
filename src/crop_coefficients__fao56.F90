@@ -435,7 +435,7 @@ contains
 
         fFrac = ( current_date - Date_mid ) / ( Date_late - Date_mid )
 
-        Kcb =  Kcb_mid * (1.0_c_double - fFrac) + Kcb_end * fFrac
+        Kcb =  real(Kcb_mid * (1.0_c_double - fFrac) + Kcb_end * fFrac, c_float)
 
       elseif ( current_date >= Date_dev ) then
 
@@ -445,7 +445,7 @@ contains
 
         fFrac = ( current_date - Date_ini ) / ( Date_dev - Date_ini )
 
-        Kcb = Kcb_ini * (1.0_c_double - fFrac) + Kcb_mid * fFrac
+        Kcb = real(Kcb_ini * (1.0_c_double - fFrac) + Kcb_mid * fFrac, c_float)
 
       elseif ( current_date >= PlantingDate ) then
 
@@ -487,10 +487,10 @@ pure elemental function crop_coefficients_FAO56_calculate_Kcb_Max(wind_speed_met
   plant_height = clip(plant_height_meters, minval=1., maxval=10.)
 
   ! equation 72, FAO-56, p 199
-  kcb_max = max(  1.2_c_double + ( (0.04_c_double * (U2 - 2._c_double)               &
+  kcb_max = real(max(  1.2_c_double + ( (0.04_c_double * (U2 - 2._c_double)               &
                                   - 0.004_c_double * (RHmin - 45._c_double) ) )      &
                                   * (plant_height_meters/3._c_double)**0.3_c_double, &
-                  Kcb + 0.05_c_double )
+                  Kcb + 0.05_c_double ), c_float)
 
 end function crop_coefficients_FAO56_calculate_Kcb_Max
 
@@ -535,7 +535,7 @@ end function crop_coefficients_FAO56_calculate_Kcb_Max
 
       fFrac = ( fGDD - GDD_mid_l ) / ( GDD_late_l - GDD_mid_l )
 
-      fKcb =  Kcb_mid * (1.0_c_double - fFrac) + Kcb_end * fFrac
+      fKcb =  real(Kcb_mid * (1.0_c_double - fFrac) + Kcb_end * fFrac, c_float)
 
     elseif ( fGDD > GDD_dev_l ) then
 
@@ -545,7 +545,7 @@ end function crop_coefficients_FAO56_calculate_Kcb_Max
 
       fFrac = ( fGDD - GDD_ini_l ) / ( GDD_dev_l - GDD_ini_l )
 
-      fKcb = Kcb_ini * (1_c_double - fFrac) + Kcb_mid * fFrac
+      fKcb = real(Kcb_ini * (1_c_double - fFrac) + Kcb_mid * fFrac, c_float)
 
     elseif ( (PlantingDOY > 0) .and. (current_DOY >= PlantingDOY) ) then
 

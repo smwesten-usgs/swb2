@@ -178,8 +178,8 @@ contains
 
         A = asin( At )
 
-        dd = ( ( W * cos( A ) ) - ( ( GDD_BASE( order(indx) ) - tmean(indx) )                    &
-               * ( real( PI / 2._c_double, c_float ) - A ) ) ) / PI
+        dd = real(( ( W * cos( A ) ) - ( ( GDD_BASE( order(indx) ) - tmean(indx) )                    &
+               * ( real( PI / 2._c_double, c_float ) - A ) ) ) / PI, c_float)
 
       endif
 

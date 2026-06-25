@@ -189,7 +189,7 @@ impure elemental function calculate_fraction_exposed_and_wetted_soil_fc( landuse
   exponent = 1.0_c_double + 0.5_c_double * current_plant_height * M_PER_FOOT
 
   if( denominator > 0.0_c_double ) then
-    fc = ( numerator / denominator ) ** exponent
+    fc = real(( numerator / denominator ) ** exponent, c_float)
   else
     fc = 1.0_c_float
   endif
@@ -395,7 +395,7 @@ impure elemental subroutine calculate_actual_et_fao56_two_stage(                
 
   Ke = calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kcb_max, Kr, fraction_exposed_and_wetted_soil )
   
-  bare_soil_evap = reference_et0 * Ke
+  bare_soil_evap = real(reference_et0 * Ke, c_float)
   evaporable_water_storage = max(0.0, evaporable_water_storage - bare_soil_evap / fraction_exposed_and_wetted_soil)
 
   ! need to remove bare soil evap from interim soil to yield lower Ks values

@@ -1626,8 +1626,8 @@ contains
             DUMP( indx )%row = row
             DUMP( indx )%indx_start = indx_start
             DUMP( indx )%indx_end   = indx_end
-            DUMP( indx )%x_coord = xcoord
-            DUMP( indx )%y_coord = ycoord
+            DUMP( indx )%x_coord = real(xcoord, c_float)
+            DUMP( indx )%y_coord = real(ycoord, c_float)
 
             if ( row_col_num_are_valid ) then
               call LOGS%WRITE( "==> SWB will dump variables for cell ("//asCharacter(col)//","     &
@@ -3447,8 +3447,8 @@ contains
 
     do indx=1,ubound(this%number_of_days_since_planting,1)
 
-      this%number_of_days_since_planting(indx) = SIM_DT%curr                   &
-              - GROWTH_STAGE_DATE( PLANTING_DATE, this%landuse_index(indx) )
+      this%number_of_days_since_planting(indx) = int(SIM_DT%curr                   &
+              - GROWTH_STAGE_DATE( PLANTING_DATE, this%landuse_index(indx) ), c_int)
     enddo
 
 
@@ -3553,7 +3553,7 @@ contains
   integer (c_int), intent(in)                    :: cell_index
 
   if (this%reference_et0(cell_index) > this%actual_et(cell_index)) then
-    this%climatic_deficit(cell_index) = this%reference_et0(cell_index) - this%actual_et(cell_index)
+    this%climatic_deficit(cell_index) = real(this%reference_et0(cell_index) - this%actual_et(cell_index), c_float)
   else
     this%climatic_deficit(cell_index) = 0.0_c_float
   endif

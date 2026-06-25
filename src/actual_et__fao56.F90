@@ -44,7 +44,7 @@ contains
     real (c_double), intent(in)     :: reference_et0
     real (c_float)                  :: p
 
-    p = p_table_22 + 0.04_c_float * ( 5.0_c_float - in_to_mm( reference_et0 ) )
+    p = real(p_table_22 + 0.04_c_float * ( 5.0_c_float - in_to_mm( reference_et0 ) ), c_float)
 
     p = min( p, 0.8_c_float )
     p = max( p, 0.1_c_float )
@@ -107,7 +107,7 @@ contains
         ! calculate fraction of day that would be at full reference ET values
         if ( crop_etc > 0.0_c_float ) then
 
-          fraction_full_PET = (interim_soil_storage - root_constant_ci) / crop_etc
+          fraction_full_PET = real((interim_soil_storage - root_constant_ci) / crop_etc, c_float)
 
         else
 

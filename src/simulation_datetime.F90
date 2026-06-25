@@ -69,12 +69,12 @@ contains
       stop ( "Attempted to set current date to one outside of start and end date." )
 
     this%curr = new_current_date  
-    this%iNumDaysFromOrigin = this%days_from_origin( new_current_date )
+    this%iNumDaysFromOrigin = int(this%days_from_origin( new_current_date ), c_int)
     this%iDaysInMonth = this%curr%dayspermonth()
     this%iDaysInYear = this%curr%daysperyear()
     this%lIsLeapYear = this%curr%isLeapYear()
     this%iDOY = day_of_year( this%curr%getJulianDay() )
-    this%iDayOfSimulation = this%curr - this%start + 1
+    this%iDayOfSimulation = int(this%curr - this%start + 1, c_int)
 
   end subroutine set_curr_to_arbitrary_date_sub
 
@@ -95,7 +95,7 @@ contains
     this%iDOY = day_of_year( this%curr%getJulianDay() )
     this%iYearOfSimulation = this%curr%iYear - this%start%iYear + 1
     this%iNumDaysFromOrigin = this%iNumDaysFromOrigin + 1
-    this%iDayOfSimulation = this%curr - this%start + 1
+    this%iDayOfSimulation = int(this%curr - this%start + 1, c_int)
 
   end subroutine advance_curr_to_last_day_of_year_sub
 
@@ -113,7 +113,7 @@ contains
     this%iDOY = day_of_year( this%curr%getJulianDay() )
     this%iYearOfSimulation = this%curr%iYear - this%start%iYear + 1
     this%iNumDaysFromOrigin = this%iNumDaysFromOrigin + 1
-    this%iDayOfSimulation = this%curr - this%start + 1
+    this%iDayOfSimulation = int(this%curr - this%start + 1, c_int)
 
   end subroutine advance_curr_to_last_day_of_month_sub
 
@@ -152,7 +152,7 @@ contains
     this%iDOY = day_of_year( this%curr%getJulianDay() )
     this%iYearOfSimulation = this%curr%iYear - this%start%iYear + 1
     this%iNumDaysFromOrigin = this%iNumDaysFromOrigin + 1
-    this%iDayOfSimulation = this%curr - this%start + 1
+    this%iDayOfSimulation = int(this%curr - this%start + 1, c_int)
 
   end subroutine increment_by_one_day_sub
 
