@@ -167,7 +167,6 @@ module et__zone_values
     integer (c_int)  :: iLineNum
     integer (c_int)  :: iFieldNum
     integer (c_int)  :: iET_zone_id
-    real (c_float)   :: fFactor
     integer (c_int)  :: iCount
 
     ET_RATIOS = 0.0_c_float

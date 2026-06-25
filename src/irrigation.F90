@@ -490,8 +490,6 @@ contains
     integer (c_int)       :: day_of_year
     integer (c_int)       :: days_in_month
     integer (c_int)       :: num_days_from_origin
-    integer (c_int)       :: index
-    character (len=31)         :: irrigation_day
     integer (c_int)       :: irrigation_days_per_month
     real (c_float)        :: efficiency
     real (c_float)        :: interim_irrigation_amount

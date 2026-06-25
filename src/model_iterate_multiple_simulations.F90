@@ -262,7 +262,6 @@ contains
     ![ LOCALS ]
     real (c_float)   :: number_of_simulation_days
     integer (c_int)  :: month
-    integer (c_int)  :: simulation_number
     character (len=256)   :: filename, file_suffix
     integer (c_int)  :: start_year, end_year
     integer (c_int)  :: nx, ny

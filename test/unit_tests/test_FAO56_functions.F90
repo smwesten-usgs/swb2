@@ -26,8 +26,6 @@ contains
 
   subroutine setup_crop_coefficients__FAO56
 
-    real (c_float), allocatable           :: fValues(:)
-    type (FSTRING_LIST_T)                 :: slString
 
     if (     (SYSTEM_NAME .containssimilar. "Windows")                           &
         .or. (SYSTEM_NAME .containssimilar. "Mingw") ) then

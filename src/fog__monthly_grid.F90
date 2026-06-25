@@ -43,9 +43,7 @@ contains
     logical (c_bool), intent(in)     :: lActive(:,:)
 
     ! [ LOCALS ]
-    integer (c_int)                 :: iStat
     type (FSTRING_LIST_T)           :: slString
-    integer (c_int)                 :: iIndex
     integer (c_int), allocatable    :: iLanduseCodes(:)
     integer (c_int)                 :: iNumberOfLanduses
     logical (c_bool)                :: lAreLengthsEqual
@@ -92,8 +90,6 @@ contains
     real (c_float), intent(in)        :: nodata_fill_value(:,:)
 
     ! [ LOCALS ]
-    integer (c_int) :: iIndex
-    real (c_float)  :: fFactor
 
     associate ( dt => SIM_DT%curr )
 

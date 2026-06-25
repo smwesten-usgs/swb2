@@ -132,7 +132,6 @@ contains
 
     ! [ LOCALS ]
     integer (c_int)  :: iIndex
-    logical (c_bool) :: using_tabular_precip_and_temperature
 
     call MODEL%set_default_method_pointers()
 
@@ -462,8 +461,6 @@ contains
   subroutine initialize_percent_pervious()
 
     ! [ LOCALS ]
-    integer (c_int)                 :: iStat
-    integer (c_int)                 :: iIndex
     type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_IMPERVIOUS
     type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_PERVIOUS
     type (DATA_CATALOG_ENTRY_T), pointer :: pFRACTION_IMPERVIOUS
@@ -549,8 +546,6 @@ contains
   subroutine initialize_percent_canopy_cover
 
     ! [ LOCALS ]
-    integer (c_int)                 :: iStat
-    integer (c_int)                 :: iIndex
     type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_CANOPY_COVER
     type (DATA_CATALOG_ENTRY_T), pointer :: pFRACTION_CANOPY_COVER
     type ( GENERAL_GRID_T ), pointer     :: pTempGrd
@@ -615,7 +610,6 @@ contains
   subroutine initialize_hydrologic_soil_groups
 
     ! [ LOCALS ]
-    integer (c_int)                 :: iStat
     integer (c_int)                 :: iIndex
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
 
@@ -683,13 +677,7 @@ contains
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: pPOLYGON_ID
     logical (c_bool)                :: any_problems
-    type (FSTRING_LIST_T)                 :: slList
-    integer (c_int), allocatable    :: polygon_id(:)
-    real (c_float), allocatable     :: rooting_depth_inches(:)
-    real (c_float), allocatable     :: soil_moisture_storage(:)
-    integer (c_int)                 :: iNumberOfPolygonIDs
     type (GENERAL_GRID_T), pointer       :: pTempGrd
-    integer (c_int)                 :: index
 
 
 
@@ -823,9 +811,7 @@ contains
     type (FSTRING_LIST_T), optional             :: slExtraDirectives
 
     ! [ LOCALS ]
-    character (len=256)             :: sRecord, sSubstring
     character (len=:), allocatable  :: sText
-    integer (c_int)            :: iStat
     integer (c_int)            :: iIndex
     integer (c_int)            :: iCount
     type (ASCII_FILE_T)             :: CF
@@ -1337,9 +1323,7 @@ contains
 
     ! [ LOCALS ]
     type (FSTRING_LIST_T)             :: myOptions
-    integer (c_int)                  :: iIndex
     character (len=:), allocatable   :: sArgText
-    integer (c_int)                  :: iStat
     real (c_double)                  :: rX0, rX1, rY0, rY1, rGridCellSize
     integer (c_int)                  :: iNX, iNY
     real (c_float)                   :: fTempVal
@@ -1426,9 +1410,7 @@ contains
       integer (c_int)             :: iIndex
       integer (c_int)             :: jIndex
       character (len=:), allocatable   :: sArgText
-      character (len=:), allocatable   :: sAction
       character (len=:), allocatable   :: sOutput
-      integer (c_int)             :: iStat
       logical (c_bool)            :: enable_output
 
       enable_output = TRUE
@@ -1502,7 +1484,6 @@ contains
     character (len=:), allocatable   :: sCmdText
     character (len=:), allocatable   :: sOptionText
     character (len=:), allocatable   :: sArgText
-    integer (c_int)                  :: iStat
     logical (c_bool)                 :: lHaveStartDate
     logical (c_bool)                 :: lHaveEndDate
 
@@ -1603,18 +1584,12 @@ contains
     ! [ LOCALS ]
     type (FSTRING_LIST_T)             :: myDirectives
     type (FSTRING_LIST_T)             :: myOptions
-    type (FSTRING_LIST_T)             :: slString
     integer (c_int)                   :: iIndex
     character (len=:), allocatable    :: sCmdText
     character (len=:), allocatable    :: sOptionText
     character (len=:), allocatable    :: sArgText
-    character (len=:), allocatable    :: sText
-    character (len=256)               :: sBuf
-    integer (c_int)                   :: iStat
     type (PARAMETERS_T)               :: PARAMS_LU_TABLE
     integer (c_int)                   :: iCount
-    type (DICT_ENTRY_T), pointer      :: pDict1
-    type (DICT_ENTRY_T), pointer      :: pDict2
 
     iCount = 0
 
@@ -1695,8 +1670,6 @@ contains
 !    character (len=:), allocatable   :: sOptionText
     type (FSTRING_LIST_T)             :: argv_list
     character (len=:), allocatable    :: sArgText
-    integer (c_int)                   :: iStat
-    integer (c_int)                   :: status
     logical (c_bool)                  :: lFatal
     integer (c_int)                   :: num_elements
 
@@ -1770,9 +1743,6 @@ contains
 !    character (len=:), allocatable   :: sOptionText
     type (FSTRING_LIST_T)             :: argv_list
     character (len=:), allocatable    :: sArgText
-    integer (c_int)                   :: iStat
-    integer (c_int)                   :: status
-    logical (c_bool)                  :: lFatal
     integer (c_int)                   :: num_elements
     character (len=:), allocatable    :: Option_Name
 
@@ -1837,7 +1807,6 @@ contains
   subroutine initialize_latitude()
 
     ! [ LOCALS ]
-    integer (c_int)  :: iIndex
 
     pCOORD_GRD => grid_Create( iNX=MODEL%number_of_columns, iNY=MODEL%number_of_rows, &
         rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
@@ -1971,8 +1940,6 @@ contains
   subroutine initialize_surface_storage_max()
 
     integer (c_int)               :: iIndex
-    integer (c_int)               :: iStat
-    character (len=256)                :: sBuf
     type (FSTRING_LIST_T)               :: slList
     integer( c_int), allocatable  :: iLanduseTableCodes(:)
     integer (c_int)               :: iNumberOfLanduses

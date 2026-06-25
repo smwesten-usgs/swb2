@@ -498,7 +498,6 @@ subroutine initialize_netcdf_data_object_sub( this, &
    character (len=*), intent(in), optional    :: sPROJ4_string
 
   ! [ LOCALS ]
-  type ( GENERAL_GRID_T ), pointer           :: pGrdBase
 
 
    if (present(sPROJ4_string) ) then
@@ -1064,18 +1063,15 @@ end subroutine set_constant_value_real
 
     ! [ LOCALS ]
     character (len=256) :: sNewFilename
-    character (len=256) :: sUppercaseFilename
     character (len=256) :: sCWD
     character (len=256) :: sBuf2
     integer (c_int) :: iPos_Y, iPos_D, iPos_M, iPos_0D, iPos_0M, iPos_B,  &
                             iPos_BF, iPos_j, iPos, iPos2, iLen, iCount
     integer (c_int) :: iNumZeros, iNumZerosToPrint
     logical (c_bool) :: lMatch
-    logical (c_bool) :: lExist
     character (len=16) :: sBuf
     character (len=12) :: sNumber
     character (len=1) :: sDelimiter
-    integer (c_int) :: iStatus
     logical (c_bool) :: lAnnual
 
     iPos_Y = 0; iPos_M = 0; iPos_D = 0; iPos = 0; iPos_B = 0; iPos_BF = 0; sNumber = ""
@@ -1364,8 +1360,6 @@ end subroutine set_constant_value_real
     type (DATETIME_T), intent(in)  :: dt
 
     ! [ LOCALS ]
-    integer (c_int) :: iTimeIndex
-    integer (c_int) :: iStat
     logical (c_bool) :: lDateTimeFound
     real (c_double) :: dAddOffset
     real (c_double) :: dScaleFactor
@@ -1652,7 +1646,6 @@ end subroutine set_constant_value_real
     real (c_float), intent(in)      :: nodata_value
 
     ! [ LOCALS ]
-    integer (c_int) :: iCount
     character (len=20)   :: sVarname
     character (len=14)   :: sMin
     character (len=14)   :: sMax
@@ -1687,7 +1680,6 @@ end subroutine set_constant_value_real
     class (DATA_CATALOG_ENTRY_T) :: this
 
     ! [ LOCALS ]
-    integer (c_int) :: iStat
     real (c_double) :: dAddOffset
     real (c_double) :: dScaleFactor
 
@@ -2144,7 +2136,6 @@ end subroutine set_maximum_allowable_value_real_sub
 
     ! [ LOCALS ]
     integer (c_int) :: iRetVal
-    real (c_float) :: rMultiplier = 0.
     real (c_double), dimension(4) :: rX, rY
 
     ! ensure that there is sufficient coverage on all sides of grid

@@ -27,8 +27,6 @@ program swbstats2
   character (len=70), allocatable :: usage_string(:)
 
   integer (c_int)                :: iNumArgs
-  character (len=1024)           :: sCompilerFlags
-  character (len=256)            :: sCompilerVersion
   character (len=256)            :: sVersionString
   character (len=256)            :: sGitHashString
   character (len=256)            :: sProgramName
@@ -39,13 +37,10 @@ program swbstats2
   integer (c_int)                :: iCount
   integer (c_int)                :: iIndex
   integer (c_int), allocatable   ::iIndex_array(:)
-  integer (c_int)                :: iLen
   real (c_double)                :: start_date_dbl
   real (c_double)                :: end_date_dbl
-  integer (c_int)                :: TIME_BNDS_VARID
   integer (c_int)                :: month_index
 
-  logical (c_bool)               :: netcdf_active = FALSE
 
   type (FSTRING_LIST_T)           :: name_list
   type (FSTRING_LIST_T)           :: value_list

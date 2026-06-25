@@ -359,7 +359,6 @@ subroutine parse_text_to_time_sub(this, sString)
   character (len=256) :: sHour, sMinute, sSecond
 
 
-  character (len=256) :: sTimeFmt
   character (len=256) :: sStr
   character (len=256) :: sBuf
 
@@ -1436,7 +1435,6 @@ function mmdd2doy(sMMDD, sInputItemName )  result(iDOY)
   ! [ LOCALS ]
   integer (c_int) :: iMonth
   integer (c_int) :: iDay
-  integer (c_int) :: iYear
   character (len=256) :: sItem, sBuf
   integer (c_int) :: iStat
   integer (c_int) :: iJD
@@ -1536,7 +1534,7 @@ function day_of_year(iJD) result(iDOY)
   integer (c_int), value :: iJD
 
   ! [ LOCALS ]
-  integer (c_int) :: iFirstDay, iLastDay, iDOY
+  integer (c_int) :: iFirstDay, iDOY
   integer (c_int) :: iMonth, iDay, iYear
 
 

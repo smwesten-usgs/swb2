@@ -367,7 +367,6 @@ contains
     integer (c_int)   :: iIndex
     integer (c_int)   :: iRainGageZone
     integer (c_int)   :: iPreviousRainGageZone
-    integer (c_int)   :: iFragmentChunk
     integer (c_int)   :: iMonth
     integer (c_int)   :: iPreviousMonth
     character (len=10)     :: sBuf0
@@ -661,10 +660,8 @@ contains
     integer (c_int)  :: iStartRecord
     integer (c_int) :: iEndRecord
     integer (c_int) :: iTargetRecord
-    integer (c_int) :: iStat
     integer (c_int) :: iUBOUND_FRAGMENTS
     integer (c_int) :: iUBOUND_CURRENT_FRAGMENTS
-    character (len=512)  :: sBuf
 
 
     iMaxRainZones = maxval(FRAGMENTS%iRainGageZone)
@@ -832,9 +829,6 @@ contains
     logical (c_bool), intent(in)     :: lActive(:,:)
 
     ! [ LOCALS ]
-    integer (c_int)              :: iIndex
-    integer (c_int)              :: iMaxRainZones
-    integer (c_int)              :: iStat
     logical (c_bool), save       :: lFirstCall = TRUE
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR

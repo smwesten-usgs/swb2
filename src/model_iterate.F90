@@ -22,7 +22,6 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: cells
 
-    type (GENERAL_GRID_T), pointer  :: pTempGrid
 
 
     ! open and prepare NetCDF files for output

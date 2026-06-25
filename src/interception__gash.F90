@@ -58,7 +58,6 @@ contains
     ! [ LOCALS ]
     integer (c_int)                 :: iStat
     type (FSTRING_LIST_T)                 :: slList
-    integer (c_int)                 :: iIndex
     integer (c_int)                 :: iCount
     integer (c_int)                 :: iNumRecs
     integer (c_int), allocatable    :: iLanduseTableCodes(:)
@@ -211,7 +210,6 @@ contains
     real (c_float)                :: Psat
 
     ! [ LOCALS ]
-    real (c_float)                :: P_div_E
 
     if ( canopy_cover_fraction > 0.0_c_float .and. canopy_storage_capacity > 0.0_c_float ) then
 

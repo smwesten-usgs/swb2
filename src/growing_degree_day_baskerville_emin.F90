@@ -146,7 +146,6 @@ contains
     integer (c_int), intent(in)         :: order(:)
 
     ! [ LOCALS ]
-    real (c_float)    :: delta
     real (c_float)    :: tmax_l
     real (c_float)    :: dd
     real (c_float)    :: W

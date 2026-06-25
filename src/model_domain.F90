@@ -432,7 +432,6 @@ contains
     ! [ LOCALS ]
     integer (c_int)  :: iCount
     integer (c_int)  :: iIndex
-    integer (c_int)  :: indx
     integer (c_int)  :: iStat(72)
 
     iCount = count( this%active )
@@ -872,7 +871,6 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
     integer (c_int)                 :: iIndex2
     integer (c_int)                 :: iCount
-    integer (c_int)                 :: iStat
     logical (c_bool)                :: lMatch
     type (FSTRING_LIST_T)                 :: slList
 
@@ -1112,7 +1110,6 @@ contains
     logical (c_bool)             :: row_col_num_are_valid
     logical (c_bool)             :: coordinates_are_valid
     logical (c_bool)             :: indices_are_valid
-    integer (c_int)              :: n
 
     Method_Name = argv_list%get(1)
 
@@ -1824,7 +1821,6 @@ contains
     ! [ LOCALS ]
     integer (c_int) :: target_index
     integer (c_int) :: cell_index
-    real (c_float)  :: msb
 
     integer (c_int) :: cell_row, cell_col, targ_row, targ_col
 
@@ -2137,7 +2133,6 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)          :: this
     integer (c_int), intent(in)               :: cell_index
 
-    integer (c_int)  :: indx
 
     !> @TODO: Should interception term be part of this? Initial abstraction should include
     !!        some of this interception...
@@ -2243,8 +2238,6 @@ contains
     integer (c_int), allocatable :: iRZ_SeqNums(:)
     real (c_float), allocatable  :: RZ(:)
     character (len=:), allocatable    :: sText
-    real (c_float), allocatable  :: water_capacity(:)
-    integer (c_int)              :: iIndex
     type (GENERAL_GRID_T), pointer    :: pRooting_Depth
     real (c_float), allocatable  :: fMax_Rooting_Depth(:,:)
     character (len=10)                :: date_str
@@ -2388,7 +2381,6 @@ contains
 
     ! [ LOCALS ]
     type ( GENERAL_GRID_T ), pointer :: pTempGrd
-    integer (c_int)             :: iStat
     type (DATA_CATALOG_ENTRY_T), pointer :: pSOIL_STORAGE_MAX_GRID
 
     pSOIL_STORAGE_MAX_GRID => null()
@@ -2488,7 +2480,6 @@ contains
     integer (c_int), intent(in)           :: indx
 
     ! [ LOCALS ]
-    integer (c_int)               :: index
 
     ! if ( present(indx) ) then
 
@@ -3737,8 +3728,6 @@ end subroutine model_calculate_climatic_water_deficit
 
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: pPRCP
-    integer (c_int) :: targetindex
-    integer (c_int) :: indexval
 
     ! in this usage, it is assumed that the precipitation grids that are being read in represent
     ! MONTHLY sum of precipitation
@@ -3795,7 +3784,6 @@ end subroutine model_calculate_climatic_water_deficit
     logical, dimension(:), optional    :: active_cells
 
     ! [ LOCALS ]
-    integer (c_int) :: iCount
     character (len=20)   :: sVarname
     character (len=14)   :: sMin
     character (len=14)   :: sMax
@@ -3848,7 +3836,6 @@ end subroutine model_calculate_climatic_water_deficit
     logical, dimension(:), optional     :: active_cells
 
     ! [ LOCALS ]
-    integer (c_int) :: iCount
     character (len=20)   :: sVarname
     character (len=14)   :: sMin
     character (len=14)   :: sMax

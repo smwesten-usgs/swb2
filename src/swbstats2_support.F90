@@ -610,8 +610,6 @@ contains
     character (len=*), intent(inout)   :: grid_filename
 
     ! [ LOCALS ]
-    integer (c_int)                 :: iIndex
-    integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
     character (len=:), allocatable       :: OUTPUT_FILESname_str
     character (len=256), save            :: previous_zone_filename
@@ -665,8 +663,6 @@ contains
     character (len=*), intent(inout)   :: grid_filename
 
     ! [ LOCALS ]
-    integer (c_int)                 :: iIndex
-    integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
     character (len=:), allocatable       :: OUTPUT_FILESname_str
     character (len=256), save            :: previous_zone_filename
@@ -715,7 +711,6 @@ contains
     character (len=*), intent(inout)   :: grid_filename
 
     ! [ LOCALS ]
-    integer (c_int)                 :: iIndex
     integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
     character (len=:), allocatable       :: OUTPUT_FILESname_str
@@ -1371,8 +1366,6 @@ contains
     type (FSTRING_LIST_T), intent(out)  :: end_date_list
 
     ! [ LOCALS ]
-    integer (c_int)           :: iFileIndex, iColIndex
-    integer (c_int)           :: iStat
     type (ASCII_FILE_T)            :: DF
     character (len=256)            :: sRecord, sItem
 
@@ -1425,8 +1418,6 @@ contains
     type (FSTRING_LIST_T), intent(out)  :: comparison_grid_file_list
 
     ! [ LOCALS ]
-    integer (c_int)           :: iFileIndex, iColIndex
-    integer (c_int)           :: iStat
     type (ASCII_FILE_T)            :: DF
     character (len=256)            :: sRecord, sItem
 
@@ -1482,8 +1473,6 @@ contains
     type (FSTRING_LIST_T), intent(out)  :: zonal_stats_grid_file_list
 
     ! [ LOCALS ]
-    integer (c_int)           :: iFileIndex, iColIndex
-    integer (c_int)           :: iStat
     type (ASCII_FILE_T)            :: DF
     character (len=256)            :: sRecord, sItem
 
@@ -1553,7 +1542,6 @@ contains
     integer (c_int)                :: i, j
     integer (c_int), allocatable   :: zone_values(:)
     integer (c_int), allocatable   :: zone2_values(:)
-    integer (c_int)                :: number_of_matches
     real (c_double), allocatable   :: stats(:)
     integer (c_int)                :: funit_l
     character (len=:), allocatable :: delimiter_
@@ -1740,7 +1728,6 @@ contains
 
     ! [ LOCALS ]
     integer (c_int)              :: stat_indx
-    integer (c_int)              :: status
     type (T_NETCDF4_FILE), pointer    :: ncfile_out
 
     do stat_indx=STATS_MEAN, STATS_VARIANCE

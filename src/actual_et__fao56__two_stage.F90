@@ -259,7 +259,6 @@ impure elemental function update_plant_height( landuse_index, it_is_growing_seas
   real (c_float)  :: plant_height_minimum_m
   real (c_double) :: numerator
   real (c_double) :: denominator
-  real (c_double) :: exponent
 
   plant_height_minimum_m = 0.1
 
@@ -366,7 +365,6 @@ impure elemental subroutine calculate_actual_et_fao56_two_stage(                
 
   real (c_float)            :: interim_soil_storage
   real (c_float)            :: interim_soil_storage2
-  real (c_double)            :: evaporable_water_layer_deficit
   real (c_float)             :: Kcb_max
 
   current_plant_height = update_plant_height( landuse_index, it_is_growing_season, Kcb )

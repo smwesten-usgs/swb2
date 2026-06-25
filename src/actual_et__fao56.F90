@@ -71,8 +71,6 @@ contains
     real (c_float), intent(in)                :: crop_etc
 
     ! [ LOCALS ]
-    real (c_float)  :: Kcb
-    real (c_float)  :: depletion_amount
     real (c_float)  :: p
     real (c_double) :: interim_soil_storage
     real (c_float)  :: fraction_full_PET

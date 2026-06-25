@@ -594,8 +594,6 @@ contains
     logical (c_bool), intent(in)    :: value
     character (len=:), allocatable  :: text
 
-    integer (c_int)      :: status
-    character (len=32)   :: sbuf
 
     if ( value ) then
       text = ".TRUE._c_bool"

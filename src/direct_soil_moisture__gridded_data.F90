@@ -65,8 +65,6 @@ contains
     integer (c_int)                 :: iStat
     type (FSTRING_LIST_T)            :: parameter_list
     integer (c_int)                 :: iIndex
-    integer (c_int)                 :: iNX
-    integer (c_int)                 :: iNY
     integer (c_int), allocatable    :: iLanduseCodes(:)
     integer (c_int)                 :: iNumberOfLanduses
     logical (c_bool)                :: lAreLengthsEqual
@@ -166,14 +164,6 @@ contains
     integer (c_int), intent(in)       :: indx
 
     ! [ LOCALS ]
-    integer (c_int) :: iJulianDay
-    integer (c_int) :: iMonth
-    integer (c_int) :: iDay
-    integer (c_int) :: iYear
-    integer (c_int) :: iDaysInMonth
-    integer (c_int) :: iNumDaysFromOrigin
-    integer (c_int) :: iIndex
-    real (c_float)  :: fFactor
 
     if ( .not. DATE_OF_LAST_RETRIEVAL == SIM_DT%curr ) then
 

@@ -113,7 +113,6 @@ contains
    subroutine test_datetime_julian_date_illegal_month
     ! datetime: supply illegal month value to Julian Date routine
       type (DATETIME_T)    :: dt
-      integer              :: indx
 
       call start_supressing_fatal_errors()
 
@@ -129,7 +128,6 @@ contains
     subroutine test_datetime_julian_date_illegal_day
       ! datetime: supply illegal day value to Julian Date routine
         type (DATETIME_T)    :: dt
-        integer              :: indx
   
         call start_supressing_fatal_errors()
 
@@ -145,7 +143,6 @@ contains
       subroutine test_datetime_julian_date_illegal_month_day
         ! datetime: supply illegal month and day value to Julian Date routine
           type (DATETIME_T)    :: dt
-          integer              :: indx
     
           call start_supressing_fatal_errors()
 
@@ -160,7 +157,7 @@ contains
 
       subroutine test_count_leap_days_between_dates
 
-        type (DATETIME_T) :: dt_min, dt_max, dt_new
+        type (DATETIME_T) :: dt_min, dt_max
         integer           :: num_leap_days
 
         call dt_min%setDateFormat("YYYY-MM-DD")

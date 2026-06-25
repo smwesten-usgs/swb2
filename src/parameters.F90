@@ -112,16 +112,12 @@ contains
     character (len=*), intent(in), optional  :: delimiters
 
     ! [ LOCALS ]
-    integer (c_int)                :: iFileIndex, iColIndex, iTempIndex
+    integer (c_int)                :: iFileIndex, iColIndex
     integer (c_int)                :: iStat
     type (ASCII_FILE_T)            :: DF
     type (DICT_ENTRY_T), pointer   :: pDict
     type (DICT_ENTRY_T), pointer   :: pCurrentDict
-    integer (c_int)                :: iNumberOfHeaderLines
-    character (len=:), allocatable :: sNumberOfHeaderLines
     character (len=256)            :: column_name
-    character (len=256)            :: tempstr2
-    character (len=256)            :: qualified_column_name
     character (len=256)            :: filename1
     character (len=:), allocatable :: comment_chars_
     character (len=:), allocatable :: delimiters_
@@ -286,10 +282,8 @@ contains
 
     ! [ LOCALS ]
     integer (c_int)         :: iStat
-    type (DICT_ENTRY_T), pointer :: pDict
     integer (c_int)         :: iIndex
     type (DICT_ENTRY_T), pointer :: pCurrentDict
-    character (len=MAX_TABLE_RECORD_LEN) :: sRecord, sItem
 
 
     pCurrentDict => null()

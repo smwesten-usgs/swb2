@@ -392,7 +392,7 @@ function nf_julian_day_to_index_adj( NCFILE, rJulianDay )  result(iStart)
 
   ! [ LOCALS ]
   integer (c_int) :: iMinDiff, iDiff
-  integer (c_int) :: iCandidateIndex, iLastCandidate
+  integer (c_int) :: iCandidateIndex
   integer (c_int) :: iInitialCandidateIndex
   integer (c_int) :: iTestIndex
   real (c_double) :: rTestJD
@@ -635,7 +635,6 @@ subroutine nf_guess_z_variable_name(NCFILE)
 
   ! [ LOCALS ]
   integer (c_int) :: iIndex
-  integer (c_int) :: iCount
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
 
   do iIndex=lbound(NCFILE%pNC_VAR,1),ubound(NCFILE%pNC_VAR,1)
@@ -665,12 +664,6 @@ subroutine netcdf_open_and_prepare_for_merging( NCFILE, sFilename, guess_z_var_n
   logical (c_bool), intent(in), optional :: guess_z_var_name
 
   ! [ LOCALS ]
-  type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
-  type (T_NETCDF_DIMENSION), pointer :: pNC_DIM
-  logical (c_bool) :: lFileOpen
-  integer (c_int), dimension(2) :: iColRow_ll, iColRow_ur, iColRow_lr, iColRow_ul
-  integer (c_int) :: iColmin, iColmax, iRowmin, iRowmax
-  integer (c_int) :: iIndex
   logical (c_bool) :: guess_z_var_name_l
 
   if (present( guess_z_var_name) ) then
@@ -759,12 +752,8 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
   integer (c_int), optional :: iLU
 
   ! [ LOCALS ]
-  type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
-  type (T_NETCDF_DIMENSION), pointer :: pNC_DIM
   logical (c_bool) :: lFileOpen
   integer (c_int), dimension(2) :: iColRow_ll, iColRow_ur, iColRow_lr, iColRow_ul
-  integer (c_int) :: iColmin, iColmax, iRowmin, iRowmax
-  integer (c_int) :: iIndex
 
   call nf_open_file(NCFILE=NCFILE, sFilename=sFilename)
 
@@ -929,9 +918,6 @@ subroutine netcdf_open_and_prepare_as_output_archive(NCFILE, NCFILE_ARCHIVE, &
   integer (c_int) :: iEndYear
 
   ! [ LOCALS ]
-  type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
-  type (T_NETCDF_DIMENSION), pointer :: pNC_DIM
-  integer (c_int) :: iIndex
   integer (c_int) :: iNumCols, iNumRows
   integer (c_int) :: iMinCol, iMaxCol
   integer (c_int) :: iMinRow, iMaxRow
@@ -1040,9 +1026,6 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   character (len=*), intent(in), optional              :: filename_modifier
 
 !   ! [ LOCALS ]
-  type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
-  type (T_NETCDF_DIMENSION), pointer :: pNC_DIM
-  integer (c_int) :: iIndex
   character (len=10)                                :: sOriginText
   character (len=:), allocatable                    :: sFilename
   type (FSTRING_LIST_T), pointer                    :: history_list_l
@@ -1334,7 +1317,6 @@ subroutine nf_get_time_vals(NCFILE)
   integer (c_int) :: iVarIndex_time
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR_time
   type (T_NETCDF_DIMENSION), pointer :: pNC_DIM_time
-  integer (c_int) :: iLowerBound, iUpperBound
   integer (c_int) :: iStat
 
   iStat = 0
@@ -1729,13 +1711,8 @@ subroutine nf_populate_variable_struct( NCFILE )
   type (T_NETCDF_ATTRIBUTE), pointer :: pNC_ATT
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
   integer (c_int) :: iStat
-  integer (c_int) :: iIndex, iIndex2 , iIndex3
+  integer (c_int) :: iIndex, iIndex2
   character (len=256) :: sVarName
-  character (len=256) :: sAttName
-  character (len=512) :: sAttValue
-  integer (c_int), dimension(0:25) :: iAttValue
-  integer (c_short), dimension(0:25) :: i2AttValue
-  real (c_double), dimension(0:25) :: cdAttValue
 
   call nf_trap( nc_inq_nvars(ncid=NCFILE%iNCID, nvarsp=NCFILE%iNumberOfVariables), &
        __FILE__, __LINE__ )
@@ -1820,7 +1797,6 @@ subroutine nf_populate_attribute_struct( NCFILE, pNC_ATT, iNC_VarID, iAttNum )
 
   ![ LOCALS ]
   integer (c_int) :: iStat
-  character (len=256) :: sVarName
   character (len=256) :: sAttName
   integer (c_int) :: iIndex
   integer (c_int) :: iLength
@@ -1939,7 +1915,6 @@ subroutine netcdf_get_variable_id_for_variable( NCFILE, variable_name, &
   integer (c_int) :: indx
   type (T_NETCDF_VARIABLE), pointer  :: pNC_VAR
   logical (c_bool)              :: variable_was_found
-  character (len=256)                :: tempstring
 
   variable_was_found = FALSE
 
@@ -2069,7 +2044,6 @@ subroutine netcdf_get_variable_list( NCFILE, variable_list )
 
   ! [ LOCALS ]
   integer (c_int) :: indx
-  type (T_NETCDF_ATTRIBUTE), pointer :: pNC_ATT
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
 
   call variable_list%clear
@@ -2090,7 +2064,6 @@ function netcdf_update_time_starting_index(NCFILE, iJulianDay)  result(lDateTime
   logical (c_bool) :: lDateTimeFound
 
   ! [ LOCALS ]
-  real (c_double) :: rNC_DateTime
 
   NCFILE%iStart(NC_TIME) = nf_julian_day_to_index_adj( NCFILE=NCFILE, &
                                      rJulianDay=real(iJulianDay, c_double ) )
@@ -2195,7 +2168,6 @@ subroutine nf_get_variable_slice_short(NCFILE, i2Values)
 
   integer (c_short), dimension(size(i2Values,2) * size(i2Values,1)) :: iTemp
 
-  integer (c_int) :: iStat
   integer (c_int) :: iRow, iCol, iIndex
   integer (c_int) :: iFromRow, iToRow, iByRow
   integer (c_int) :: iFromCol, iToCol, iByCol
@@ -2267,7 +2239,6 @@ subroutine nf_get_variable_slice_int(NCFILE, iValues)
 
   integer (c_int), dimension(size(iValues,2) * size(iValues,1)) :: iTemp
 
-  integer (c_int) :: iStat
   integer (c_int) :: iRow, iCol, iIndex
   integer (c_int) :: iFromRow, iToRow, iByRow
   integer (c_int) :: iFromCol, iToCol, iByCol
@@ -2337,7 +2308,6 @@ subroutine nf_get_variable_slice_float(NCFILE, rValues)
   ! [ LOCALS ]
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
   real (c_float), dimension(size(rValues,2) * size(rValues,1)) :: rTemp
-  integer (c_int) :: iStat
   integer (c_int) :: iRow, iCol, iIndex
   integer (c_int) :: iFromRow, iToRow, iByRow
   integer (c_int) :: iFromCol, iToCol, iByCol
@@ -2406,7 +2376,6 @@ subroutine nf_get_variable_slice_double(NCFILE, dpValues)
   ! [ LOCALS ]
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
   real (c_double), dimension(size(dpValues,2) * size(dpValues,1)) :: dpTemp
-  integer (c_int) :: iStat
   integer (c_int) :: iRow, iCol, iIndex
   integer (c_int) :: iFromRow, iToRow, iByRow
   integer (c_int) :: iFromCol, iToCol, iByCol
@@ -2710,7 +2679,7 @@ subroutine netcdf_dump_cdl(NCFILE, iLU)
   integer (c_int) :: iDimID
   integer (c_int) :: iUbound
 
-  integer :: iResult, iIndex, iIndex2, iIndex3, iIndex4
+  integer :: iIndex, iIndex3, iIndex4
 
   sBuf=""; sBuf2=""
 
@@ -2818,9 +2787,7 @@ function nf_get_first_and_last(NCFILE, iVarIndex)  result(dpValues)
 
   ! [ LOCALS ]
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
-  type (T_NETCDF_DIMENSION), pointer :: pNC_DIM
   integer (c_int) :: iDimSize
-  integer (c_int) :: iDimIndex
   integer (c_size_t) :: iStride
   integer (c_size_t) :: iCount
   integer (c_short), dimension(0:1) :: spValues
@@ -2995,7 +2962,6 @@ subroutine nf_get_xyz_units(NCFILE)
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
   integer (c_int) :: iIndex, iIndex2
   logical (c_bool) :: lFound
-  integer (c_int) :: iStat
 
   do iIndex = NC_Y, NC_Z
 
@@ -3034,7 +3000,6 @@ subroutine nf_get_scale_and_offset(NCFILE)
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
   integer (c_int) :: iIndex
   logical (c_bool) :: lFound
-  integer (c_int) :: iStat
   character (len=32) :: sBuf
 
   pNC_VAR => NCFILE%pNC_VAR(NCFILE%iVarID(NC_Z) )
@@ -3401,7 +3366,6 @@ subroutine nf_define_dimension(NCFILE, sDimensionName, iDimensionSize)
   integer (c_int) :: iDimID
 
   integer (c_size_t) :: iDimSize
-  type (T_NETCDF_DIMENSION), pointer :: pNC_DIM
 
   iDimSize = int(iDimensionSize, c_size_t)
 
@@ -3439,9 +3403,7 @@ subroutine nf_define_dimensions( NCFILE )
   type (T_NETCDF4_FILE) :: NCFILE
 
   ! [ LOCALS ]
-  integer (c_int) :: iStat
   integer (c_int) :: iIndex
-  character (len=256) :: sDimName
   type (T_NETCDF_DIMENSION), pointer :: pNC_DIM
 
   do iIndex = 0, NCFILE%iNumberOfDimensions-1
@@ -4100,7 +4062,6 @@ subroutine nf_put_x_and_y(NCFILE, dpX, dpY)
 
   ! [ LOCALS ]
   integer (c_size_t) :: iLength
-  real (c_double), dimension(:), allocatable :: rX, rY
 
   iLength = int(size(dpX, 1), c_size_t)
 
@@ -4184,9 +4145,7 @@ subroutine nf_define_variables( NCFILE )
   type (T_NETCDF4_FILE) :: NCFILE
 
   ! [ LOCALS ]
-  integer (c_int) :: iStat
   integer (c_int) :: iIndex
-  character (len=256) :: sDimName
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
 
   !! note: the default number of variables for a simple archive file is 4:
@@ -4318,12 +4277,10 @@ subroutine nf_put_attributes(NCFILE)
   type (T_NETCDF4_FILE ) :: NCFILE
 
   ! [ LOCALS ]
-  integer (c_size_t) :: iNumberOfAttributes
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
   type (T_NETCDF_ATTRIBUTE), pointer :: pNC_ATT
   integer (c_int) :: iIndex
   integer (c_int) :: iIndex2
-  integer (c_int) :: iStat
   integer (c_int) :: indx
 
   ! loop over variables

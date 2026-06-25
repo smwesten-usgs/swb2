@@ -51,9 +51,6 @@ subroutine et_hargreaves_initialize( ) !pConfig, sRecord )
 !  character (len=*),intent(inout) :: sRecord
 
   ! [ LOCALS ]
-  character (len=256) :: sOption
-  integer (c_int) :: iStat
-  real (c_float) :: rValue
 
   real (kind=c_float), allocatable :: fET_slope(:)
   real (kind=c_float), allocatable :: fET_exponent(:)

@@ -25,7 +25,6 @@ contains
 
     ! [ LOCALS ]
     integer (c_int), parameter       :: MAX_STR_LEN = 8096
-    character (len=MAX_STR_LEN)           :: sString
     character (len=MAX_STR_LEN)           :: sSubString
     character (len=MAX_STR_LEN)           :: sSubStringClean
     character (len=MAX_STR_LEN)           :: sBuf

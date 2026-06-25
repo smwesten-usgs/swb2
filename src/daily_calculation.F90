@@ -239,7 +239,6 @@ contains
     logical, intent(in), optional               :: logical_vector(:)
 
     ! [ LOCALS ]
-    integer (c_int) :: iCount
     character (len=30)   :: sVarname
     character (len=14)   :: sMin
     character (len=14)   :: sMax

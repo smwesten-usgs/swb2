@@ -514,7 +514,7 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
 
   ! ARGUMENTS
   character (len=*), intent(in) :: sFileName          ! Name of the grid input file
-  integer (c_int), intent(in) :: iDataType       ! T_GRID_INT or T_GRID_REAL
+  integer (c_int), intent(in) :: iDataType            ! T_GRID_INT or T_GRID_REAL
   ! RETURN VALUE
   type (GENERAL_GRID_T), pointer :: pGrd
   ! LOCALS
@@ -522,16 +522,14 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
   character (len=256) :: sDirective                   ! Directive for input
   character (len=256) :: sArgument                    ! Argument for keyword directives
   character (len=256) :: sNoDataValue                 ! String to hold nodata value
-  character (len=8192) :: sBuf
-  integer (c_int) :: iStat                       ! For "iostat="
-  integer (c_int) :: iNX,iNY                     ! Grid dimensions
-  integer (c_int) :: iHdrRecs                    ! Number of records in header
-  integer (c_int) :: iCol,iRow,k                 ! Loop indices for grid reading
-  real (c_double) :: rX0,rX1                        ! Limits in X
-  real (c_double) :: rY0,rY1                        ! Limits in Y
-  real (c_double) :: rCellSize                      ! Cell size
-  integer (c_int) :: iCount,iCumlCount
-  logical (c_bool) :: lXLLCenter, lYLLCenter  ! Flags XLLCENTER / XLLCORNER
+  integer (c_int) :: iStat                            ! For "iostat="
+  integer (c_int) :: iNX,iNY                          ! Grid dimensions
+  integer (c_int) :: iHdrRecs                         ! Number of records in header
+  integer (c_int) :: iCol,iRow                        ! Loop indices for grid reading
+  real (c_double) :: rX0,rX1                          ! Limits in X
+  real (c_double) :: rY0,rY1                          ! Limits in Y
+  real (c_double) :: rCellSize                        ! Cell size
+  logical (c_bool) :: lXLLCenter, lYLLCenter          ! Flags XLLCENTER / XLLCORNER
   logical (c_bool) :: lFileExists
   logical (c_bool) :: lIsOpen
 
@@ -692,16 +690,14 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
   character (len=256) :: sDirective                   ! Directive for input
   character (len=256) :: sArgument                    ! Argument for keyword directives
   character (len=256) :: sNoDataValue                 ! String to hold nodata value
-  character (len=8192) :: sBuf
-  integer (c_int) :: iStat                       ! For "iostat="
-  integer (c_int) :: iNX,iNY                     ! Grid dimensions
-  integer (c_int) :: iHdrRecs                    ! Number of records in header
-  integer (c_int) :: iCol,iRow,k                 ! Loop indices for grid reading
-  real (c_double) :: rX0,rX1                        ! Limits in X
-  real (c_double) :: rY0,rY1                        ! Limits in Y
-  real (c_double) :: rCellSize                      ! Cell size
-  integer (c_int) :: iCount,iCumlCount
-  logical (c_bool) :: lXLLCenter, lYLLCenter  ! Flags XLLCENTER / XLLCORNER
+  integer (c_int) :: iStat                            ! For "iostat="
+  integer (c_int) :: iNX,iNY                          ! Grid dimensions
+  integer (c_int) :: iHdrRecs                         ! Number of records in header
+  integer (c_int) :: iCol,iRow                        ! Loop indices for grid reading
+  real (c_double) :: rX0                              ! lower left-hand corner X
+  real (c_double) :: rY0                              ! lower left-hand corner Y
+  real (c_double) :: rCellSize                        ! Cell size
+  logical (c_bool) :: lXLLCenter, lYLLCenter          ! Flags XLLCENTER / XLLCORNER
   logical (c_bool) :: lFileExists
   logical (c_bool) :: lIsOpen
 
@@ -880,12 +876,12 @@ function grid_ReadSurferGrid_fn ( sFileName, iDataType ) result ( pGrd )
   type (GENERAL_GRID_T), pointer :: pGrd
   ! LOCALS
   character (len=4) :: sSentinel                      ! Better be "DSAA" for SURFER!
-  integer (c_int) :: iStat                       ! For "iostat="
-  integer (c_int) :: iNX,iNY                     ! Grid dimensions
-  integer (c_int) :: iCol,iRow                         ! Loop indices for grid reading
-  real (c_double) :: rX0,rX1                       ! Limits in X
-  real (c_double) :: rY0,rY1                       ! Limits in Y
-  real (c_float) :: rZ0,rZ1                       ! Limits in Z (not used)
+  integer (c_int) :: iStat                            ! For "iostat="
+  integer (c_int) :: iNX,iNY                          ! Grid dimensions
+  integer (c_int) :: iRow                             ! Loop index for grid reading
+  real (c_double) :: rX0,rX1                          ! Limits in X
+  real (c_double) :: rY0,rY1                          ! Limits in Y
+  real (c_float) :: rZ0,rZ1                           ! Limits in Z (not used)
   logical (c_bool) :: lFileExists
   logical (c_bool) :: lIsOpen
 
@@ -961,12 +957,12 @@ subroutine grid_ReadSurferGrid_sub ( sFileName, pGrd )
 
   ! LOCALS
   character (len=4) :: sSentinel                      ! Better be "DSAA" for SURFER!
-  integer (c_int) :: iStat                       ! For "iostat="
-  integer (c_int) :: iNX,iNY                     ! Grid dimensions
-  integer (c_int) :: iCol,iRow                         ! Loop indices for grid reading
-  real (c_double) :: rX0,rX1                       ! Limits in X
-  real (c_double) :: rY0,rY1                       ! Limits in Y
-  real (c_float) :: rZ0,rZ1                       ! Limits in Z (not used)
+  integer (c_int) :: iStat                            ! For "iostat="
+  integer (c_int) :: iNX,iNY                          ! Grid dimensions
+  integer (c_int) :: iRow                             ! Loop index for grid reading
+  real (c_double) :: rX0,rX1                          ! Limits in X
+  real (c_double) :: rY0,rY1                          ! Limits in Y
+  real (c_float) :: rZ0,rZ1                           ! Limits in Z (not used)
   logical (c_bool) :: lFileExists
   logical (c_bool) :: lIsOpen
 
@@ -1547,8 +1543,6 @@ subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4, rX, rY )
 
   ! [ LOCALS ]
   integer (c_int) :: iRetVal
-  integer (c_int) :: i
-  logical (c_bool), dimension(pGrd%iNY, pGrd%iNX) :: lMask
 
   if (present(rX) .and. present(rY)) then
 
@@ -1624,13 +1618,7 @@ subroutine grid_checkIntegerGridValues(pGrd, sFilename)
 
   ! [ LOCALS ]
   integer (c_int) :: iRunningSum
-  integer (c_int) :: iIndex
-  integer (c_int) :: iCount
   integer (c_int) :: iRecord
-  character (len=10)   :: sBuf0
-  character (len=14)   :: sBuf1
-  character (len=10)   :: sBuf2
-  character (len=40)   :: sBuf3
 
   iRunningSum = 0
   iRecord = 0
@@ -1840,7 +1828,6 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
   integer (c_int) :: ib,ia,istat,iRow
   real (c_float) :: u,v,frac,rprev
   real (c_float),dimension(:),allocatable :: rCol
-  character (len=128) :: buf
 
   ! allocate space for all ROWS of data that come from a single COLUMN
   allocate ( rCol(pGrd%iNY), stat=istat )
@@ -2072,7 +2059,6 @@ function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
   integer (c_int) :: iColBoundLower, iColBoundUpper
   integer (c_int) :: iCol, iRow
   integer (c_int) :: iCandidateRow, iCandidateCol
-  integer (c_int) :: iStat
   logical (c_bool) :: lChanged
 
   ! this will get us close to where we need to be; however, since the
@@ -2310,7 +2296,6 @@ function grid_GridToPoint_int(pGrdFrom, pGrdTo, iCol, iRow)  result(iValue)
 
   ! [ LOCALS ]
   integer (c_int), dimension(2) :: iColRow
-  integer (c_int) :: iSrcCol, iSrcRow
   integer (c_int) :: iSpread
 
   ! must ensure that there are coordinates associated with the "to" grid...
@@ -2355,7 +2340,6 @@ subroutine grid_GridToGrid_int( pGrdFrom, pGrdTo, lUseMajorityFilter )
   ! [ LOCALS ]
   integer (c_int) :: iCol, iRow
   integer (c_int), dimension(2) :: iColRow
-  integer (c_int) :: iSrcCol, iSrcRow
   integer (c_int) :: iSpread
   real (c_float)  :: fGridcellRatio
 
@@ -2434,9 +2418,7 @@ subroutine grid_GridToGrid_sgl(pGrdFrom,  pGrdTo )
   ! [ LOCALS ]
   integer (c_int), dimension(2) :: iColRow
   integer (c_int) :: iCol, iRow
-  integer (c_int) :: iSrcCol, iSrcRow
   real (c_float), dimension(3,3) :: rKernel
-  logical  :: printout
 
   rKernel = 1.
   rKernel(2,2) = 8.
@@ -2498,7 +2480,7 @@ function grid_MajorityFilter_int(pGrdFrom, iTargetCol, &
   logical (c_bool) :: lMatch
   integer (c_int) :: iRow
   integer (c_int) :: iCol
-  integer (c_int) :: i, iSize, iLast, iIndex, iCellNum
+  integer (c_int) :: i, iLast, iIndex, iCellNum
 
   iValue = 0
   iCount = 0

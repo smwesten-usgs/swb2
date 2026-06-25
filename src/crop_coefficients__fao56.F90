@@ -105,21 +105,14 @@ contains
     ! [ LOCALS ]
     ! type (FSTRING_LIST_T)            :: slREW, slTEW
     type (FSTRING_LIST_T)             :: slList
-    type (DATETIME_T)                 :: DT
-    type (DATETIME_T)                 :: temp_date
     ! integer (c_int), allocatable :: iTEWSeqNums(:)
     ! integer (c_int), allocatable :: iREWSeqNums(:)
-    integer (c_int)                   :: iNumberOfTEW, iNumberOfREW
     integer (c_int)                   :: iNumberOfLanduses
-    integer (c_int)                   :: iIndex, iIndex2
+    integer (c_int)                   :: iIndex
     integer (c_int)                   :: iStat
-    real (c_float)                    :: growing_cycle_length
 
-    character (len=10)                :: sMMDDYYYY
-    character (len=:), allocatable    :: sText
 
     !type (FSTRING_LIST_T)             :: slPlantingDate
-    type (DATETIME_T)                 :: dtPlantingDate
     character (len=:), allocatable    :: PlantingDate_str
 
     real (c_float), allocatable       :: L_ini_l(:)
@@ -134,7 +127,6 @@ contains
     real (c_float), allocatable       :: GDD_mid_l(:)
     real (c_float), allocatable       :: GDD_late_l(:)
 
-    real (c_float), allocatable       :: Kcb_MAX(:)
 
     real (c_float), allocatable       :: Kcb_ini_l(:)
     real (c_float), allocatable       :: Kcb_mid_l(:)
@@ -154,10 +146,7 @@ contains
     real (c_float), allocatable       :: Kcb_nov(:)
     real (c_float), allocatable       :: Kcb_dec(:)
 
-    real (c_float)                    :: fKcb_initial
-    real (c_float)                    :: fRz_initial
 
-    type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_PERCENT_SOIL_MOISTURE
 
    !> create string list that allows for alternate heading identifiers for the landuse code
    slList = create_list("LU_Code, Landuse_Code, Landuse_Lookup_Code")
@@ -583,9 +572,6 @@ end function update_crop_coefficient_GDD_as_threshold
 
     ! [ LOCALS ]
     integer (c_int) :: iIndex
-    real (c_double) :: dTempDate
-    type (DATETIME_T)    :: dtTempDate
-    real (c_float)  :: growing_cycle_length
 
     do iIndex=lbound(GROWTH_STAGE_DATE,2), ubound(GROWTH_STAGE_DATE,2)
 

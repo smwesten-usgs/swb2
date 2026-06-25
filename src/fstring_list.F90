@@ -300,7 +300,6 @@ end subroutine append_fstring_to_fstring_sub
 
     class (FSTRING_LIST_T), intent(inout), target   :: this
 
-    character (len=:), allocatable :: sbuf
     integer (c_int)                :: start_pos
     integer (c_int)                :: end_pos
     integer (c_int)                :: str_len
@@ -450,7 +449,6 @@ function retrieve_values_as_logical_fn(this)   result(values)
   logical (c_bool), allocatable             :: values(:)
 
   integer (c_int)    :: i
-  logical (c_bool)   :: value
   integer (c_int)    :: op_status
   character (len=64) :: sbuf
 
@@ -919,7 +917,6 @@ end function retrieve_values_as_logical_fn
 
     ! [ LOCALS ]
     integer (c_int)  :: i
-    integer (c_int)  :: status
     logical (c_bool) :: match_case_
 
     if ( present( match_case ) ) then

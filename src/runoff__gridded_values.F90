@@ -159,15 +159,8 @@ module runoff__gridded_values
   subroutine runoff_gridded_values_update_ratios( )
 
     ! [ LOCALS ]
-    integer (c_int)  :: iJulianDay
-    integer (c_int)  :: iMonth
-    integer (c_int)  :: iDay
-    integer (c_int)  :: iYear
-    integer (c_int)  :: iDaysInMonth
-    integer (c_int)  :: iNumDaysFromOrigin
     integer (c_int)  :: iLineNum
     integer (c_int)  :: iFieldNum
-    real (c_float)   :: fFactor
     logical (c_bool) :: lMatch
     integer (c_int)  :: iCount
 

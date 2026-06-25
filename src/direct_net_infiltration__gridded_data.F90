@@ -74,8 +74,6 @@ contains
     integer (c_int)                 :: status
     type (FSTRING_LIST_T)                 :: parameter_list
     integer (c_int)                 :: indx
-    integer (c_int)                 :: iNX
-    integer (c_int)                 :: iNY
     integer (c_int), allocatable    :: landuse_codes(:)
     integer (c_int)                 :: number_of_landuses
     logical (c_bool)                :: are_lengths_equal
@@ -302,7 +300,6 @@ contains
     real (c_float), intent(in)        :: nodata_fill_value(:,:)
 
     ! [ LOCALS ]
-    real (c_float)  :: fFactor
 
     if ( .not. DATE_OF_LAST_RETRIEVAL == SIM_DT%curr ) then
 

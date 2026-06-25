@@ -294,7 +294,6 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)   :: cells
 
     ! [ LOCALS ]
-    integer (c_int) :: iStat
     integer (c_int) :: iIndex
 
     do iIndex = 1, ubound(NC_OUT, 1)
@@ -363,7 +362,6 @@ contains
 
     ! [ LOCALS ]
     integer (c_int)           :: iIndex
-    type (T_NETCDF4_FILE), pointer :: ncfile_ptr
 
     do
 
@@ -799,7 +797,6 @@ contains
 
     ! [ LOCALS ]
     integer (c_int)           :: iIndex
-    type (T_NETCDF4_FILE), pointer :: ncfile_ptr
 
 
 

@@ -42,7 +42,6 @@ contains
     ! [ LOCALS ]
     real (c_float) :: surface_storage_excess
     real (c_float) :: impervious_fraction
-    real (c_float) :: surface_storage_l
 
 !    if ( storm_drain_capture_fraction >= 0.0_c_float ) then
 
