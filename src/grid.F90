@@ -269,7 +269,7 @@ function grid_CreateComplete ( iNX, iNY, rX0, rY0, rX1, rY1, iDataType ) result 
   pGrd%rX1 = rX1
   pGrd%rY0 = rY0
   pGrd%rY1 = rY1
-  pGrd%rGridCellSize = (pGrd%rX1 - pGrd%rX0) / real(pGrd%iNX, c_float)
+  pGrd%rGridCellSize = (pGrd%rX1 - pGrd%rX0) / real(pGrd%iNX, c_double)
   pGrd%iNumGridCells = iNX * iNY
 
   allocate(pGrd%iMask(iNX, iNY))
@@ -592,8 +592,8 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
           iHdrRecs = iHdrRecs + 1
       else
           ! Found the data -- construct the grid
-          if ( lXLLCenter ) rX0 = rX0 - 0.5_c_float*rCellSize
-          if ( lYLLCenter ) rY0 = rY0 - 0.5_c_float*rCellSize
+          if ( lXLLCenter ) rX0 = rX0 - 0.5_c_double*rCellSize
+          if ( lYLLCenter ) rY0 = rY0 - 0.5_c_double*rCellSize
           rX1 = rX0 + real(iNX, c_double) * rCellSize
           rY1 = rY0 + real(iNY, c_double) * rCellSize
 
@@ -1165,7 +1165,7 @@ subroutine grid_WriteSurferGrid(sFilename, pGrd)
       __FILE__, __LINE__)
   endif
 
-  fHalfCell = pGrd%rGridCellSize * 0.5_c_float
+  fHalfCell = real(pGrd%rGridCellSize * 0.5_c_double, c_float)
 
   ! dynamically create the Fortran output format
   write(sBuf,FMT="(a,a,a)") '(',TRIM( asCharacter(iNumCols)),'(a,1x))'
@@ -1273,9 +1273,9 @@ function grid_Conform ( pGrd1, pGrd2, rTolerance ) result ( lConform )
   real (c_float), parameter :: rDEFAULT_TOLERANCE = 0.5_c_float
 
   if ( present ( rTolerance ) ) then
-      rTol = rTolerance * ( pGrd1%rX1 - pGrd1%rX0 )
+      rTol = real(rTolerance * ( pGrd1%rX1 - pGrd1%rX0 ), c_float)
   else
-      rTol = rDEFAULT_TOLERANCE * ( pGrd1%rX1 - pGrd1%rX0 )
+      rTol = real(rDEFAULT_TOLERANCE * ( pGrd1%rX1 - pGrd1%rX0 ), c_float)
   end if
 
   lConform = TRUE
@@ -1336,7 +1336,7 @@ function grid_CompletelyCover( pBaseGrd, pOtherGrd, rTolerance ) result ( lCompl
   real (c_float) :: rTol
   real (c_float) :: rDEFAULT_TOLERANCE
 
-  rDEFAULT_TOLERANCE = -pBaseGrd%rGridCellSize / 100.
+  rDEFAULT_TOLERANCE = real(-pBaseGrd%rGridCellSize / 100.0_c_double, c_float)
   !rDEFAULT_TOLERANCE = rZERO
 
   if ( present ( rTolerance ) ) then
@@ -1429,7 +1429,7 @@ subroutine grid_LookupColumn(pGrd,rXval,iBefore,iAfter,rFrac)
   ! [ LOCALS ]
   real (c_float) :: rColPosition
 
-  rColPosition = (pGrd%iNX - 1) * (rXval - pGrd%rX0) / (pGrd%rX1 - pGrd%rX0)
+  rColPosition = real((pGrd%iNX - 1) * (rXval - pGrd%rX0) / (pGrd%rX1 - pGrd%rX0), c_float)
   rFrac = rZERO
   iBefore = floor(rColPosition) + 1
   iAfter = iBefore + 1
@@ -1497,7 +1497,7 @@ subroutine grid_LookupRow(pGrd,rYval,iBefore,iAfter,rFrac)
   ! [ LOCALS ]
   real (c_float) :: rColPosition
 
-  rColPosition = (pGrd%iNY - 1) * (pGrd%rY1 - rYval) / (pGrd%rY1 - pGrd%rY0)
+  rColPosition = real((pGrd%iNY - 1) * (pGrd%rY1 - rYval) / (pGrd%rY1 - pGrd%rY0), c_float)
   rFrac = rZERO
   iBefore = floor(rColPosition) + 1
   iAfter = iBefore + 1
@@ -1595,10 +1595,10 @@ subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4, rX, rY )
   pGrd%rGridCellSize = ( maxval(pGrd%rX) - minval(pGrd%rX) ) &
              / real(pGrd%iNX - 1, c_double)
 
-  pGrd%rX0 = minval(pGrd%rX) - pGrd%rGridCellSize / 2_c_float
-  pGrd%rX1 = maxval(pGrd%rX) + pGrd%rGridCellSize / 2_c_float
-  pGrd%rY0 = minval(pGrd%rY) - pGrd%rGridCellSize / 2_c_float
-  pGrd%rY1 = maxval(pGrd%rY) + pGrd%rGridCellSize / 2_c_float
+  pGrd%rX0 = minval(pGrd%rX) - pGrd%rGridCellSize / 2.0_c_double
+  pGrd%rX1 = maxval(pGrd%rX) + pGrd%rGridCellSize / 2.0_c_double
+  pGrd%rY0 = minval(pGrd%rY) - pGrd%rGridCellSize / 2.0_c_double
+  pGrd%rY1 = maxval(pGrd%rY) + pGrd%rGridCellSize / 2.0_c_double
 
   ! finally, change the projection string to reflect the new coordinate system
   pGrd%sPROJ4_string = trim(sToPROJ4)
@@ -1747,9 +1747,9 @@ function grid_Interpolate(pGrd,rXval,rYval) result ( rValue )
   ! In some cases, when things really dry out, the y value
   ! goes out of range - enforce bounds.
   if ( rYval < pGrd%rY0 ) then
-    ylocal = pGrd%rY0
+    ylocal = real(pGrd%rY0, c_float)
   else if ( rYval > pGrd%rY1 ) then
-    ylocal = pGrd%rY1
+    ylocal = real(pGrd%rY1, c_float)
   else
     ylocal = rYval
   end if
@@ -1882,8 +1882,8 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
         continue
       else
         ! end of the line -- we didn't find the value, so return the limit
-        v = real(iRow-1) / real(pGrd%iNY-1)
-        rValue = ( 1.0_c_float -v)*pGrd%rY0 + v*pGrd%rY1
+        v = real(iRow-1, c_float) / real(pGrd%iNY-1, c_float)
+        rValue = real(( 1.0_c_float -v)*pGrd%rY0 + v*pGrd%rY1, c_float)
         exit
       endif
     else
@@ -1894,21 +1894,21 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
           ! Found it!
           frac = (rZval-rCol(iRow-1)) / (rCol(iRow)-rCol(iRow-1))
           ! Note: it's 'iRow-2' in the next expr to account for one-based indexing
-          v = ( real(iRow-2)+frac ) / real(pGrd%iNY-1)
-          rValue = v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1
+          v = ( real(iRow-2, c_float)+frac ) / real(pGrd%iNY-1, c_float)
+          rValue = real(v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1, c_float)
           exit
         else if ( rZval < rprev .and. rCol(iRow) > rprev ) then
           ! does not exist, choose the limit
-          v = real(iRow-2) / real(pGrd%iNY-1)
-          rValue = v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1
+          v = real(iRow-2, c_float) / real(pGrd%iNY-1, c_float)
+          rValue = real(v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1, c_float)
           exit
         else if ( rZval > rprev .and. rCol(iRow) < rprev ) then
-          v = real(iRow-2) / real(pGrd%iNY-1)
-          rValue = v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1
+          v = real(iRow-2, c_float) / real(pGrd%iNY-1, c_float)
+          rValue = real(v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1, c_float)
           exit
         else if ( iRow == pGrd%iNY ) then
           v =  1.0_c_float
-          rValue = v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1
+          rValue = real(v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1, c_float)
           exit
         end if
       end if
@@ -2071,15 +2071,15 @@ function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
 
   if (iStartingColNum > 0 .and. iStartingColNum <= pGrd%iNX &
      .and. iStartingRowNum > 0 .and. iStartingRowNum <= pGrd%iNY) then
-    rDist = hypot(pGrd%rX(iStartingColNum,iStartingRowNum) - rX, &
-                pGrd%rY(iStartingColNum,iStartingRowNum) - rY)
+    rDist = real(hypot(pGrd%rX(iStartingColNum,iStartingRowNum) - rX, &
+                pGrd%rY(iStartingColNum,iStartingRowNum) - rY), c_float)
 
     ! need to ensure that the leftover column and row numbers from
     ! perhaps an entirely different grid are not used as indices
     if (iLastColNum > 0 .and. iLastColNum <= pGrd%iNX &
        .and. iLastRowNum > 0 .and. iLastRowNum <= pGrd%iNY) then
-      rDist2 = hypot(pGrd%rX(iLastColNum,iLastRowNum) - rX, &
-                pGrd%rY(iLastColNum,iLastRowNum) - rY)
+      rDist2 = real(hypot(pGrd%rX(iLastColNum,iLastRowNum) - rX, &
+                pGrd%rY(iLastColNum,iLastRowNum) - rY), c_float)
     else
       rDist2 = rBIGVAL
     endif
@@ -2114,7 +2114,7 @@ function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
       do iRow=iRowBoundLower,iRowBoundUpper
         do iCol=iColBoundLower,iColBoundUpper
 
-          rDist = hypot(pGrd%rX(iCol,iRow) - rX, pGrd%rY(iCol,iRow) - rY)
+          rDist = real(hypot(pGrd%rX(iCol,iRow) - rX, pGrd%rY(iCol,iRow) - rY), c_float)
 
           if (rDist < rMinDistance ) then
 
@@ -2348,7 +2348,7 @@ subroutine grid_GridToGrid_int( pGrdFrom, pGrdTo, lUseMajorityFilter )
   if(.not. allocated(pGrdTo%rX) )  call grid_PopulateXY(pGrdTo)
   if(.not. allocated(pGrdFrom%rX) )  call grid_PopulateXY(pGrdFrom)
 
-  fGridcellRatio = pGrdTo%rGridCellSize / pGrdFrom%rGridCellSize
+  fGridcellRatio = real(pGrdTo%rGridCellSize / pGrdFrom%rGridCellSize, c_float)
 
   ! Allow USER to trigger whether the majority filter is employed or not
   if ( lUseMajorityFilter ) then

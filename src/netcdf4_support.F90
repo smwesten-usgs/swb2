@@ -347,7 +347,7 @@ function nf_julian_day_to_index(NCFILE, rJulianDay)  result (iIndex)
   real (c_double) :: rJulianDay
   integer (c_int) :: iIndex
 
-  iIndex = aint(rJulianDay) - NCFILE%iFirstDayJD
+  iIndex = int(aint(rJulianDay), c_int) - NCFILE%iFirstDayJD
 
 end function nf_julian_day_to_index
 
@@ -375,9 +375,9 @@ function nf_dayvalue_to_julian_day(NCFILE, rDayValue)   result(rJulianDay)
   real (c_double) :: rJulianDay
 
   rJulianDay = real(NCFILE%iOriginJD, c_double) &
-    + real(NCFILE%iOriginHH, c_double) / 24_c_double &
-    + real(NCFILE%iOriginMM, c_double) / 1440_c_double &
-    + real(NCFILE%iOriginSS, c_double) / 86400_c_double &
+    + real(NCFILE%iOriginHH, c_double) / 24.0_c_double &
+    + real(NCFILE%iOriginMM, c_double) / 1440.0_c_double &
+    + real(NCFILE%iOriginSS, c_double) / 86400.0_c_double &
     + rDayValue
 
 end function nf_dayvalue_to_julian_day
@@ -423,7 +423,7 @@ function nf_julian_day_to_index_adj( NCFILE, rJulianDay )  result(iStart)
       rTestJD = nf_dayvalue_to_julian_day(NCFILE=NCFILE, &
           rDayValue=NCFILE%rDateTimeValues(iIndex))
 
-      iTestIndex = aint(rTestJD) - NCFILE%iFirstDayJD
+      iTestIndex = int(aint(rTestJD), c_int) - NCFILE%iFirstDayJD
       iDiff = abs(iTestIndex - iInitialCandidateIndex)
 
       if (iDiff < iMinDiff ) then
@@ -440,7 +440,7 @@ function nf_julian_day_to_index_adj( NCFILE, rJulianDay )  result(iStart)
 
   enddo
 
-  if (iMinDiff == 0) iStart = iCandidateIndex
+  if (iMinDiff == 0) iStart = int(iCandidateIndex, c_size_t)
 
 end function nf_julian_day_to_index_adj
 
@@ -753,7 +753,7 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
 
   ! [ LOCALS ]
   logical (c_bool) :: lFileOpen
-  integer (c_int), dimension(2) :: iColRow_ll, iColRow_ur, iColRow_lr, iColRow_ul
+  integer (c_size_t), dimension(2) :: iColRow_ll, iColRow_ur, iColRow_lr, iColRow_ul
 
   call nf_open_file(NCFILE=NCFILE, sFilename=sFilename)
 
@@ -862,21 +862,21 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
 #endif
 
     NCFILE%iColBounds(NC_LEFT) = &
-      max( min( iColRow_ul(COLUMN), iColRow_ur(COLUMN), iColRow_ll(COLUMN), iColRow_lr(COLUMN) ) - 4, &
-                lbound(NCFILE%rX_Coords,1) )
+      max( min( iColRow_ul(COLUMN), iColRow_ur(COLUMN), iColRow_ll(COLUMN), iColRow_lr(COLUMN) ) - 4_c_size_t, &
+                int(lbound(NCFILE%rX_Coords,1), c_size_t) )
 
     NCFILE%iColBounds(NC_RIGHT) = &
-      min( max( iColRow_ul(COLUMN), iColRow_ur(COLUMN), iColRow_ll(COLUMN), iColRow_lr(COLUMN) ) + 4, &
-                ubound(NCFILE%rX_Coords,1) )
+      min( max( iColRow_ul(COLUMN), iColRow_ur(COLUMN), iColRow_ll(COLUMN), iColRow_lr(COLUMN) ) + 4_c_size_t, &
+                int(ubound(NCFILE%rX_Coords,1), c_size_t) )
 
 
       NCFILE%iRowBounds(NC_TOP) = &
-        max( min( iColRow_ul(ROW), iColRow_ur(ROW), iColRow_ll(ROW), iColRow_lr(ROW) ) - 4, &
-                  lbound(NCFILE%rY_Coords,1) )
+        max( min( iColRow_ul(ROW), iColRow_ur(ROW), iColRow_ll(ROW), iColRow_lr(ROW) ) - 4_c_size_t, &
+                  int(lbound(NCFILE%rY_Coords,1), c_size_t) )
 
       NCFILE%iRowBounds(NC_BOTTOM) = &
-        min( max( iColRow_ul(ROW), iColRow_ur(ROW), iColRow_ll(ROW), iColRow_lr(ROW) ) + 4, &
-                  ubound(NCFILE%rY_Coords,1) )
+        min( max( iColRow_ul(ROW), iColRow_ur(ROW), iColRow_ll(ROW), iColRow_lr(ROW) ) + 4_c_size_t, &
+                  int(ubound(NCFILE%rY_Coords,1), c_size_t) )
 
   else
 
@@ -928,10 +928,10 @@ subroutine netcdf_open_and_prepare_as_output_archive(NCFILE, NCFILE_ARCHIVE, &
   write(sOriginText, fmt="(i4.4,'-',i2.2,'-',i2.2)") iOriginYear, &
     iOriginMonth, iOriginDay
 
-  iMaxRow = maxval(NCFILE%iRowBounds)
-  iMinRow = minval(NCFILE%iRowBounds)
-  iMaxCol = maxval(NCFILE%iColBounds)
-  iMinCol = minval(NCFILE%iColBounds)
+  iMaxRow = int(maxval(NCFILE%iRowBounds), c_int)
+  iMinRow = int(minval(NCFILE%iRowBounds), c_int)
+  iMaxCol = int(maxval(NCFILE%iColBounds), c_int)
+  iMinCol = int(minval(NCFILE%iColBounds), c_int)
 
   iNumRows = iMaxRow - iMinRow + 1
   iNumCols = iMaxCol - iMinCol + 1
@@ -1235,9 +1235,9 @@ subroutine nf_set_start_count_stride(NCFILE)
 
         !> need to subtract 1 from the start index: we are using the
         !> netCDF C API, in which index values are relative to zero
-        NCFILE%iStart(iIndex) = minval(NCFILE%iColBounds) - 1
-        NCFILE%iNX = maxval(NCFILE%iColBounds) - minval(NCFILE%iColBounds) + 1
-        NCFILE%iCount(iIndex) = NCFILE%iNX
+        NCFILE%iStart(iIndex) = minval(NCFILE%iColBounds) - 1_c_size_t
+        NCFILE%iNX = int(maxval(NCFILE%iColBounds) - minval(NCFILE%iColBounds) + 1_c_size_t, c_int)
+        NCFILE%iCount(iIndex) = int(NCFILE%iNX, c_size_t)
 !        NCFILE%iCount(iIndex) = maxval(NCFILE%iColBounds) - minval(NCFILE%iColBounds)
         NCFILE%iStride(iIndex) = 1_c_size_t
 
@@ -1246,9 +1246,9 @@ subroutine nf_set_start_count_stride(NCFILE)
         !> note: this assumes that the row numbers increase from top to bottom,
         !>       while the Y coordinates decrease top to bottom
 
-        NCFILE%iStart(iIndex) = minval(NCFILE%iRowBounds) - 1
-        NCFILE%iNY = maxval(NCFILE%iRowBounds) - minval(NCFILE%iRowBounds) + 1
-        NCFILE%iCount(iIndex) = NCFILE%iNY
+        NCFILE%iStart(iIndex) = minval(NCFILE%iRowBounds) - 1_c_size_t
+        NCFILE%iNY = int(maxval(NCFILE%iRowBounds) - minval(NCFILE%iRowBounds) + 1_c_size_t, c_int)
+        NCFILE%iCount(iIndex) = int(NCFILE%iNY, c_size_t)
         !>
         !> count must be set to the number of values! maxval minus minval results
         !> in a diagonal pattern in the input as we read in the incorrect number
@@ -1334,7 +1334,7 @@ subroutine nf_get_time_vals(NCFILE)
   call assert(iStat==0, "Failed to deallocate memory for time values", &
     __FILE__, __LINE__)
 
-  allocate( NCFILE%rDateTimeValues(0 : pNC_DIM_time%iNC_DimSize-1 ), stat=iStat )
+  allocate( NCFILE%rDateTimeValues(0 : pNC_DIM_time%iNC_DimSize-1_c_size_t ), stat=iStat )
   call assert(iStat==0, "Failed to allocate memory for time values", &
     __FILE__, __LINE__)
 
@@ -1814,7 +1814,7 @@ subroutine nf_populate_attribute_struct( NCFILE, pNC_ATT, iNC_VarID, iAttNum )
     xtypep=pNC_ATT%iNC_AttType, &
     lenp=pNC_ATT%iNC_AttSize), __FILE__, __LINE__ )
 
-  iLength = pNC_ATT%iNC_AttSize
+  iLength = int(pNC_ATT%iNC_AttSize, c_int)
 
   iStat = 0
   allocate(pNC_ATT%sAttValue(0:iLength-1), stat=iStat )
@@ -2801,7 +2801,7 @@ function nf_get_first_and_last(NCFILE, iVarIndex)  result(dpValues)
       __FILE__, __LINE__)
 
   pNC_VAR => NCFILE%pNC_VAR(iVarIndex)
-  iDimSize = nf_return_DimSize(NCFILE, pNC_VAR%iNC_DimID(0) )
+  iDimSize = int(nf_return_DimSize(NCFILE, pNC_VAR%iNC_DimID(0) ), c_int)
 
   if (iDimSize > 1) then
     iCount = 2_c_size_t
@@ -2876,8 +2876,8 @@ subroutine nf_calculate_time_range(NCFILE)
   NCFILE%iOriginJD = julian_day(NCFILE%iOriginYear, &
     NCFILE%iOriginMonth, NCFILE%iOriginDay)
 
-  NCFILE%iFirstDayJD = NCFILE%iOriginJD + NCFILE%dpFirstAndLastTimeValues(NC_FIRST)
-  NCFILE%iLastDayJD = NCFILE%iOriginJD + NCFILE%dpFirstAndLastTimeValues(NC_LAST)
+  NCFILE%iFirstDayJD = NCFILE%iOriginJD + int(NCFILE%dpFirstAndLastTimeValues(NC_FIRST), c_int)
+  NCFILE%iLastDayJD = NCFILE%iOriginJD + int(NCFILE%dpFirstAndLastTimeValues(NC_LAST), c_int)
 
 end subroutine nf_calculate_time_range
 
@@ -3224,8 +3224,8 @@ function netcdf_coord_to_col_row(NCFILE, rX, rY)  result(iColRow)
   iColNum = nf_return_index_double(NCFILE%rX_Coords, rX, x_offset)
   iRowNum = nf_return_index_double(NCFILE%rY_Coords, rY, y_offset)
 
-  iColRow(COLUMN) = iColNum
-  iColRow(ROW) = iRowNum
+  iColRow(COLUMN) = int(iColNum, c_size_t)
+  iColRow(ROW) = int(iRowNum, c_size_t)
 
 end function netcdf_coord_to_col_row
 
@@ -3463,11 +3463,11 @@ subroutine nf_set_standard_dimensions(NCFILE, iNX, iNY, write_time_bounds )
 
   !> define the y dimension;
   NCFILE%pNC_DIM(NC_Y)%sDimensionName = "y"
-  NCFILE%pNC_DIM(NC_Y)%iNC_DimSize = iNY
+  NCFILE%pNC_DIM(NC_Y)%iNC_DimSize = int(iNY, c_size_t)
 
   !> define the x dimension;
   NCFILE%pNC_DIM(NC_X)%sDimensionName = "x"
-  NCFILE%pNC_DIM(NC_X)%iNC_DimSize = iNX
+  NCFILE%pNC_DIM(NC_X)%iNC_DimSize = int(iNX, c_size_t)
 
   if ( write_time_bounds_l ) then
     !> define the auxiliary dimension;
@@ -4219,7 +4219,7 @@ subroutine nf_put_attribute(NCFILE, iVarID, sAttributeName, &
 
   if (present(sAttributeValue) ) then
 
-    iNumberOfAttributes = size( sAttributeValue, 1)
+    iNumberOfAttributes = int(size( sAttributeValue, 1), c_size_t)
     iNumberOfAttributes = int(len_trim(sAttributeValue(1)), c_size_t)
 
     call nf_trap( nc_put_att_text(ncid=NCFILE%iNCID, &
@@ -4231,7 +4231,7 @@ subroutine nf_put_attribute(NCFILE, iVarID, sAttributeName, &
 
   elseif (present(iAttributeValue) ) then
 
-    iNumberOfAttributes = size( iAttributeValue, 1)
+    iNumberOfAttributes = int(size( iAttributeValue, 1), c_size_t)
 
     call nf_trap( nc_put_att_int(ncid=NCFILE%iNCID, &
                     varid=iVarID, &
@@ -4243,7 +4243,7 @@ subroutine nf_put_attribute(NCFILE, iVarID, sAttributeName, &
 
   elseif (present(rAttributeValue) ) then
 
-    iNumberOfAttributes = size( rAttributeValue, 1)
+    iNumberOfAttributes = int(size( rAttributeValue, 1), c_size_t)
 
     call nf_trap( nc_put_att_float(ncid=NCFILE%iNCID, &
                     varid=iVarID, &
@@ -4255,7 +4255,7 @@ subroutine nf_put_attribute(NCFILE, iVarID, sAttributeName, &
 
   elseif (present(dpAttributeValue) ) then
 
-    iNumberOfAttributes = size( dpAttributeValue, 1)
+    iNumberOfAttributes = int(size( dpAttributeValue, 1), c_size_t)
 
     call nf_trap( nc_put_att_double(ncid=NCFILE%iNCID, &
                        varid=iVarID, &

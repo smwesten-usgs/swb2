@@ -11,7 +11,7 @@
 | Metric | Value |
 |--------|-------|
 | gfortran build | ✅ Compiles + links (zero errors) |
-| gfortran Fortran warnings | **176** (down from 540) |
+| gfortran Fortran warnings | **~140** (down from 540) |
 | ifx build | ✅ Compiles + links |
 | ifx Fortran diagnostics | ~420 est. (down from 487) |
 
@@ -19,9 +19,7 @@
 
 - ✅ Mixed-kind min/max (18 instances) — all fixed
 - ✅ Impure function warnings — 64 of 69 eliminated (5 remain in `fstring_list`)
-- ✅ Conversion warnings in `constants_and_conversions.F90` — 8 fixed
-- ✅ Conversion warnings in `snowmelt__original.F90` — 2 fixed
-- ✅ Conversion warning in `kiss_random_number_generator.F90` — 1 fixed
+- ✅ **Implicit narrowing `-Wconversion` — ALL 89 instances eliminated**
 - ✅ **Unused variables — ALL Fortran instances eliminated** (289 → 0)
 - ✅ Meson build refactored (DRY source lists, `profile` option, Cray paths removed)
 
@@ -29,28 +27,9 @@
 
 ## Remaining gfortran Warnings (191)
 
-### 1. Implicit narrowing `-Wconversion` — 89 instances
+### 1. ~~Implicit narrowing `-Wconversion`~~ — ✅ DONE (89 → 0)
 
-Double-to-float or int64-to-int32 assignments without explicit conversion.
-
-| File | Count | Pattern |
-|------|-------|---------|
-| `datetime.F90` | 18 | `c_int` assigned from `c_short` member arithmetic |
-| `grid.F90` | 17 | `c_double` coordinates → `c_float` locals |
-| `netcdf4_support.F90` | 16 | `c_size_t` → `c_int`, Julian day calcs |
-| `simulation_datetime.F90` | 5 | Date arithmetic (`c_double`) → `c_int` |
-| `crop_coefficients__fao56.F90` | 5 | `c_double` interpolation → `c_float` Kcb |
-| `model_initialize.F90` | 4 | Grid cell/coordinate calcs |
-| `model_domain.F90` | 4 | Coordinate/date conversions |
-| `data_catalog_entry.F90` | 4 | Scale/offset applied to float grids |
-| `test_FAO56_functions.F90` | 4 | Test calculations |
-| `mass_balance__soil.F90` | 3 | `c_double` soil_storage → `c_float` delta |
-| Others (7 files) | 9 | 1–2 each |
-
-**Fix:** Wrap RHS with `real(..., c_float)` or `int(..., c_int)`.  
-**Effort:** 2–3 hours  
-**Risk:** Low (making implicit behavior explicit)
-
+All 89 instances eliminated across 17 files. Fixes applied explicit `real(..., c_float)`, `int(..., c_int)`, or `int(..., c_size_t)` wrappers to make intentional precision reductions explicit.
 ### 2. Unused private functions `-Wunused-function` — 31 instances
 
 Private module functions defined but never called.
@@ -159,14 +138,14 @@ These are in addition to items shared with gfortran:
 
 | # | Task | Warnings eliminated | Effort |
 |---|------|--------------------:|--------|
-| 1 | Fix `-Wconversion` (89) | 89 | 2–3 hr |
+| 1 | ~~Fix `-Wconversion` (89)~~ | ✅ 89 | Done |
 | 2 | Delete unused functions (31) | 31 | 1 hr |
 | 3 | Fix maybe-uninitialized (13) | 13 | 1 hr |
 | 4 | Delete unused module vars (11) | 11 | 15 min |
 | 5 | Fix stack-to-static (10) | 10 | 30 min |
 | 6 | Address float comparisons (10) | 10 | 20 min |
 | 7 | Remaining small items (12) | 12 | 30 min |
-| | **Total** | **176** | **~6 hr** |
+| | **Total remaining** | **~87** | **~4 hr** |
 
 ---
 
@@ -177,7 +156,8 @@ These are in addition to items shared with gfortran:
 | June 23 | 540 (build failed) | Initial static_analysis profile created |
 | June 24 AM | 540 → 476 | Fixed 18 min/max, marked 5 functions pure |
 | June 24 PM | 476 → 191 | Fixed 11 conversions, removed 271 unused vars |
-| June 25 | **176** | All Fortran unused variables eliminated (289 → 0) |
+| June 25 AM | 191 → 176 | All Fortran unused variables eliminated (289 → 0) |
+| June 25 PM | 176 → **~140** | All 89 `-Wconversion` instances eliminated |
 
 ---
 
@@ -188,4 +168,4 @@ These are in addition to items shared with gfortran:
 | June 23, 2026 | Initial plan based on ifx build |
 | June 23, 2026 | Revised: added gfortran results, documented min/max as fatal |
 | June 24, 2026 | Fixed min/max, pure functions, conversions, bulk unused var removal |
-| June 25, 2026 | Unused variables fully eliminated; 176 warnings remain across 7 categories |
+| June 25, 2026 | Unused variables fully eliminated; all 89 `-Wconversion` warnings eliminated |
