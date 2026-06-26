@@ -57,7 +57,9 @@ contains
 
     ! update crop evapotranspiration; crop_coefficient_kcb defaults to 1.0
     ! there is less power to evaporate/transpire if there is active evaporation of interception
-    cells%crop_etc = real(max(cells%reference_et0 - cells%actual_et_interception, 0.0_c_double), c_float) * cells%crop_coefficient_kcb
+    cells%crop_etc = real(max(cells%reference_et0                              &
+      - cells%actual_et_interception, 0.0_c_double), c_float)                  &
+      * cells%crop_coefficient_kcb
 
     call cells%calc_snowfall()
 

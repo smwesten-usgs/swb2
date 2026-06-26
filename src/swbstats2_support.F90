@@ -1133,7 +1133,9 @@ contains
 !          ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ", minval(grd_new,  mask=grd_new > NC_FILL_FLOAT), &
 !          !     maxval(grd_new,  mask=grd_new > NC_FILL_FLOAT)
 !          !
-!          ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ", minval(this%grd_native%dpData,  mask=this%grd_native%dpData > NC_FILL_FLOAT), &
+!          ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ",           &
+!          !   minval(this%grd_native%dpData,                        &
+!          !     mask=this%grd_native%dpData > NC_FILL_FLOAT),       &
 !          !     maxval(this%grd_native%dpData,  mask=this%grd_native%dpData > NC_FILL_FLOAT)
 
 !         call SIM_DT%addDay

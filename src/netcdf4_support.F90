@@ -753,7 +753,7 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
   integer (c_int), optional :: iLU
 
   ! [ LOCALS ]
-  logical (c_bool) :: lFileOpen
+  logical :: lFileOpen
   integer (c_size_t), dimension(2) :: iColRow_ll, iColRow_ur, iColRow_lr, iColRow_ul
 
   call nf_open_file(NCFILE=NCFILE, sFilename=sFilename)
@@ -1482,7 +1482,7 @@ subroutine nf_open_file(NCFILE, sFilename, iLU)
   integer (c_int), optional :: iLU
 
   ! [ LOCALS ]
-  logical (c_bool) :: lFileOpen
+  logical :: lFileOpen
 
   call LOGS%write("Attempting to open READONLY netCDF file: " &
     //dquote(sFilename))

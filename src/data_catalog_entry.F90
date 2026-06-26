@@ -620,7 +620,7 @@ end subroutine initialize_netcdf_data_object_sub
 
 elemental subroutine apply_scale_and_offset_float(fResult, fValue, dUserScaleFactor, dUserSubOffset, dUserAddOffset )
 
-  real (c_float), intent(out)  :: fResult
+  real (c_float), intent(inout) :: fResult
   real (c_float), intent(in)   :: fValue
   real (c_double), intent(in)   :: dUserScaleFactor
   real (c_double), intent(in)   :: dUserSubOffset
@@ -634,7 +634,7 @@ end subroutine apply_scale_and_offset_float
 
 elemental subroutine apply_scale_and_offset_int(iResult, iValue, dUserScaleFactor, dUserSubOffset, dUserAddOffset )
 
-  integer (c_int), intent(out) :: iResult
+  integer (c_int), intent(inout) :: iResult
   integer (c_int), intent(in)  :: iValue
   real (c_double), intent(in)   :: dUserScaleFactor
   real (c_double), intent(in)   :: dUserSubOffset
@@ -823,8 +823,8 @@ subroutine getvalues_constant_sub( this  )
 
     class (DATA_CATALOG_ENTRY_T)   :: this
     type (DATETIME_T), optional    :: dt
-    logical (c_bool) :: lExist
-    logical (c_bool) :: lOpened
+    logical :: lExist
+    logical :: lOpened
 
     this%lGridHasChanged = FALSE
 
@@ -1283,7 +1283,7 @@ end subroutine set_constant_value_real
     type (DATETIME_T), intent(in) :: dt
 
     ! [ LOCALS ]
-    logical (c_bool) :: lExist
+    logical :: lExist
     integer (c_int)  :: iDaysLeftInMonth
     integer (c_int)  :: iPos
     logical (c_bool) :: lNeedToPadData

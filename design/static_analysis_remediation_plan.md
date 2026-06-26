@@ -13,7 +13,8 @@
 | gfortran build | ✅ Compiles + links (zero errors) |
 | gfortran Fortran warnings | **20** — all intentional reserve API. **Zero actionable.** |
 | ifx build | ✅ Compiles + links (zero errors) |
-| ifx diagnostics | **181** (down from 487): 76 build-config, 83 remarks, 16 INQUIRE type, 6 long lines |
+| ifx warnings | **0** — zero actual warnings |
+| ifx remarks | 83 — unused dummy arguments (informational only) |
 
 ### Completed
 
@@ -28,7 +29,12 @@
 - ✅ **Float comparisons — ALL 10 instances fixed** (inequality + product test)
 - ✅ **Stack-to-static — ALL 10 instances fixed** (allocatable)
 - ✅ **Character truncation — fixed** (widened local variable)
+- ✅ **Argument aliasing — fixed** (intent(inout))
+- ✅ **ifx `/MDd` vs `/MT` conflict — fixed** (b_vscrt in Meson)
+- ✅ **ifx INQUIRE `logical(c_bool)` — ALL 16 fixed** (default logical)
+- ✅ **ifx long lines — ALL 6 fixed**
 - ✅ **gfortran actionable warnings: ZERO remaining**
+- ✅ **ifx actionable warnings: ZERO remaining**
 
 ---
 
@@ -146,19 +152,14 @@ String assignment where RHS is longer than LHS.
 
 ## Recommended Next Steps (by ROI)
 
-**gfortran: COMPLETE** — zero actionable warnings remain.
+**gfortran: COMPLETE** — zero actionable warnings.  
+**ifx: COMPLETE** — zero actual warnings (83 informational remarks only).
 
-**ifx remaining work:**
+### Remaining Diagnostics — By Design
 
-| # | Task | Diagnostics eliminated | Effort |
-|---|------|--------------------:|--------|
-| 1 | Fix `/MDd` vs `/MT` meson config | 76 | 5 min |
-| 2 | Fix INQUIRE `logical(c_bool)` → default logical | 16 | 20 min |
-| 3 | Wrap lines >132 chars | 6 | 10 min |
-| 4 | (Optional) Suppress unused dummy arg remarks | 83 | Build flag or leave as remarks |
-| | **Total** | **181** | **~35 min** + optional |
+**gfortran (20 `-Wunused-function` warnings):** These are private module functions retained as intentional reserve API — part of a NetCDF abstraction layer, spatial analysis library, and planned features (zone aggregation, configurable date formats). They follow a facade design pattern: private helpers intended for future public entry points. Each has been reviewed and documented in `unused_functions_analysis.md`. These will be suppressed in normal (non-static-analysis) builds.
 
-**Note:** 20 `-Wunused-function` warnings (gfortran) are acknowledged intentional reserve API (documented in `unused_functions_analysis.md`). Suppressed in normal builds.
+**ifx (83 `#7712` remarks):** Unused dummy arguments in type-bound procedure stubs and interface implementations. These are inherent to Fortran OOP — a base-type method signature must match across all implementations even when a particular implementation doesn't use every argument. ifx correctly classifies these as remarks (informational), not warnings.
 
 ---
 
@@ -171,7 +172,7 @@ String assignment where RHS is longer than LHS.
 | June 24 PM | 476 → 191 | Fixed 11 conversions, removed 271 unused vars |
 | June 25 AM | 191 → 176 | All Fortran unused variables eliminated (289 → 0) |
 | June 25 PM | 176 → **~140** | All 89 `-Wconversion` instances eliminated |
-| June 26 | ~140 → **20** (0 actionable) | 12 stale functions deleted; unused module vars/imports eliminated; all maybe-uninitialized fixed (3 real bugs found); float comparisons fixed; stack-to-static fixed; impure functions fixed; character truncation fixed. **gfortran complete.** |
+| June 26 | **540 → 20 (gfortran), 487 → 0 (ifx)** | All actionable warnings eliminated across both compilers. 12 stale functions deleted; 20 intentional reserve API functions retained by design. Fixed 3 real bugs (uninitialized variable, typo in Kahan summation). Meson CRT linkage fixed. All INQUIRE type conformance issues resolved. **DONE.** |
 
 ---
 

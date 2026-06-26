@@ -532,8 +532,8 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
   real (c_double) :: rY0,rY1                          ! Limits in Y
   real (c_double) :: rCellSize                        ! Cell size
   logical (c_bool) :: lXLLCenter, lYLLCenter          ! Flags XLLCENTER / XLLCORNER
-  logical (c_bool) :: lFileExists
-  logical (c_bool) :: lIsOpen
+  logical :: lFileExists
+  logical :: lIsOpen
 
   ! Pre-scan for the number of header records and read the header
   inquire(file=trim(sFileName), EXIST=lFileExists)
@@ -700,8 +700,8 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
   real (c_double) :: rY0                              ! lower left-hand corner Y
   real (c_double) :: rCellSize                        ! Cell size
   logical (c_bool) :: lXLLCenter, lYLLCenter          ! Flags XLLCENTER / XLLCORNER
-  logical (c_bool) :: lFileExists
-  logical (c_bool) :: lIsOpen
+  logical :: lFileExists
+  logical :: lIsOpen
 
   ! Pre-scan for the number of header records and read the header
 
@@ -884,8 +884,8 @@ function grid_ReadSurferGrid_fn ( sFileName, iDataType ) result ( pGrd )
   real (c_double) :: rX0,rX1                          ! Limits in X
   real (c_double) :: rY0,rY1                          ! Limits in Y
   real (c_float) :: rZ0,rZ1                           ! Limits in Z (not used)
-  logical (c_bool) :: lFileExists
-  logical (c_bool) :: lIsOpen
+  logical :: lFileExists
+  logical :: lIsOpen
 
   inquire(file=trim(sFileName), EXIST=lFileExists)
   call assert( lFileExists, "The Surfer ASCII grid file "//dquote(sFilename)// &
@@ -965,8 +965,8 @@ subroutine grid_ReadSurferGrid_sub ( sFileName, pGrd )
   real (c_double) :: rX0,rX1                          ! Limits in X
   real (c_double) :: rY0,rY1                          ! Limits in Y
   real (c_float) :: rZ0,rZ1                           ! Limits in Z (not used)
-  logical (c_bool) :: lFileExists
-  logical (c_bool) :: lIsOpen
+  logical :: lFileExists
+  logical :: lIsOpen
 
   inquire(file=trim(sFileName), EXIST=lFileExists)
   call assert( lFileExists, "The Surfer ASCII grid file "//dquote(sFilename)// &
@@ -2133,7 +2133,9 @@ function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
         enddo
       enddo
 
-!      print *, 'iterating: rdist: ', rDist, '  cand X: ', pGrd%rX(iCandidateCol,iCandidateRow), ' X: ', rX, '  cand Y: ', pGrd%rY(iCandidateCol,iCandidateRow), ' Y: ', rY
+!      print *, 'iterating: rdist: ', rDist, '  cand X: ',        &
+!        pGrd%rX(iCandidateCol,iCandidateRow), ' X: ', rX,       &
+!        '  cand Y: ', pGrd%rY(iCandidateCol,iCandidateRow), ' Y: ', rY
 
       if (.not. lChanged ) exit
 

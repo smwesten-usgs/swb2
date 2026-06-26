@@ -278,7 +278,7 @@ contains
 
     class (ASCII_FILE_T)              :: this
     character (len=*), intent(in)    :: sFilename
-    logical(c_bool)             :: lExists
+    logical             :: lExists
 
     inquire(file=fully_qualified_filename( sFilename ), exist=lExists)
 

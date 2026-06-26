@@ -528,18 +528,6 @@ program swbstats2
   !  c) time periods bracketing complete calendar years within the start and
   !     end dates contained within the netCDF file to be munged.
 
-
-! .o8                             o8o                                                o8o                   oooo                                 
-!"888                             `"'                                                `"'                   `888                                 
-! 888oooo.   .ooooo.   .oooooooo oooo  ooo. .oo.        ooo. .oo.  .oo.    .oooo.   oooo  ooo. .oo.         888   .ooooo.   .ooooo.  oo.ooooo.  
-! d88' `88b d88' `88b 888' `88b  `888  `888P"Y88b       `888P"Y88bP"Y88b  `P  )88b  `888  `888P"Y88b        888  d88' `88b d88' `88b  888' `88b 
-! 888   888 888ooo888 888   888   888   888   888        888   888   888   .oP"888   888   888   888        888  888   888 888   888  888   888 
-! 888   888 888    .o `88bod8P'   888   888   888        888   888   888  d8(  888   888   888   888        888  888   888 888   888  888   888 
-! `Y8bod8P' `Y8bod8P' `8oooooo.  o888o o888o o888o      o888o o888o o888o `Y888""8o o888o o888o o888o      o888o `Y8bod8P' `Y8bod8P'  888bod8P' 
-!                     d"     YD                                                                                                       888       
-!                     "Y88888P'                                                                                                      o888o      
-
-
 ! One potential use case: several hundred lines that look like the entry below.
 ! Need to ensure that all resources are deallocated promptly to avoid memory leak
 
