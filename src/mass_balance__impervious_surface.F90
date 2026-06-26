@@ -42,7 +42,6 @@ contains
     ! [ LOCALS ]
     real (c_float) :: surface_storage_excess
     real (c_float) :: impervious_fraction
-    real (c_float) :: surface_storage_l
 
 !    if ( storm_drain_capture_fraction >= 0.0_c_float ) then
 
@@ -65,11 +64,11 @@ contains
                       - runoff
 
     ! **amount is reduced proportional to amount of impervious surface present**
-    surface_storage_excess = max( 0.0_c_float,                               &
+    surface_storage_excess = real(max( 0.0_c_double,                        &
                            ( surface_storage - surface_storage_max )         &
-                            * impervious_fraction )
+                            * impervious_fraction ), c_float)
 
-    surface_storage = min( surface_storage, surface_storage_max )
+    surface_storage = min( surface_storage, real(surface_storage_max, c_double) )
 
     storm_drain_capture = surface_storage_excess * storm_drain_capture_fraction
 

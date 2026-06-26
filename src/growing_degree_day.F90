@@ -20,7 +20,6 @@ module growing_degree_day
   real (c_float), allocatable  :: GDD_BASE(:)
   real (c_float), allocatable  :: GDD_MAX(:)
   integer (c_int), allocatable :: GDD_RESET_DATE(:)
-  type (T_NETCDF4_FILE), pointer    :: pNCFILE
 
 contains
 

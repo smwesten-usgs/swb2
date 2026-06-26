@@ -26,7 +26,6 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_CFGI
     type (DATA_CATALOG_ENTRY_T), pointer :: pCFGI_LOWER_LIMIT
     type (DATA_CATALOG_ENTRY_T), pointer :: pCFGI_UPPER_LIMIT
-    integer (c_int) :: i
 
     ! locate the data structure associated with the gridded initial_cfgi
     pINITIAL_CFGI => DAT%find("INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX")

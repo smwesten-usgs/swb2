@@ -248,6 +248,8 @@ contains
     character (len=*), intent(in) :: sKey
     type (DICT_ENTRY_T), pointer  :: pDict
 
+    pDict => null()
+
     ! if "current" location is not null, it will point to the location of the
     ! last key value found. move forward by one before examining the next key...
     if (associated( this%current) ) pDict => this%current%next
@@ -300,7 +302,6 @@ contains
     type (FSTRING_LIST_T)             :: slString
 
     ! [ LOCALS ]
-    integer (c_int)             :: iIndex
 
     this%current => this%first
 
@@ -328,7 +329,6 @@ function key_name_already_in_use_fn(this, sKey)   result( in_use )
   logical (c_bool)                 :: in_use
 
   ! [ LOCALS ]
-  integer (c_int)             :: iIndex
   integer (c_int)             :: iCount
 
   this%current => this%first
@@ -368,7 +368,6 @@ function find_dict_entry_fn(this, sSearchKey)   result( pDict )
   type (DICT_ENTRY_T), pointer     :: pDict
 
   ! [ LOCALS ]
-  integer (c_int)             :: iIndex
 
   pDict => null()
   this%current => this%first
@@ -675,7 +674,6 @@ end function find_dict_entry_fn
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
-    integer (c_int)           :: iStat
     integer (c_int)           :: iCount
     character (len=:), allocatable :: sText
     logical (c_bool)          :: is_fatal_l
@@ -733,10 +731,7 @@ end function find_dict_entry_fn
     logical (c_bool), optional                      :: is_fatal
 
     ! [ LOCALS ]
-    type (DICT_ENTRY_T), pointer   :: pTarget
-    integer (c_int)           :: iStat
     logical (c_bool)          :: is_fatal_l
-    logical (c_bool)          :: empty_entries
 
     if ( present( is_fatal ) ) then
       is_fatal_l = is_fatal
@@ -771,7 +766,6 @@ end function find_dict_entry_fn
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
-    integer (c_int)           :: iStat
     logical (c_bool)          :: is_fatal_l
     logical (c_bool)          :: empty_entries
 
@@ -1017,7 +1011,6 @@ end function find_dict_entry_fn
     character (len=512)            :: sTempBuf
     character (len=:), allocatable :: sDescription_
     integer (c_int)           :: iCount
-    integer (c_int)           :: iIndex
     integer (c_int)           :: iLogLevel_l
     logical (c_bool)          :: lEcho_l
 

@@ -347,7 +347,7 @@ contains
     ! [ LOCALS ]
     character (len=len(sMessageText) ) :: sRecord
     character (len=256) :: sItem
-    logical (c_bool) :: lFileOpen
+    logical :: lFileOpen
     character (len=12) :: sFmt
     integer (c_int) :: iIndex
 
@@ -412,17 +412,6 @@ contains
     endif
 
   end subroutine split
-
-!--------------------------------------------------------------------------------------------------
-
-  function dquote(sText1)    result(sText)
-
-    character (len=*), intent(in)         :: sText1
-    character (len=len_trim(sText1)+2)    :: sText
-
-    sText = '"'//trim(sText1)//'"'
-
-  end function dquote
 
 !--------------------------------------------------------------------------------------------------
 

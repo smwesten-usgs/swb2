@@ -9,7 +9,6 @@ module interception__gash
   use file_operations
   use parameters, only          : PARAMS
   use grid
-  use netcdf4_support, only      : T_NETCDF4_FILE
   use simulation_datetime
   use fstring
   use fstring_list
@@ -41,8 +40,6 @@ module interception__gash
 
   real (c_float), allocatable   :: P_SAT(:)
 
-  type (T_NETCDF4_FILE), pointer     :: pNCFILE           ! pointer to OUTPUT NetCDF file
-
 contains
 
   !> Initialize the Gash interception algorithm.
@@ -58,7 +55,6 @@ contains
     ! [ LOCALS ]
     integer (c_int)                 :: iStat
     type (FSTRING_LIST_T)                 :: slList
-    integer (c_int)                 :: iIndex
     integer (c_int)                 :: iCount
     integer (c_int)                 :: iNumRecs
     integer (c_int), allocatable    :: iLanduseTableCodes(:)
@@ -211,7 +207,6 @@ contains
     real (c_float)                :: Psat
 
     ! [ LOCALS ]
-    real (c_float)                :: P_div_E
 
     if ( canopy_cover_fraction > 0.0_c_float .and. canopy_storage_capacity > 0.0_c_float ) then
 

@@ -7,12 +7,13 @@ swbtest_src = files(
   'test_FAO56_functions.F90',
   'test_gash.F90',
   'test_timer.F90',
-  'fruit_driver.F90'
+  'fruit_driver.F90',
 )
 
-executable('swbtest', 
-            swbtest_src,
-            link_with: [proj4, swb_library], 
-            link_language: 'fortran',
-            dependencies : [zlib, hdf5, hdf5_hl, netcdf],
-            install: true)
+executable('swbtest',
+    swbtest_src,
+    link_with: [swb_library],
+    link_language: 'fortran',
+    dependencies: swb_deps,
+    install: true,
+)

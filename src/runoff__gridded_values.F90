@@ -87,7 +87,9 @@ module runoff__gridded_values
     integer (c_int)    :: iIndex
     integer (c_int)    :: iNumLines
     integer (c_int)    :: iNumFields
-    type (ASCII_FILE_T)     :: RUNOFF_RATIO_FILE
+    type (ASCII_FILE_T), allocatable :: RUNOFF_RATIO_FILE
+
+    allocate(RUNOFF_RATIO_FILE)
 
     call RUNOFF_RATIO_FILE%open( sFilename = sFilename, &
                   sCommentChars = "#%!", &
@@ -159,15 +161,8 @@ module runoff__gridded_values
   subroutine runoff_gridded_values_update_ratios( )
 
     ! [ LOCALS ]
-    integer (c_int)  :: iJulianDay
-    integer (c_int)  :: iMonth
-    integer (c_int)  :: iDay
-    integer (c_int)  :: iYear
-    integer (c_int)  :: iDaysInMonth
-    integer (c_int)  :: iNumDaysFromOrigin
     integer (c_int)  :: iLineNum
     integer (c_int)  :: iFieldNum
-    real (c_float)   :: fFactor
     logical (c_bool) :: lMatch
     integer (c_int)  :: iCount
 

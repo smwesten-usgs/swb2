@@ -1,62 +1,63 @@
-# change from previous build files: swb version is only defined in the meson
-# 'project' call... the value should propagate through the build using
-# meson variables
 project(
   'swb2',
   ['fortran', 'c', 'cpp'],
   version: 'v2.3.5-rc0',
   meson_version: '>= 1.6.0',
-  default_options : ['optimization=2',     #meson understands: {plain, 0, g, 1, 2, 3, s}
-                     'debug=true']         # whether or not to compile with debug symbols enabled
+  default_options: ['optimization=2', 'debug=true']
 )
 
 version = meson.project_version()
-
-# determine what kind of system we're building on
-# expected value is one of 'windows', 'darwin' (MacOS), or 'linux'
 system = build_machine.system()
 
-git_branch = run_command(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], capture : true, check : true)
+# Git metadata
+git_branch = run_command(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], capture: true, check: true)
 git_branch_str = '"' + git_branch.stdout().strip() + '"'
 
-git_hash = run_command(['git', 'log', '-1', '--format=%h'], capture : true, check : true)
+git_hash = run_command(['git', 'log', '-1', '--format=%h'], capture: true, check: true)
 git_hash_str = '"' + git_hash.stdout().strip() + '"'
 
-build_number = run_command(['git', 'rev-list', version + '..', '--count'], capture : true, check : true)
+build_number = run_command(['git', 'rev-list', version + '..', '--count'], capture: true, check: true)
 build_number_str = '"' + build_number.stdout().strip() + '"'
 
 message('GIT BRANCH IS: ' + git_branch_str)
 message('GIT HASH IS: ' + git_hash_str)
 message('VERSION IS: ' + version)
 
+# Version parsing
+version_core = version.substring(1)
+version_parts = version_core.split('.')
+swb_major_version = version_parts[0]
+swb_minor_version = version_parts[1]
+swb_patch_and_suffix = version_parts[2].split('-')
+swb_patch_version = swb_patch_and_suffix[0]
+swb_suffix = swb_patch_and_suffix.length() > 1 ? swb_patch_and_suffix[1] : ''
+
+# Configuration data for version_control.F90 template
 conf_data = configuration_data()
 conf_data.set('version', version)
 conf_data.set('GIT_BRANCH_STRING', git_branch_str)
 conf_data.set('GIT_HASH_STRING', git_hash_str)
 conf_data.set('BUILD_NUMBER_STRING', build_number_str)
-
-# Parse version components
-version_core = version.substring(1)  # remove leading 'v'
-version_parts = version_core.split('.')  # ['2', '3', '4-rc0']
-
-swb_major_version = version_parts[0]
-swb_minor_version = version_parts[1]
-swb_patch_and_suffix = version_parts[2].split('-')  # ['4', 'rc0']
-swb_patch_version = swb_patch_and_suffix[0]
-swb_suffix = swb_patch_and_suffix.length() > 1 ? swb_patch_and_suffix[1] : ''
-
-# Use in configuration
-conf_data.set('SWB_MAJOR_VERSION_STRING', '"' + swb_major_version + '"')
 conf_data.set('SWB_MAJOR_VERSION_STRING', '"' + swb_major_version + '"')
 conf_data.set('SWB_MINOR_VERSION_STRING', '"' + swb_minor_version + '"')
 conf_data.set('SWB_PATCH_VERSION_STRING', '"' + swb_patch_version + '"')
 conf_data.set('SWB_SUFFIX_STRING', '"' + swb_suffix + '"')
 conf_data.set('VERSION_STRING', '"' + version + '"')
 
-# Attempt to gracefully handle netcdf dependency
-netcdf_root = get_option('netcdf_root')
+# Platform configuration
+if system == 'linux'
+  conf_data.set('PLATFORM_NAME', '"Linux"')
+  conf_data.set('WINDOWS_SYSTEM', 'False')
+elif system == 'darwin'
+  conf_data.set('PLATFORM_NAME', '"MacOS"')
+  conf_data.set('WINDOWS_SYSTEM', 'False')
+elif system == 'windows'
+  conf_data.set('PLATFORM_NAME', '"Windows"')
+  conf_data.set('WINDOWS_SYSTEM', 'True')
+endif
 
-# Platform-specific defaults
+# NetCDF root with platform defaults
+netcdf_root = get_option('netcdf_root')
 if netcdf_root == ''
   if system == 'windows'
     netcdf_root = 'C:/Program Files/netCDF 4.9.3'
@@ -69,17 +70,12 @@ if netcdf_root == ''
   endif
 endif
 
-add_global_arguments('-DDEBUG_PRINT', language : 'fortran')
+# Build profile
+profile = get_option('profile')
 
-if get_option('optimization') == '2'
-  profile = 'release'
-else
-  profile = 'develop'
-endif
+add_global_arguments('-DDEBUG_PRINT', language: 'fortran')
 
-#inc_dirs = include_directories(netcdf_root / 'include')
-
-# get compiler information
+# Compilers
 fc = meson.get_compiler('fortran')
 fc_id = fc.get_id()
 compile_args = []
@@ -89,59 +85,72 @@ link_args = []
 cc = meson.get_compiler('c')
 cc_id = cc.get_id()
 
-if system == 'linux'
-  conf_data.set('PLATFORM_NAME','"Linux"')
-  conf_data.set('WINDOWS_SYSTEM', 'False')
-  message('setting Meson conf_data for Linux')
-elif system == 'darwin'
-  conf_data.set('PLATFORM_NAME','"MacOS"')
-  conf_data.set('WINDOWS_SYSTEM', 'False')
-  message('setting Meson conf_data for MacOS')
-elif system == 'windows'
-  conf_data.set('PLATFORM_NAME','"Windows"')
-  conf_data.set('WINDOWS_SYSTEM', 'True')
-  message('setting Meson conf_data for Windows')
-endif
+message('Profile: ' + profile)
+message('netcdf_root: ' + netcdf_root)
+message('Fortran compiler: ' + fc_id)
+message('C compiler: ' + cc_id)
+message('Build machine: ' + system)
 
-message('The compilation profile is:', profile)
-message('Using netcdf_root: ' + netcdf_root)
-message('Meson sees the compiler name as:' + fc_id)
-message('Meson sees the C compiler name as: ' + cc_id)
-message('Meson sees the build machine as: ' + system)
-
-# Command line options for gfortran
+# ===========================================================================
+# gfortran flags
+# ===========================================================================
 if fc_id == 'gcc'
-  # General options
+
+  # --- Flags common to all profiles ---
   compile_args += [
-                   '-fall-intrinsics',
-                   '-pedantic',
-                   '-std=gnu',
-                   '-fallow-argument-mismatch',
-                   '-Wcharacter-truncation',
-                   '-ffree-line-length-none',
-                   '-Wno-error=line-truncation',
-                   '-Wno-unused-dummy-argument', # This makes problems with OOP
-                   '-Wno-intrinsic-shadow',      # We shadow intrinsics with methods, which should be fine
-                   '-Wno-maybe-uninitialized',   # "Uninitialized" flags produce false positives with allocatables
-                   '-Wno-uninitialized',
-                   '-Wno-conversion',
-                   ]
+    '-ffree-line-length-none',
+    '-Wcharacter-truncation',
+    '-Wno-intrinsic-shadow',
+  ]
 
   link_args += ['-static-libgfortran', '-static-libquadmath', '-static-libgcc']
 
-
-  # Options specific to profile
+  # --- Profile-specific flags ---
   if profile == 'release'
-    #compile_args += ['-ffpe-summary=overflow', '-ffpe-trap=overflow,zero', '-g', '-fbacktrace']
-    compile_args += ['-ffpe-trap=overflow,zero', '-g', '-fbacktrace']
+    compile_args += [
+      '-fall-intrinsics',
+      '-std=gnu',
+      '-fallow-argument-mismatch',
+      '-Wno-unused-dummy-argument',
+      '-Wno-maybe-uninitialized',
+      '-Wno-uninitialized',
+      '-Wno-conversion',
+      '-ffpe-trap=overflow,zero',
+      '-g', '-fbacktrace',
+    ]
+
   elif profile == 'develop'
-    #compile_args += ['-fcheck=all', '-finit-real=nan', '-ffpe-trap=overflow,zero,invalid', '-g', '-fbacktrace' ]
-    compile_args += ['-fcheck=all', '-finit-real=nan', '-ffpe-trap=overflow,zero', '-g', '-fbacktrace' ]
+    compile_args += [
+      '-fall-intrinsics',
+      '-std=gnu',
+      '-fallow-argument-mismatch',
+      '-Wno-unused-dummy-argument',
+      '-Wno-maybe-uninitialized',
+      '-Wno-uninitialized',
+      '-Wno-conversion',
+      '-fcheck=all',
+      '-finit-real=nan',
+      '-ffpe-trap=overflow,zero',
+      '-g', '-fbacktrace',
+    ]
+
+  elif profile == 'static_analysis'
+    # Goal: emit comprehensive warnings about everything non-conforming.
+    # -fallow-argument-mismatch downgrades type mismatches from errors to warnings
+    # so compilation continues and we get the full report.
+    compile_args += [
+      '-std=f2018',
+      '-fallow-argument-mismatch',
+      '-Wall',
+      '-Wextra',
+      '-Wimplicit-interface',
+      '-Wno-unused-dummy-argument',
+      '-pedantic',
+      '-g',
+    ]
   endif
 
-  # Define OS with gfortran for OS specific code
-  # These are identical to pre-defined macros available with ifort
-  system = build_machine.system()
+  # OS preprocessor defines (mirrors Intel predefined macros)
   if system == 'linux'
     compile_args += '-D__linux__'
   elif system == 'darwin'
@@ -151,69 +160,96 @@ if fc_id == 'gcc'
   endif
 endif
 
-# Command line options for ifort
+# ===========================================================================
+# Intel ifx flags (Windows - intel-llvm-cl)
+# ===========================================================================
 if (fc_id == 'intel-llvm-cl') and (system == 'windows')
-  # windows
 
-### Meson apparently throws in a /utf-8 compiler argument, which clang complains about. The kludge below is an attempt
-### to silence this
-  c_compile_args += ['/Qdiag-disable:10430',
-                     '/Wno-unused-command-line-argument',
-                     '/Wno-unknown-argument',
-                     '/Wmost',
-                     '/Wno-tautological-compare',
-                     '/Wno-missing-braces',
-                     '/Wno-infinite-recursion',
-                     '/fp-speculation=safe',
-                     '/fp-model=precise',
-                     '/no-fma',
-                     '/MT'
-                    ]
+  c_compile_args += [
+    '/Qdiag-disable:10430',
+    '/Wno-unused-command-line-argument',
+    '/Wno-unknown-argument',
+    '/Wmost',
+    '/Wno-tautological-compare',
+    '/Wno-missing-braces',
+    '/Wno-infinite-recursion',
+    '/fp-speculation=safe',
+    '/fp-model=precise',
+    '/no-fma',
+  ]
 
-  compile_args += [#'/fpe:0',              # Activate all floating point exceptions
-                   '/heap-arrays:0',
-                   '/traceback',
-                   '/W0',
-                   '/MT',
-                   '/fp:precise',
-                   '/fpp',                # Activate preprocessing
-                   '/Qdiag-disable:7416', # f2008 warning
-                   '/Qdiag-disable:7025', # f2008 warning
-                   '/Qdiag-disable:6048', # f2008: default-logical-variable must be of type default logical
-                   '/Qdiag-disable:5268', # Line too long
-                   '/Qdiag-error-limit:1',
-                  ]
+  if profile == 'release' or profile == 'develop'
+    compile_args += [
+      '/heap-arrays:0',
+      '/traceback',
+      '/W0',
+      '/fp:precise',
+      '/fpp',
+      '/Qdiag-disable:7416',
+      '/Qdiag-disable:7025',
+      '/Qdiag-disable:6048',
+      '/Qdiag-disable:5268',
+      '/Qdiag-error-limit:1',
+    ]
 
-
-elif fc_id == 'intel-llvm'
-  # linux and macOS
-
-  if profile == 'release'
-  compile_args += ['-fpe0',               # Activate subset of floating point exceptions
-                   '-fpp',
-                   '-fp-model=precise',
-                   '-no-heap-arrays',
-                   '-traceback',
-                   '-diag-disable:7416',  # f2008 warning
-                   '-diag-disable:7025',  # f2008 warning
-                   '-diag-disable:5268',  # Line too long
-                  ]
-
-  elif profile == 'develop'
-  compile_args += ['-fpe-all=0',              # Activate all floating point exceptions
-                   '-fpp',
-                   '-fp-model=strict',
-                   '-check=all',
-                   '-no-heap-arrays',
-                   '-traceback',
-                   '-diag-disable:7416',  # f2008 warning
-                   '-diag-disable:7025',  # f2008 warning
-                   '-diag-disable:5268',  # Line too long
-                  ]
+  elif profile == 'static_analysis'
+    # Emit all warnings, flag non-standard code, do not suppress diagnostics
+    compile_args += [
+      '/heap-arrays:0',
+      '/traceback',
+      '/fp:precise',
+      '/fpp',
+      '/warn:all',
+      '/stand:f18',
+      '/Qdiag-error-limit:0',
+    ]
   endif
 
-link_args += '-static-intel'
-  
+# ===========================================================================
+# Intel ifx flags (Linux/macOS - intel-llvm)
+# ===========================================================================
+elif fc_id == 'intel-llvm'
+
+  if profile == 'release'
+    compile_args += [
+      '-fpe0',
+      '-fpp',
+      '-fp-model=precise',
+      '-no-heap-arrays',
+      '-traceback',
+      '-diag-disable:7416',
+      '-diag-disable:7025',
+      '-diag-disable:5268',
+    ]
+
+  elif profile == 'develop'
+    compile_args += [
+      '-fpe-all=0',
+      '-fpp',
+      '-fp-model=strict',
+      '-check=all',
+      '-no-heap-arrays',
+      '-traceback',
+      '-diag-disable:7416',
+      '-diag-disable:7025',
+      '-diag-disable:5268',
+    ]
+
+  elif profile == 'static_analysis'
+    # Emit all warnings, flag non-standard code, no error limit
+    compile_args += [
+      '-fpp',
+      '-fp-model=precise',
+      '-no-heap-arrays',
+      '-traceback',
+      '-warn', 'all',
+      '-stand', 'f18',
+      '-diag-error-limit=0',
+    ]
+  endif
+
+  link_args += '-static-intel'
+
 endif
 
 add_project_arguments(fc.get_supported_arguments(compile_args), language: 'fortran')

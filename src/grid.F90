@@ -269,7 +269,7 @@ function grid_CreateComplete ( iNX, iNY, rX0, rY0, rX1, rY1, iDataType ) result 
   pGrd%rX1 = rX1
   pGrd%rY0 = rY0
   pGrd%rY1 = rY1
-  pGrd%rGridCellSize = (pGrd%rX1 - pGrd%rX0) / real(pGrd%iNX, c_float)
+  pGrd%rGridCellSize = (pGrd%rX1 - pGrd%rX0) / real(pGrd%iNX, c_double)
   pGrd%iNumGridCells = iNX * iNY
 
   allocate(pGrd%iMask(iNX, iNY))
@@ -452,6 +452,8 @@ function grid_Read ( sFilename, sFileType, iDataType ) result ( pGrd )
   ! RETURN VALUE
   type (GENERAL_GRID_T), pointer :: pGrd
 
+  pGrd => null()
+
   if ( trim(sFileType) == "ARC_GRID" ) then
       pGrd => grid_ReadArcGrid_fn( sFileName, iDataType )
   else if ( trim(sFileType) == "SURFER" ) then
@@ -514,7 +516,7 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
 
   ! ARGUMENTS
   character (len=*), intent(in) :: sFileName          ! Name of the grid input file
-  integer (c_int), intent(in) :: iDataType       ! T_GRID_INT or T_GRID_REAL
+  integer (c_int), intent(in) :: iDataType            ! T_GRID_INT or T_GRID_REAL
   ! RETURN VALUE
   type (GENERAL_GRID_T), pointer :: pGrd
   ! LOCALS
@@ -522,18 +524,16 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
   character (len=256) :: sDirective                   ! Directive for input
   character (len=256) :: sArgument                    ! Argument for keyword directives
   character (len=256) :: sNoDataValue                 ! String to hold nodata value
-  character (len=8192) :: sBuf
-  integer (c_int) :: iStat                       ! For "iostat="
-  integer (c_int) :: iNX,iNY                     ! Grid dimensions
-  integer (c_int) :: iHdrRecs                    ! Number of records in header
-  integer (c_int) :: iCol,iRow,k                 ! Loop indices for grid reading
-  real (c_double) :: rX0,rX1                        ! Limits in X
-  real (c_double) :: rY0,rY1                        ! Limits in Y
-  real (c_double) :: rCellSize                      ! Cell size
-  integer (c_int) :: iCount,iCumlCount
-  logical (c_bool) :: lXLLCenter, lYLLCenter  ! Flags XLLCENTER / XLLCORNER
-  logical (c_bool) :: lFileExists
-  logical (c_bool) :: lIsOpen
+  integer (c_int) :: iStat                            ! For "iostat="
+  integer (c_int) :: iNX,iNY                          ! Grid dimensions
+  integer (c_int) :: iHdrRecs                         ! Number of records in header
+  integer (c_int) :: iCol,iRow                        ! Loop indices for grid reading
+  real (c_double) :: rX0,rX1                          ! Limits in X
+  real (c_double) :: rY0,rY1                          ! Limits in Y
+  real (c_double) :: rCellSize                        ! Cell size
+  logical (c_bool) :: lXLLCenter, lYLLCenter          ! Flags XLLCENTER / XLLCORNER
+  logical :: lFileExists
+  logical :: lIsOpen
 
   ! Pre-scan for the number of header records and read the header
   inquire(file=trim(sFileName), EXIST=lFileExists)
@@ -594,8 +594,8 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
           iHdrRecs = iHdrRecs + 1
       else
           ! Found the data -- construct the grid
-          if ( lXLLCenter ) rX0 = rX0 - 0.5_c_float*rCellSize
-          if ( lYLLCenter ) rY0 = rY0 - 0.5_c_float*rCellSize
+          if ( lXLLCenter ) rX0 = rX0 - 0.5_c_double*rCellSize
+          if ( lYLLCenter ) rY0 = rY0 - 0.5_c_double*rCellSize
           rX1 = rX0 + real(iNX, c_double) * rCellSize
           rY1 = rY0 + real(iNY, c_double) * rCellSize
 
@@ -692,18 +692,16 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
   character (len=256) :: sDirective                   ! Directive for input
   character (len=256) :: sArgument                    ! Argument for keyword directives
   character (len=256) :: sNoDataValue                 ! String to hold nodata value
-  character (len=8192) :: sBuf
-  integer (c_int) :: iStat                       ! For "iostat="
-  integer (c_int) :: iNX,iNY                     ! Grid dimensions
-  integer (c_int) :: iHdrRecs                    ! Number of records in header
-  integer (c_int) :: iCol,iRow,k                 ! Loop indices for grid reading
-  real (c_double) :: rX0,rX1                        ! Limits in X
-  real (c_double) :: rY0,rY1                        ! Limits in Y
-  real (c_double) :: rCellSize                      ! Cell size
-  integer (c_int) :: iCount,iCumlCount
-  logical (c_bool) :: lXLLCenter, lYLLCenter  ! Flags XLLCENTER / XLLCORNER
-  logical (c_bool) :: lFileExists
-  logical (c_bool) :: lIsOpen
+  integer (c_int) :: iStat                            ! For "iostat="
+  integer (c_int) :: iNX,iNY                          ! Grid dimensions
+  integer (c_int) :: iHdrRecs                         ! Number of records in header
+  integer (c_int) :: iCol,iRow                        ! Loop indices for grid reading
+  real (c_double) :: rX0                              ! lower left-hand corner X
+  real (c_double) :: rY0                              ! lower left-hand corner Y
+  real (c_double) :: rCellSize                        ! Cell size
+  logical (c_bool) :: lXLLCenter, lYLLCenter          ! Flags XLLCENTER / XLLCORNER
+  logical :: lFileExists
+  logical :: lIsOpen
 
   ! Pre-scan for the number of header records and read the header
 
@@ -880,14 +878,14 @@ function grid_ReadSurferGrid_fn ( sFileName, iDataType ) result ( pGrd )
   type (GENERAL_GRID_T), pointer :: pGrd
   ! LOCALS
   character (len=4) :: sSentinel                      ! Better be "DSAA" for SURFER!
-  integer (c_int) :: iStat                       ! For "iostat="
-  integer (c_int) :: iNX,iNY                     ! Grid dimensions
-  integer (c_int) :: iCol,iRow                         ! Loop indices for grid reading
-  real (c_double) :: rX0,rX1                       ! Limits in X
-  real (c_double) :: rY0,rY1                       ! Limits in Y
-  real (c_float) :: rZ0,rZ1                       ! Limits in Z (not used)
-  logical (c_bool) :: lFileExists
-  logical (c_bool) :: lIsOpen
+  integer (c_int) :: iStat                            ! For "iostat="
+  integer (c_int) :: iNX,iNY                          ! Grid dimensions
+  integer (c_int) :: iRow                             ! Loop index for grid reading
+  real (c_double) :: rX0,rX1                          ! Limits in X
+  real (c_double) :: rY0,rY1                          ! Limits in Y
+  real (c_float) :: rZ0,rZ1                           ! Limits in Z (not used)
+  logical :: lFileExists
+  logical :: lIsOpen
 
   inquire(file=trim(sFileName), EXIST=lFileExists)
   call assert( lFileExists, "The Surfer ASCII grid file "//dquote(sFilename)// &
@@ -961,14 +959,14 @@ subroutine grid_ReadSurferGrid_sub ( sFileName, pGrd )
 
   ! LOCALS
   character (len=4) :: sSentinel                      ! Better be "DSAA" for SURFER!
-  integer (c_int) :: iStat                       ! For "iostat="
-  integer (c_int) :: iNX,iNY                     ! Grid dimensions
-  integer (c_int) :: iCol,iRow                         ! Loop indices for grid reading
-  real (c_double) :: rX0,rX1                       ! Limits in X
-  real (c_double) :: rY0,rY1                       ! Limits in Y
-  real (c_float) :: rZ0,rZ1                       ! Limits in Z (not used)
-  logical (c_bool) :: lFileExists
-  logical (c_bool) :: lIsOpen
+  integer (c_int) :: iStat                            ! For "iostat="
+  integer (c_int) :: iNX,iNY                          ! Grid dimensions
+  integer (c_int) :: iRow                             ! Loop index for grid reading
+  real (c_double) :: rX0,rX1                          ! Limits in X
+  real (c_double) :: rY0,rY1                          ! Limits in Y
+  real (c_float) :: rZ0,rZ1                           ! Limits in Z (not used)
+  logical :: lFileExists
+  logical :: lIsOpen
 
   inquire(file=trim(sFileName), EXIST=lFileExists)
   call assert( lFileExists, "The Surfer ASCII grid file "//dquote(sFilename)// &
@@ -1169,7 +1167,7 @@ subroutine grid_WriteSurferGrid(sFilename, pGrd)
       __FILE__, __LINE__)
   endif
 
-  fHalfCell = pGrd%rGridCellSize * 0.5_c_float
+  fHalfCell = real(pGrd%rGridCellSize * 0.5_c_double, c_float)
 
   ! dynamically create the Fortran output format
   write(sBuf,FMT="(a,a,a)") '(',TRIM( asCharacter(iNumCols)),'(a,1x))'
@@ -1277,9 +1275,9 @@ function grid_Conform ( pGrd1, pGrd2, rTolerance ) result ( lConform )
   real (c_float), parameter :: rDEFAULT_TOLERANCE = 0.5_c_float
 
   if ( present ( rTolerance ) ) then
-      rTol = rTolerance * ( pGrd1%rX1 - pGrd1%rX0 )
+      rTol = real(rTolerance * ( pGrd1%rX1 - pGrd1%rX0 ), c_float)
   else
-      rTol = rDEFAULT_TOLERANCE * ( pGrd1%rX1 - pGrd1%rX0 )
+      rTol = real(rDEFAULT_TOLERANCE * ( pGrd1%rX1 - pGrd1%rX0 ), c_float)
   end if
 
   lConform = TRUE
@@ -1340,7 +1338,7 @@ function grid_CompletelyCover( pBaseGrd, pOtherGrd, rTolerance ) result ( lCompl
   real (c_float) :: rTol
   real (c_float) :: rDEFAULT_TOLERANCE
 
-  rDEFAULT_TOLERANCE = -pBaseGrd%rGridCellSize / 100.
+  rDEFAULT_TOLERANCE = real(-pBaseGrd%rGridCellSize / 100.0_c_double, c_float)
   !rDEFAULT_TOLERANCE = rZERO
 
   if ( present ( rTolerance ) ) then
@@ -1433,7 +1431,7 @@ subroutine grid_LookupColumn(pGrd,rXval,iBefore,iAfter,rFrac)
   ! [ LOCALS ]
   real (c_float) :: rColPosition
 
-  rColPosition = (pGrd%iNX - 1) * (rXval - pGrd%rX0) / (pGrd%rX1 - pGrd%rX0)
+  rColPosition = real((pGrd%iNX - 1) * (rXval - pGrd%rX0) / (pGrd%rX1 - pGrd%rX0), c_float)
   rFrac = rZERO
   iBefore = floor(rColPosition) + 1
   iAfter = iBefore + 1
@@ -1501,7 +1499,7 @@ subroutine grid_LookupRow(pGrd,rYval,iBefore,iAfter,rFrac)
   ! [ LOCALS ]
   real (c_float) :: rColPosition
 
-  rColPosition = (pGrd%iNY - 1) * (pGrd%rY1 - rYval) / (pGrd%rY1 - pGrd%rY0)
+  rColPosition = real((pGrd%iNY - 1) * (pGrd%rY1 - rYval) / (pGrd%rY1 - pGrd%rY0), c_float)
   rFrac = rZERO
   iBefore = floor(rColPosition) + 1
   iAfter = iBefore + 1
@@ -1547,8 +1545,6 @@ subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4, rX, rY )
 
   ! [ LOCALS ]
   integer (c_int) :: iRetVal
-  integer (c_int) :: i
-  logical (c_bool), dimension(pGrd%iNY, pGrd%iNX) :: lMask
 
   if (present(rX) .and. present(rY)) then
 
@@ -1601,10 +1597,10 @@ subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4, rX, rY )
   pGrd%rGridCellSize = ( maxval(pGrd%rX) - minval(pGrd%rX) ) &
              / real(pGrd%iNX - 1, c_double)
 
-  pGrd%rX0 = minval(pGrd%rX) - pGrd%rGridCellSize / 2_c_float
-  pGrd%rX1 = maxval(pGrd%rX) + pGrd%rGridCellSize / 2_c_float
-  pGrd%rY0 = minval(pGrd%rY) - pGrd%rGridCellSize / 2_c_float
-  pGrd%rY1 = maxval(pGrd%rY) + pGrd%rGridCellSize / 2_c_float
+  pGrd%rX0 = minval(pGrd%rX) - pGrd%rGridCellSize / 2.0_c_double
+  pGrd%rX1 = maxval(pGrd%rX) + pGrd%rGridCellSize / 2.0_c_double
+  pGrd%rY0 = minval(pGrd%rY) - pGrd%rGridCellSize / 2.0_c_double
+  pGrd%rY1 = maxval(pGrd%rY) + pGrd%rGridCellSize / 2.0_c_double
 
   ! finally, change the projection string to reflect the new coordinate system
   pGrd%sPROJ4_string = trim(sToPROJ4)
@@ -1624,13 +1620,7 @@ subroutine grid_checkIntegerGridValues(pGrd, sFilename)
 
   ! [ LOCALS ]
   integer (c_int) :: iRunningSum
-  integer (c_int) :: iIndex
-  integer (c_int) :: iCount
   integer (c_int) :: iRecord
-  character (len=10)   :: sBuf0
-  character (len=14)   :: sBuf1
-  character (len=10)   :: sBuf2
-  character (len=40)   :: sBuf3
 
   iRunningSum = 0
   iRecord = 0
@@ -1759,9 +1749,9 @@ function grid_Interpolate(pGrd,rXval,rYval) result ( rValue )
   ! In some cases, when things really dry out, the y value
   ! goes out of range - enforce bounds.
   if ( rYval < pGrd%rY0 ) then
-    ylocal = pGrd%rY0
+    ylocal = real(pGrd%rY0, c_float)
   else if ( rYval > pGrd%rY1 ) then
-    ylocal = pGrd%rY1
+    ylocal = real(pGrd%rY1, c_float)
   else
     ylocal = rYval
   end if
@@ -1840,7 +1830,6 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
   integer (c_int) :: ib,ia,istat,iRow
   real (c_float) :: u,v,frac,rprev
   real (c_float),dimension(:),allocatable :: rCol
-  character (len=128) :: buf
 
   ! allocate space for all ROWS of data that come from a single COLUMN
   allocate ( rCol(pGrd%iNY), stat=istat )
@@ -1873,13 +1862,13 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
   ! Fix missing values
 
   do iRow=1,pGrd%iNY
-    if ( pGrd%rData(ia, iRow) == rNoData .and. pGrd%rData(ib, iRow) == rNoData ) then
+    if ( pGrd%rData(ia, iRow) <= rNoData .and. pGrd%rData(ib, iRow) <= rNoData ) then
       rCol(iRow) = rNoData
-    else if ( pGrd%rData(ib,iRow) == rNoData .and. u>0.9_c_float ) then
+    else if ( pGrd%rData(ib,iRow) <= rNoData .and. u>0.9_c_float ) then
       rCol(iRow) = pGrd%rData(ia,iRow)
-    else if ( pGrd%rData(ia,iRow) == rNoData .and. u<0.1_c_float ) then
+    else if ( pGrd%rData(ia,iRow) <= rNoData .and. u<0.1_c_float ) then
       rCol(iRow) = pGrd%rData(ib,iRow)
-    else if ( pGrd%rData(ia,iRow) == rNoData .or. pGrd%rData(ib,iRow) == rNoData ) then
+    else if ( pGrd%rData(ia,iRow) <= rNoData .or. pGrd%rData(ib,iRow) <= rNoData ) then
       rCol(iRow) = rNoData
     end if
   end do
@@ -1889,39 +1878,42 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
   rprev = rNoData
   rValue = rNoData
   do iRow=1,pGrd%iNY
-    if ( rCol(iRow) == rNoData ) then
-      if ( rprev == rNoData ) then
+    if ( rCol(iRow) <= rNoData ) then
+      if ( rprev <= rNoData ) then
         ! keep skipping missing values...
         continue
       else
         ! end of the line -- we didn't find the value, so return the limit
-        v = real(iRow-1) / real(pGrd%iNY-1)
-        rValue = ( 1.0_c_float -v)*pGrd%rY0 + v*pGrd%rY1
+        v = real(iRow-1, c_float) / real(pGrd%iNY-1, c_float)
+        rValue = real(( 1.0_c_float -v)*pGrd%rY0 + v*pGrd%rY1, c_float)
         exit
       endif
     else
-      if ( rprev == rNoData ) then
+      if ( rprev <= rNoData ) then
         rprev = rCol(iRow)
       else
-        if ( sign( 1.0_c_float ,rCol(iRow)-rZval) /= sign( 1.0_c_float ,rprev-rZval) ) then
+        ! Detect sign change: a negative product means rCol(iRow) and rprev
+        ! straddle rZval (one above, one below), indicating the target value
+        ! lies between these two consecutive table entries.
+        if ( (rCol(iRow) - rZval) * (rprev - rZval) < 0.0_c_float ) then
           ! Found it!
           frac = (rZval-rCol(iRow-1)) / (rCol(iRow)-rCol(iRow-1))
           ! Note: it's 'iRow-2' in the next expr to account for one-based indexing
-          v = ( real(iRow-2)+frac ) / real(pGrd%iNY-1)
-          rValue = v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1
+          v = ( real(iRow-2, c_float)+frac ) / real(pGrd%iNY-1, c_float)
+          rValue = real(v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1, c_float)
           exit
         else if ( rZval < rprev .and. rCol(iRow) > rprev ) then
           ! does not exist, choose the limit
-          v = real(iRow-2) / real(pGrd%iNY-1)
-          rValue = v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1
+          v = real(iRow-2, c_float) / real(pGrd%iNY-1, c_float)
+          rValue = real(v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1, c_float)
           exit
         else if ( rZval > rprev .and. rCol(iRow) < rprev ) then
-          v = real(iRow-2) / real(pGrd%iNY-1)
-          rValue = v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1
+          v = real(iRow-2, c_float) / real(pGrd%iNY-1, c_float)
+          rValue = real(v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1, c_float)
           exit
         else if ( iRow == pGrd%iNY ) then
           v =  1.0_c_float
-          rValue = v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1
+          rValue = real(v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1, c_float)
           exit
         end if
       end if
@@ -2072,7 +2064,6 @@ function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
   integer (c_int) :: iColBoundLower, iColBoundUpper
   integer (c_int) :: iCol, iRow
   integer (c_int) :: iCandidateRow, iCandidateCol
-  integer (c_int) :: iStat
   logical (c_bool) :: lChanged
 
   ! this will get us close to where we need to be; however, since the
@@ -2085,15 +2076,15 @@ function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
 
   if (iStartingColNum > 0 .and. iStartingColNum <= pGrd%iNX &
      .and. iStartingRowNum > 0 .and. iStartingRowNum <= pGrd%iNY) then
-    rDist = hypot(pGrd%rX(iStartingColNum,iStartingRowNum) - rX, &
-                pGrd%rY(iStartingColNum,iStartingRowNum) - rY)
+    rDist = real(hypot(pGrd%rX(iStartingColNum,iStartingRowNum) - rX, &
+                pGrd%rY(iStartingColNum,iStartingRowNum) - rY), c_float)
 
     ! need to ensure that the leftover column and row numbers from
     ! perhaps an entirely different grid are not used as indices
     if (iLastColNum > 0 .and. iLastColNum <= pGrd%iNX &
        .and. iLastRowNum > 0 .and. iLastRowNum <= pGrd%iNY) then
-      rDist2 = hypot(pGrd%rX(iLastColNum,iLastRowNum) - rX, &
-                pGrd%rY(iLastColNum,iLastRowNum) - rY)
+      rDist2 = real(hypot(pGrd%rX(iLastColNum,iLastRowNum) - rX, &
+                pGrd%rY(iLastColNum,iLastRowNum) - rY), c_float)
     else
       rDist2 = rBIGVAL
     endif
@@ -2128,7 +2119,7 @@ function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
       do iRow=iRowBoundLower,iRowBoundUpper
         do iCol=iColBoundLower,iColBoundUpper
 
-          rDist = hypot(pGrd%rX(iCol,iRow) - rX, pGrd%rY(iCol,iRow) - rY)
+          rDist = real(hypot(pGrd%rX(iCol,iRow) - rX, pGrd%rY(iCol,iRow) - rY), c_float)
 
           if (rDist < rMinDistance ) then
 
@@ -2142,7 +2133,9 @@ function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
         enddo
       enddo
 
-!      print *, 'iterating: rdist: ', rDist, '  cand X: ', pGrd%rX(iCandidateCol,iCandidateRow), ' X: ', rX, '  cand Y: ', pGrd%rY(iCandidateCol,iCandidateRow), ' Y: ', rY
+!      print *, 'iterating: rdist: ', rDist, '  cand X: ',        &
+!        pGrd%rX(iCandidateCol,iCandidateRow), ' X: ', rX,       &
+!        '  cand Y: ', pGrd%rY(iCandidateCol,iCandidateRow), ' Y: ', rY
 
       if (.not. lChanged ) exit
 
@@ -2310,7 +2303,6 @@ function grid_GridToPoint_int(pGrdFrom, pGrdTo, iCol, iRow)  result(iValue)
 
   ! [ LOCALS ]
   integer (c_int), dimension(2) :: iColRow
-  integer (c_int) :: iSrcCol, iSrcRow
   integer (c_int) :: iSpread
 
   ! must ensure that there are coordinates associated with the "to" grid...
@@ -2355,7 +2347,6 @@ subroutine grid_GridToGrid_int( pGrdFrom, pGrdTo, lUseMajorityFilter )
   ! [ LOCALS ]
   integer (c_int) :: iCol, iRow
   integer (c_int), dimension(2) :: iColRow
-  integer (c_int) :: iSrcCol, iSrcRow
   integer (c_int) :: iSpread
   real (c_float)  :: fGridcellRatio
 
@@ -2364,7 +2355,7 @@ subroutine grid_GridToGrid_int( pGrdFrom, pGrdTo, lUseMajorityFilter )
   if(.not. allocated(pGrdTo%rX) )  call grid_PopulateXY(pGrdTo)
   if(.not. allocated(pGrdFrom%rX) )  call grid_PopulateXY(pGrdFrom)
 
-  fGridcellRatio = pGrdTo%rGridCellSize / pGrdFrom%rGridCellSize
+  fGridcellRatio = real(pGrdTo%rGridCellSize / pGrdFrom%rGridCellSize, c_float)
 
   ! Allow USER to trigger whether the majority filter is employed or not
   if ( lUseMajorityFilter ) then
@@ -2434,9 +2425,7 @@ subroutine grid_GridToGrid_sgl(pGrdFrom,  pGrdTo )
   ! [ LOCALS ]
   integer (c_int), dimension(2) :: iColRow
   integer (c_int) :: iCol, iRow
-  integer (c_int) :: iSrcCol, iSrcRow
   real (c_float), dimension(3,3) :: rKernel
-  logical  :: printout
 
   rKernel = 1.
   rKernel(2,2) = 8.
@@ -2498,7 +2487,7 @@ function grid_MajorityFilter_int(pGrdFrom, iTargetCol, &
   logical (c_bool) :: lMatch
   integer (c_int) :: iRow
   integer (c_int) :: iCol
-  integer (c_int) :: i, iSize, iLast, iIndex, iCellNum
+  integer (c_int) :: i, iLast, iIndex, iCellNum
 
   iValue = 0
   iCount = 0

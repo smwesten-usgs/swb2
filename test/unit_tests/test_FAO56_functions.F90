@@ -26,8 +26,6 @@ contains
 
   subroutine setup_crop_coefficients__FAO56
 
-    real (c_float), allocatable           :: fValues(:)
-    type (FSTRING_LIST_T)                 :: slString
 
     if (     (SYSTEM_NAME .containssimilar. "Windows")                           &
         .or. (SYSTEM_NAME .containssimilar. "Mingw") ) then
@@ -248,8 +246,8 @@ subroutine test_fao56_example_35
       if ( evaporable_water_deficit <= REW_ ) then
         Kr = 1._c_double
       elseif ( evaporable_water_deficit < TEW_ ) then
-        Kr = ( real(TEW_, c_double) - evaporable_water_deficit )         &
-            / ( real(TEW_, c_double) - real(REW_, c_double) + 1.0E-8)
+        Kr = real(( real(TEW_, c_double) - evaporable_water_deficit )         &
+            / ( real(TEW_, c_double) - real(REW_, c_double) + 1.0E-8), c_float)
       else
         Kr = 0._c_double
       endif
@@ -258,13 +256,13 @@ subroutine test_fao56_example_35
       ! of Ks should be the same as the value for Kr
       Ks = Kr
 
-      Ke = Kr * ( real(Kcb_max, c_double) - real(Kcb, c_double) )
+      Ke = real(Kr * ( real(Kcb_max, c_double) - real(Kcb, c_double) ), c_float)
 
       call assert_equals(Kr, ex35_kr(day),message="Kr, day "//as_character(day)//": SWB calculated "//as_character(Kr), delta=1.0e-2)
       call assert_equals(Ke, ex35_ke(day),message="Ke, day "//as_character(day)//": SWB calculated "//as_character(Ke), delta=1.0e-2)
 
-      bare_soil_evap           = reference_et0 * Ke / few
-      crop_etc                 = reference_et0 * Kcb * Ks * 0.0 !* (1 - few)
+      bare_soil_evap           = real(reference_et0 * Ke / few, c_float)
+      crop_etc                 = real(reference_et0 * Kcb * Ks * 0.0, c_float) !* (1 - few)
       actual_et                = crop_etc + bare_soil_evap
 
       evaporable_water_storage = clip(evaporable_water_storage - actual_et, minval=0.0, maxval=TEW_)

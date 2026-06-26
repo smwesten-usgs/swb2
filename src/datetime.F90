@@ -333,9 +333,9 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
 
   endif
 
-  this%iMonth = iMonth
+  this%iMonth = int(iMonth, c_short)
   this%iYear = iYear
-  this%iDay = iDay
+  this%iDay = int(iDay, c_short)
 
   this%dJulianDate = julian_day( iMonth=iMonth, iDay=iDay, iYear=iYear )
 
@@ -359,7 +359,6 @@ subroutine parse_text_to_time_sub(this, sString)
   character (len=256) :: sHour, sMinute, sSecond
 
 
-  character (len=256) :: sTimeFmt
   character (len=256) :: sStr
   character (len=256) :: sBuf
 
@@ -392,9 +391,9 @@ subroutine parse_text_to_time_sub(this, sString)
     iSecond = 0
   endif
 
-  this%iHour = iHour
-  this%iMinute = iMinute
-  this%iSecond = iSecond
+  this%iHour = int(iHour, c_short)
+  this%iMinute = int(iMinute, c_short)
+  this%iSecond = int(iSecond, c_short)
 
   this%dJulianDate = this%dJulianDate + real( iHour, c_double) / 24.0_c_double      &
                                       + real( iMinute, c_double) / 1440.0_c_double  &
@@ -478,12 +477,12 @@ subroutine calc_julian_day_sub(this, iMonth, iDay, iYear, &
   integer (c_int), intent(in), optional :: iMinute
   integer (c_int), intent(in), optional :: iSecond
 
-  if(present(iMonth) ) this%iMonth = iMonth
-  if(present(iDay) ) this%iDay = iDay
+  if(present(iMonth) ) this%iMonth = int(iMonth, c_short)
+  if(present(iDay) ) this%iDay = int(iDay, c_short)
   if(present(iYear) ) this%iYear = iYear
-  if(present(iHour) ) this%iHour = iHour
-  if(present(iMinute) ) this%iMinute = iMinute
-  if(present(iSecond) ) this%iSecond = iSecond
+  if(present(iHour) ) this%iHour = int(iHour, c_short)
+  if(present(iMinute) ) this%iMinute = int(iMinute, c_short)
+  if(present(iSecond) ) this%iSecond = int(iSecond, c_short)
 
   this%dJulianDate = real( julian_day( int(this%iYear, c_int), &
                           int(this%iMonth, c_int), &
@@ -520,8 +519,8 @@ end subroutine calc_julian_day_sub
   call gregorian_date( iJulianDay, iYear, iMonth, iDay )
 
   this%iYear = iYear
-  this%iMonth = iMonth
-  this%iDay = iDay
+  this%iMonth = int(iMonth, c_short)
+  this%iDay = int(iDay, c_short)
 
   rHour = this%getFractionOfDay() * 24._c_double
   iHour = int(rHour, c_int)
@@ -534,9 +533,9 @@ end subroutine calc_julian_day_sub
   rSecond = ( rMinute - real(iMinute, c_double) ) * 60._c_double
   iSecond = int(rSecond, c_int)
 
-  this%iHour = iHour
-  this%iMinute = iMinute
-  this%iHour = iSecond
+  this%iHour = int(iHour, c_short)
+  this%iMinute = int(iMinute, c_short)
+  this%iHour = int(iSecond, c_short)
 
 end subroutine calc_gregorian_date_sub
 
@@ -1282,7 +1281,7 @@ subroutine date_set_day_sub(this, newday)
   class(DATETIME_T)                  :: this
   integer (c_int), intent(in)   :: newday
 
-  this%iDay = newday
+  this%iDay = int(newday, c_short)
   call this%calcJulianDay()
 
 end subroutine date_set_day_sub
@@ -1294,7 +1293,7 @@ subroutine date_set_month_sub(this, newmonth)
   class(DATETIME_T)                  :: this
   integer (c_int), intent(in)   :: newmonth
 
-  this%iMonth = newmonth
+  this%iMonth = int(newmonth, c_short)
   call this%calcJulianDay()
 
 end subroutine date_set_month_sub
@@ -1320,7 +1319,7 @@ subroutine date_advance_to_last_day_of_month_sub(this)
   this%iDay = 1_c_int
 
   if (this%iMonth < 12) then
-    this%iMonth = this%iMonth + 1
+    this%iMonth = int(this%iMonth + 1, c_short)
   else
     this%iMonth = 1
     this%iYear = this%iYear + 1
@@ -1386,43 +1385,7 @@ function is_leap_year_fn(this)   result(lIsLeapYear)
 
 end function is_leap_year_fn
 
-!------------------------------------------------------------------------------
 
-function mmddyyyy2julian(sMMDDYYYY)  result(iJD)
-
-  character (len=*) :: sMMDDYYYY
-  integer (c_int) :: iJD
-
-  ! [ LOCALS ]
-  integer (c_int) :: iMonth
-  integer (c_int) :: iDay
-  integer (c_int) :: iYear
-  character (len=256) :: sItem, sBuf
-  integer (c_int) :: iStat
-
-  sItem = sMMDDYYYY
-
-  ! parse month value
-  call chomp(sItem, sBuf, "/-")
-  read(sBuf,*,iostat = iStat) iMonth
-  call Assert(iStat==0, "Problem reading month value from string "//TRIM(sMMDDYYYY), &
-    __FILE__,__LINE__)
-
-  ! parse day value
-  call chomp(sItem, sBuf, "/-")
-  read(sBuf,*,iostat=iStat) iDay
-  call Assert(iStat==0, "Problem reading day value from string "//TRIM(sMMDDYYYY), &
-    __FILE__,__LINE__)
-
-  ! parse year value
-  call chomp(sItem, sBuf, "/-")
-  read(sBuf,*,iostat=iStat) iYear
-  call Assert(iStat==0, "Problem reading year value from string "//TRIM(sMMDDYYYY), &
-    __FILE__,__LINE__)
-
-  iJD = julian_day ( iYear, iMonth, iDay)
-
-end function mmddyyyy2julian
 
 !------------------------------------------------------------------------------
 
@@ -1436,7 +1399,6 @@ function mmdd2doy(sMMDD, sInputItemName )  result(iDOY)
   ! [ LOCALS ]
   integer (c_int) :: iMonth
   integer (c_int) :: iDay
-  integer (c_int) :: iYear
   character (len=256) :: sItem, sBuf
   integer (c_int) :: iStat
   integer (c_int) :: iJD
@@ -1477,46 +1439,7 @@ end function mmdd2doy
 
 !------------------------------------------------------------------------------
 
-function mmddyyyy2doy(sMMDDYYYY)  result(iDOY)
 
-  character (len=*) :: sMMDDYYYY
-  integer (c_int) :: iDOY
-
-  ! [ LOCALS ]
-  integer (c_int) :: iMonth
-  integer (c_int) :: iDay
-  integer (c_int) :: iYear
-  character (len=256) :: sItem, sBuf
-  integer (c_int) :: iStat
-  integer (c_int) :: iJD
-  integer (c_int) :: iStartingJD
-
-  sItem = sMMDDYYYY
-
-  ! parse month value
-  call chomp(sItem, sBuf, "/-")
-  read(sBuf,*,iostat = iStat) iMonth
-  call assert(iStat==0, "Problem reading month value from string "//TRIM(sMMDDYYYY), &
-    __FILE__,__LINE__)
-
-  ! parse day value
-  call chomp(sItem, sBuf, "/-")
-  read(sBuf,*,iostat=iStat) iDay
-  call assert(iStat==0, "Problem reading day value from string "//TRIM(sMMDDYYYY), &
-    __FILE__,__LINE__)
-
-  ! parse year value
-  call chomp(sItem, sBuf, "/-")
-  read(sBuf,*,iostat=iStat) iYear
-  call assert(iStat==0, "Problem reading year value from string "//TRIM(sMMDDYYYY), &
-    __FILE__,__LINE__)
-
-  iStartingJD = julian_day ( iYear, 1, 1)
-  iJD = julian_day ( iYear, iMonth, iDay)
-
-  iDOY = iJD - iStartingJD + 1
-
-end function mmddyyyy2doy
 
 !--------------------------------------------------------------------------
 
@@ -1536,7 +1459,7 @@ function day_of_year(iJD) result(iDOY)
   integer (c_int), value :: iJD
 
   ! [ LOCALS ]
-  integer (c_int) :: iFirstDay, iLastDay, iDOY
+  integer (c_int) :: iFirstDay, iDOY
   integer (c_int) :: iMonth, iDay, iYear
 
 

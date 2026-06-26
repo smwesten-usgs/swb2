@@ -37,28 +37,28 @@ contains
     ! open water cell
     if ( soil_storage_max < NEAR_ZERO ) then
 
-      actual_et_soil = min( reference_et0, infiltration )
+      actual_et_soil = min( reference_et0, real(infiltration, c_double) )
       net_infiltration = 0.0_c_float
       ! **** infiltration term includes the previously calculated runoff; add this back in
       !      before adjusting the runoff value
-      runoff = max( 0.0_c_float, infiltration + runoff - actual_et_soil )
+      runoff = real(max( 0.0_c_double, real(infiltration, c_double) + runoff - actual_et_soil ), c_float)
       soil_storage = 0.0_c_float
       delta_soil_storage = 0.0_c_float
 
     ! new soil storage value exceeds soil_storage_max; net infiltration event
     elseif ( new_soil_storage > soil_storage_max ) then
 
-      net_infiltration    = new_soil_storage - soil_storage_max
+      net_infiltration    = real(new_soil_storage - soil_storage_max, c_float)
 
       ! should represent a positive change in storage
-      delta_soil_storage  = soil_storage_max - soil_storage
+      delta_soil_storage  = real(soil_storage_max - soil_storage, c_float)
 !      actual_et_soil      = max( 0.0_c_float, soil_storage + infiltration - net_infiltration )
       soil_storage        = soil_storage_max
 
     else
 
       ! could be positive or negative
-      delta_soil_storage  = new_soil_storage - soil_storage
+      delta_soil_storage  = real(new_soil_storage - soil_storage, c_float)
       soil_storage = new_soil_storage
       net_infiltration = 0.0_c_float
 

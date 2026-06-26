@@ -105,13 +105,8 @@ module precipitation__method_of_fragments
     integer (c_int) :: sim_selected_set
   end type FRAGMENTS_SEQUENCE_T
 
-  !> Pointer to all or some of the FRAGMENTS_SEQUENCE array
-  type ( FRAGMENTS_SEQUENCE_T ), pointer :: pFRAGMENTS_SEQUENCE
-
   !> Array of fragment sequence sets
   type (FRAGMENTS_SEQUENCE_T), allocatable, public  :: FRAGMENTS_SEQUENCE(:)
-
-  type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR
 
   integer (c_int) :: LU_FRAGMENTS_ECHO
 
@@ -228,8 +223,9 @@ contains
     integer (c_int)  :: last_month
     integer (c_int)  :: iNumLines
     real (c_float)   :: fTempValue
-    type (ASCII_FILE_T)   :: FRAGMENTS_FILE
+    type (ASCII_FILE_T), allocatable :: FRAGMENTS_FILE
 
+    allocate(FRAGMENTS_FILE)
 
     call FRAGMENTS_FILE%open( sFilename = sFilename,         &
                               sCommentChars = "#%!",         &
@@ -367,7 +363,6 @@ contains
     integer (c_int)   :: iIndex
     integer (c_int)   :: iRainGageZone
     integer (c_int)   :: iPreviousRainGageZone
-    integer (c_int)   :: iFragmentChunk
     integer (c_int)   :: iMonth
     integer (c_int)   :: iPreviousMonth
     character (len=10)     :: sBuf0
@@ -481,7 +476,7 @@ contains
     integer (c_int)  :: iCount
     integer (c_int)  :: iIndex
     integer (c_int)  :: iNumLines
-    type (ASCII_FILE_T)   :: SEQUENCE_FILE
+    type (ASCII_FILE_T), allocatable :: SEQUENCE_FILE
     character (len=10)     :: sBuf0
     character (len=10)     :: sBuf1
     character (len=12)     :: sBuf2
@@ -493,6 +488,7 @@ contains
     integer (c_int)   :: max_rain_gage_number
     integer (c_int)   :: max_simulation_number
 
+    allocate(SEQUENCE_FILE)
 
     call SEQUENCE_FILE%open( sFilename = sFilename,         &
                              sCommentChars = "#%!",         &
@@ -661,10 +657,8 @@ contains
     integer (c_int)  :: iStartRecord
     integer (c_int) :: iEndRecord
     integer (c_int) :: iTargetRecord
-    integer (c_int) :: iStat
     integer (c_int) :: iUBOUND_FRAGMENTS
     integer (c_int) :: iUBOUND_CURRENT_FRAGMENTS
-    character (len=512)  :: sBuf
 
 
     iMaxRainZones = maxval(FRAGMENTS%iRainGageZone)
@@ -832,9 +826,6 @@ contains
     logical (c_bool), intent(in)     :: lActive(:,:)
 
     ! [ LOCALS ]
-    integer (c_int)              :: iIndex
-    integer (c_int)              :: iMaxRainZones
-    integer (c_int)              :: iStat
     logical (c_bool), save       :: lFirstCall = TRUE
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR

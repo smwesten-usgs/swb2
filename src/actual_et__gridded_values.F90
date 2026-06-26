@@ -40,8 +40,6 @@ contains
 
     ! [ LOCALS ]
     integer (c_int)                 :: iStat
-    type (FSTRING_LIST_T)                 :: slString
-    integer (c_int)                 :: iIndex
 
     ! locate the data structure associated with the gridded actual_et entries
     pAET_GRID => DAT%find("ACTUAL_ET")

@@ -109,24 +109,6 @@ contains
 
   end subroutine runoff_curve_number_initialize
 
-!--------------------------------------------------------------------------------------------------
-
-  elemental function return_landuse_index_fn(iLanduseCode)      result(iLanduseIndex)
-
-    integer (c_int), intent(in)         :: iLanduseCode
-    integer (c_int)                     :: iLanduseIndex
-
-    iLanduseIndex = 0
-
-    do while (iLanduseIndex < ubound( iLanduseCodes, 1) )
-
-      iLanduseIndex = iLanduseIndex + 1
-
-      if (iLanduseCode == iLanduseCodes(iLanduseIndex) ) exit
-
-    end do
-
-  end function return_landuse_index_fn
 
 !--------------------------------------------------------------------------------------------------
 
@@ -190,7 +172,6 @@ contains
 
   ! [ LOCALS ]
   real (c_float) :: Pf
-  real (c_float) :: frac
   real (c_float) :: fInflow
 
   fInflow = PREV_5_DAYS_RAIN( cell_index, FIVE_DAY_SUM )
@@ -333,7 +314,6 @@ contains
     ! [ LOCALS ]
 !    real (c_float) :: CN_05
     real (c_float) :: Smax
-    real (c_float) :: CN_adj
 
     curve_num_adj = update_curve_number_fn( landuse_index, soil_group,                        &
                                             cell_index,                                       &

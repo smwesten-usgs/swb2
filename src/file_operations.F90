@@ -265,7 +265,6 @@ contains
 
     class (ASCII_FILE_T) :: this
 
-    integer (c_int)      :: iStat
 
     close(unit=this%iUnitNum, iostat=this%iStat)
     
@@ -279,7 +278,7 @@ contains
 
     class (ASCII_FILE_T)              :: this
     character (len=*), intent(in)    :: sFilename
-    logical(c_bool)             :: lExists
+    logical             :: lExists
 
     inquire(file=fully_qualified_filename( sFilename ), exist=lExists)
 
@@ -287,9 +286,9 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function is_file_open_fn(this) result(lIsOpen)
+  pure function is_file_open_fn(this) result(lIsOpen)
 
-    class (ASCII_FILE_T) :: this
+    class (ASCII_FILE_T), intent(in) :: this
     logical(c_bool) :: lIsOpen
 
     lIsOpen = this%lIsOpen
@@ -306,7 +305,6 @@ contains
     integer (c_int) :: iStat
     integer (c_int) :: iNumLines
     integer (c_int) :: iNumRecords
-    integer (c_int) :: iIndex
 
     iNumLines = 0
     iNumRecords = 0
@@ -345,10 +343,8 @@ contains
     type (FSTRING_LIST_T) :: stList
 
     ! [ LOCALS ]
-    character (len=MAX_STR_LEN)           :: sString
     character (len=MAX_STR_LEN)           :: sSubString
     character (len=MAX_STR_LEN)           :: sSubStringClean
-    integer (c_int)                       :: iStat
 
     this%sBuf = this%readline()
     call stList%clear()

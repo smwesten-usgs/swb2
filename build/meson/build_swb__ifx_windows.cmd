@@ -32,7 +32,7 @@ set CXX=icx
 rmdir /S /Q builddir
 mkdir builddir
 :: meson setup builddir -Dnetcdf_root="%LATEST_NETCDF%" ..\.. && cd builddir && meson compile --verbose
-meson setup builddir -Dnetcdf_root="%LATEST_NETCDF%" "..\.." 
+meson setup builddir -Db_vscrt=mt -Dnetcdf_root="%LATEST_NETCDF%" "..\.." 
 
 :: custom C++ solution to fix meson's broken linker identification...
 fix_linker__ifx_windows.exe

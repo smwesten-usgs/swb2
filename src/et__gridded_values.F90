@@ -32,9 +32,6 @@ contains
     logical (c_bool), intent(in)     :: lActive(:,:)
 
     ! [ LOCALS ]
-    integer (c_int)                 :: iStat
-    type (FSTRING_LIST_T)                 :: slString
-    integer (c_int)                 :: iIndex
 
 
     ! locate the data structure associated with the gridded rainfall zone entries

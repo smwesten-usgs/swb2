@@ -1,8 +1,7 @@
 program swbstats2
 
   use iso_c_binding
-  use constants_and_conversions, only : TRUE, FALSE, DATATYPE_INT,             &
-                                        DATATYPE_FLOAT, BNDS, asFloat,         &
+  use constants_and_conversions, only : TRUE, FALSE, asFloat,                  &
                                         OS_NATIVE_PATH_DELIMITER
   use exceptions, only                : assert, die
   use datetime, only                  : DATETIME_T, assignment(=), operator(>)
@@ -27,8 +26,6 @@ program swbstats2
   character (len=70), allocatable :: usage_string(:)
 
   integer (c_int)                :: iNumArgs
-  character (len=1024)           :: sCompilerFlags
-  character (len=256)            :: sCompilerVersion
   character (len=256)            :: sVersionString
   character (len=256)            :: sGitHashString
   character (len=256)            :: sProgramName
@@ -39,13 +36,10 @@ program swbstats2
   integer (c_int)                :: iCount
   integer (c_int)                :: iIndex
   integer (c_int), allocatable   ::iIndex_array(:)
-  integer (c_int)                :: iLen
   real (c_double)                :: start_date_dbl
   real (c_double)                :: end_date_dbl
-  integer (c_int)                :: TIME_BNDS_VARID
   integer (c_int)                :: month_index
 
-  logical (c_bool)               :: netcdf_active = FALSE
 
   type (FSTRING_LIST_T)           :: name_list
   type (FSTRING_LIST_T)           :: value_list
@@ -533,18 +527,6 @@ program swbstats2
   !     netCDF start and end period; or
   !  c) time periods bracketing complete calendar years within the start and
   !     end dates contained within the netCDF file to be munged.
-
-
-! .o8                             o8o                                                o8o                   oooo                                 
-!"888                             `"'                                                `"'                   `888                                 
-! 888oooo.   .ooooo.   .oooooooo oooo  ooo. .oo.        ooo. .oo.  .oo.    .oooo.   oooo  ooo. .oo.         888   .ooooo.   .ooooo.  oo.ooooo.  
-! d88' `88b d88' `88b 888' `88b  `888  `888P"Y88b       `888P"Y88bP"Y88b  `P  )88b  `888  `888P"Y88b        888  d88' `88b d88' `88b  888' `88b 
-! 888   888 888ooo888 888   888   888   888   888        888   888   888   .oP"888   888   888   888        888  888   888 888   888  888   888 
-! 888   888 888    .o `88bod8P'   888   888   888        888   888   888  d8(  888   888   888   888        888  888   888 888   888  888   888 
-! `Y8bod8P' `Y8bod8P' `8oooooo.  o888o o888o o888o      o888o o888o o888o `Y888""8o o888o o888o o888o      o888o `Y8bod8P' `Y8bod8P'  888bod8P' 
-!                     d"     YD                                                                                                       888       
-!                     "Y88888P'                                                                                                      o888o      
-
 
 ! One potential use case: several hundred lines that look like the entry below.
 ! Need to ensure that all resources are deallocated promptly to avoid memory leak

@@ -28,12 +28,16 @@ program tests
   ! test_datetime.F90:
   call run_test_case(test_datetime_basic_dateparse,"datetime: parse with default mm/dd/yyyy date format")
   call run_test_case(test_datetime_illegal_values,"datetime: parse with non-existant day value")
-  call run_test_case(test_datetime_basic_mangled_dateparse,"datetime: parse with default mm/dd/yyyy date format, missing '0' values in month and day")
+  call run_test_case(test_datetime_basic_mangled_dateparse,      &
+    "datetime: parse with default mm/dd/yyyy date format, "     &
+    //"missing '0' values in month and day")
   call run_test_case(test_datetime_custom_dateparse,"datetime: parse with custom yyyy-mm-dd date format")
   call run_test_case(test_datetime_addition_day,"datetime: add 5 to Julian day and return the correct Gregorian date")
   call run_test_case(test_datetime_julian_date_illegal_month,"datetime: supply illegal month value to Julian Date routine")
   call run_test_case(test_datetime_julian_date_illegal_day,"datetime: supply illegal day value to Julian Date routine")
-  call run_test_case(test_datetime_julian_date_illegal_month_day,"datetime: supply illegal month and day value to Julian Date routine")
+  call run_test_case(test_datetime_julian_date_illegal_month_day,&
+    "datetime: supply illegal month and day value "              &
+    //"to Julian Date routine")
   call run_test_case(test_count_leap_days_between_dates,"test_count_leap_days_between_dates")
   call run_test_case(test_datetime_basic_addition,"datetime: add known quantity to datetime object")
 

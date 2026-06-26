@@ -33,7 +33,7 @@ contains
 
       if ( ( ( tmin + tmax ) / 2.0_c_double ) > FREEZING_F ) then
 
-        potential_snowmelt = MELT_INDEX * ( tmax - FREEZING_F ) * DEGC_PER_DEGF / MM_PER_INCH
+        potential_snowmelt = real(MELT_INDEX * ( tmax - FREEZING_F ) * DEGC_PER_DEGF / MM_PER_INCH, c_float)
 
       else 
 
@@ -47,7 +47,7 @@ contains
 
       if ( ( ( tmin + tmax ) / 2.0_c_double ) > FREEZING_C ) then
 
-        potential_snowmelt = MELT_INDEX * tmax 
+        potential_snowmelt = real(MELT_INDEX * tmax, c_float)
 
       else 
 

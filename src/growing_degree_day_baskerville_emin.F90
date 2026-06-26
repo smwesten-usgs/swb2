@@ -19,7 +19,6 @@ module growing_degree_day_baskerville_emin
   real (c_float), allocatable  :: GDD_BASE(:)
   real (c_float), allocatable  :: GDD_MAX(:)
   integer (c_int), allocatable :: GDD_RESET_DATE(:)
-  type (T_NETCDF4_FILE), pointer    :: pNCFILE
 
 contains
 
@@ -146,7 +145,6 @@ contains
     integer (c_int), intent(in)         :: order(:)
 
     ! [ LOCALS ]
-    real (c_float)    :: delta
     real (c_float)    :: tmax_l
     real (c_float)    :: dd
     real (c_float)    :: W
@@ -179,8 +177,8 @@ contains
 
         A = asin( At )
 
-        dd = ( ( W * cos( A ) ) - ( ( GDD_BASE( order(indx) ) - tmean(indx) )                    &
-               * ( real( PI / 2._c_double, c_float ) - A ) ) ) / PI
+        dd = real(( ( W * cos( A ) ) - ( ( GDD_BASE( order(indx) ) - tmean(indx) )                    &
+               * ( real( PI / 2._c_double, c_float ) - A ) ) ) / PI, c_float)
 
       endif
 

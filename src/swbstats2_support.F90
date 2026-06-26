@@ -340,7 +340,7 @@ contains
     mean_val = 0.0; mean_val_comp = 0.0
     max_val = 0.0; max_val_comp = 0.0
     min_val = 0.0; min_val_comp = 0.0
-    sum_val = 0.0; sum_val = 0.0
+    sum_val = 0.0; sum_val_comp = 0.0
     n_val = 0.0; n_val_comp = 0.0
 
     n_val = count( zone_ids==target_id .and. values > NC_FILL_FLOAT )
@@ -413,7 +413,7 @@ contains
     mean_val = 0.0; mean_val_comp = 0.0
     max_val = 0.0; max_val_comp = 0.0
     min_val = 0.0; min_val_comp = 0.0
-    sum_val = 0.0; sum_val = 0.0
+    sum_val = 0.0; sum_val_comp = 0.0
     n_val = 0.0; n_val_comp = 0.0
 
     n_val = count( zone_ids==target_id .and. zone2_ids==target2_id             &
@@ -610,8 +610,6 @@ contains
     character (len=*), intent(inout)   :: grid_filename
 
     ! [ LOCALS ]
-    integer (c_int)                 :: iIndex
-    integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
     character (len=:), allocatable       :: OUTPUT_FILESname_str
     character (len=256), save            :: previous_zone_filename
@@ -665,8 +663,6 @@ contains
     character (len=*), intent(inout)   :: grid_filename
 
     ! [ LOCALS ]
-    integer (c_int)                 :: iIndex
-    integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
     character (len=:), allocatable       :: OUTPUT_FILESname_str
     character (len=256), save            :: previous_zone_filename
@@ -715,7 +711,6 @@ contains
     character (len=*), intent(inout)   :: grid_filename
 
     ! [ LOCALS ]
-    integer (c_int)                 :: iIndex
     integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
     character (len=:), allocatable       :: OUTPUT_FILESname_str
@@ -1138,7 +1133,9 @@ contains
 !          ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ", minval(grd_new,  mask=grd_new > NC_FILL_FLOAT), &
 !          !     maxval(grd_new,  mask=grd_new > NC_FILL_FLOAT)
 !          !
-!          ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ", minval(this%grd_native%dpData,  mask=this%grd_native%dpData > NC_FILL_FLOAT), &
+!          ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ",           &
+!          !   minval(this%grd_native%dpData,                        &
+!          !     mask=this%grd_native%dpData > NC_FILL_FLOAT),       &
 !          !     maxval(this%grd_native%dpData,  mask=this%grd_native%dpData > NC_FILL_FLOAT)
 
 !         call SIM_DT%addDay
@@ -1371,10 +1368,10 @@ contains
     type (FSTRING_LIST_T), intent(out)  :: end_date_list
 
     ! [ LOCALS ]
-    integer (c_int)           :: iFileIndex, iColIndex
-    integer (c_int)           :: iStat
-    type (ASCII_FILE_T)            :: DF
+    type (ASCII_FILE_T), allocatable :: DF
     character (len=256)            :: sRecord, sItem
+
+    allocate(DF)
 
    ! open the file associated with current file index value
     call DF%open(sFilename = csv_filename,                               &
@@ -1425,10 +1422,10 @@ contains
     type (FSTRING_LIST_T), intent(out)  :: comparison_grid_file_list
 
     ! [ LOCALS ]
-    integer (c_int)           :: iFileIndex, iColIndex
-    integer (c_int)           :: iStat
-    type (ASCII_FILE_T)            :: DF
+    type (ASCII_FILE_T), allocatable :: DF
     character (len=256)            :: sRecord, sItem
+
+    allocate(DF)
 
    ! open the file associated with current file index value
     call DF%open(sFilename = csv_filename,                               &
@@ -1482,10 +1479,10 @@ contains
     type (FSTRING_LIST_T), intent(out)  :: zonal_stats_grid_file_list
 
     ! [ LOCALS ]
-    integer (c_int)           :: iFileIndex, iColIndex
-    integer (c_int)           :: iStat
-    type (ASCII_FILE_T)            :: DF
+    type (ASCII_FILE_T), allocatable :: DF
     character (len=256)            :: sRecord, sItem
+
+    allocate(DF)
 
    ! open the file associated with current file index value
     call DF%open(sFilename = csv_filename,                               &
@@ -1553,7 +1550,6 @@ contains
     integer (c_int)                :: i, j
     integer (c_int), allocatable   :: zone_values(:)
     integer (c_int), allocatable   :: zone2_values(:)
-    integer (c_int)                :: number_of_matches
     real (c_double), allocatable   :: stats(:)
     integer (c_int)                :: funit_l
     character (len=:), allocatable :: delimiter_
@@ -1740,7 +1736,6 @@ contains
 
     ! [ LOCALS ]
     integer (c_int)              :: stat_indx
-    integer (c_int)              :: status
     type (T_NETCDF4_FILE), pointer    :: ncfile_out
 
     do stat_indx=STATS_MEAN, STATS_VARIANCE

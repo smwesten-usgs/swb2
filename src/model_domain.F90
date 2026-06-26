@@ -432,7 +432,6 @@ contains
     ! [ LOCALS ]
     integer (c_int)  :: iCount
     integer (c_int)  :: iIndex
-    integer (c_int)  :: indx
     integer (c_int)  :: iStat(72)
 
     iCount = count( this%active )
@@ -872,7 +871,6 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
     integer (c_int)                 :: iIndex2
     integer (c_int)                 :: iCount
-    integer (c_int)                 :: iStat
     logical (c_bool)                :: lMatch
     type (FSTRING_LIST_T)                 :: slList
 
@@ -1112,7 +1110,6 @@ contains
     logical (c_bool)             :: row_col_num_are_valid
     logical (c_bool)             :: coordinates_are_valid
     logical (c_bool)             :: indices_are_valid
-    integer (c_int)              :: n
 
     Method_Name = argv_list%get(1)
 
@@ -1629,8 +1626,8 @@ contains
             DUMP( indx )%row = row
             DUMP( indx )%indx_start = indx_start
             DUMP( indx )%indx_end   = indx_end
-            DUMP( indx )%x_coord = xcoord
-            DUMP( indx )%y_coord = ycoord
+            DUMP( indx )%x_coord = real(xcoord, c_float)
+            DUMP( indx )%y_coord = real(ycoord, c_float)
 
             if ( row_col_num_are_valid ) then
               call LOGS%WRITE( "==> SWB will dump variables for cell ("//asCharacter(col)//","     &
@@ -1824,7 +1821,6 @@ contains
     ! [ LOCALS ]
     integer (c_int) :: target_index
     integer (c_int) :: cell_index
-    real (c_float)  :: msb
 
     integer (c_int) :: cell_row, cell_col, targ_row, targ_col
 
@@ -2137,7 +2133,6 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)          :: this
     integer (c_int), intent(in)               :: cell_index
 
-    integer (c_int)  :: indx
 
     !> @TODO: Should interception term be part of this? Initial abstraction should include
     !!        some of this interception...
@@ -2243,8 +2238,6 @@ contains
     integer (c_int), allocatable :: iRZ_SeqNums(:)
     real (c_float), allocatable  :: RZ(:)
     character (len=:), allocatable    :: sText
-    real (c_float), allocatable  :: water_capacity(:)
-    integer (c_int)              :: iIndex
     type (GENERAL_GRID_T), pointer    :: pRooting_Depth
     real (c_float), allocatable  :: fMax_Rooting_Depth(:,:)
     character (len=10)                :: date_str
@@ -2388,7 +2381,6 @@ contains
 
     ! [ LOCALS ]
     type ( GENERAL_GRID_T ), pointer :: pTempGrd
-    integer (c_int)             :: iStat
     type (DATA_CATALOG_ENTRY_T), pointer :: pSOIL_STORAGE_MAX_GRID
 
     pSOIL_STORAGE_MAX_GRID => null()
@@ -2488,7 +2480,6 @@ contains
     integer (c_int), intent(in)           :: indx
 
     ! [ LOCALS ]
-    integer (c_int)               :: index
 
     ! if ( present(indx) ) then
 
@@ -3108,7 +3099,7 @@ contains
 
 !    this%actual_et(indx) = ACTUAL_ET(indx)
     this%actual_et_soil(indx) = max(ACTUAL_ET(indx) - this%actual_et_interception(indx)                &
-                                                      * this%canopy_cover_fraction(indx), 0.0_c_float)
+                                                      * this%canopy_cover_fraction(indx), 0.0_c_double)
 
   end subroutine model_calculate_actual_et_gridded_values
 
@@ -3223,7 +3214,7 @@ contains
               soil_storage=this%soil_storage( indx ),                                           &
               soil_storage_max=this%soil_storage_max( indx ),                                   &
               reference_et0=max(this%reference_et0( indx )                                      &
-                                - this%actual_et_interception( indx ), 0.0),                    &
+                                - this%actual_et_interception( indx ), 0.0_c_double),                    &
               infiltration=this%infiltration( indx ) )
 
   end subroutine model_calculate_actual_et_fao56__two_stage
@@ -3456,8 +3447,8 @@ contains
 
     do indx=1,ubound(this%number_of_days_since_planting,1)
 
-      this%number_of_days_since_planting(indx) = SIM_DT%curr                   &
-              - GROWTH_STAGE_DATE( PLANTING_DATE, this%landuse_index(indx) )
+      this%number_of_days_since_planting(indx) = int(SIM_DT%curr                   &
+              - GROWTH_STAGE_DATE( PLANTING_DATE, this%landuse_index(indx) ), c_int)
     enddo
 
 
@@ -3562,7 +3553,7 @@ contains
   integer (c_int), intent(in)                    :: cell_index
 
   if (this%reference_et0(cell_index) > this%actual_et(cell_index)) then
-    this%climatic_deficit(cell_index) = this%reference_et0(cell_index) - this%actual_et(cell_index)
+    this%climatic_deficit(cell_index) = real(this%reference_et0(cell_index) - this%actual_et(cell_index), c_float)
   else
     this%climatic_deficit(cell_index) = 0.0_c_float
   endif
@@ -3737,8 +3728,6 @@ end subroutine model_calculate_climatic_water_deficit
 
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: pPRCP
-    integer (c_int) :: targetindex
-    integer (c_int) :: indexval
 
     ! in this usage, it is assumed that the precipitation grids that are being read in represent
     ! MONTHLY sum of precipitation
@@ -3795,7 +3784,6 @@ end subroutine model_calculate_climatic_water_deficit
     logical, dimension(:), optional    :: active_cells
 
     ! [ LOCALS ]
-    integer (c_int) :: iCount
     character (len=20)   :: sVarname
     character (len=14)   :: sMin
     character (len=14)   :: sMax
@@ -3848,7 +3836,6 @@ end subroutine model_calculate_climatic_water_deficit
     logical, dimension(:), optional     :: active_cells
 
     ! [ LOCALS ]
-    integer (c_int) :: iCount
     character (len=20)   :: sVarname
     character (len=14)   :: sMin
     character (len=14)   :: sMax

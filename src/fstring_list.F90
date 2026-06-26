@@ -300,7 +300,6 @@ end subroutine append_fstring_to_fstring_sub
 
     class (FSTRING_LIST_T), intent(inout), target   :: this
 
-    character (len=:), allocatable :: sbuf
     integer (c_int)                :: start_pos
     integer (c_int)                :: end_pos
     integer (c_int)                :: str_len
@@ -320,16 +319,6 @@ end subroutine append_fstring_to_fstring_sub
     end do
 
   end subroutine print_all_entries_sub
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine list_finalize_sub(this)
-
-    type (FSTRING_LIST_T), intent(inout)          :: this
-
-    call this%clear()
-
-  end subroutine list_finalize_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -450,7 +439,6 @@ function retrieve_values_as_logical_fn(this)   result(values)
   logical (c_bool), allocatable             :: values(:)
 
   integer (c_int)    :: i
-  logical (c_bool)   :: value
   integer (c_int)    :: op_status
   character (len=64) :: sbuf
 
@@ -474,7 +462,7 @@ end function retrieve_values_as_logical_fn
 
 !--------------------------------------------------------------------------------------------------
 
-  function retrieve_value_from_list_at_index_fn(this, index_val)   result(text)
+  pure function retrieve_value_from_list_at_index_fn(this, index_val)   result(text)
 
     class (FSTRING_LIST_T), intent(in)        :: this
     integer (c_int), intent(in)               :: index_val
@@ -909,9 +897,9 @@ end function retrieve_values_as_logical_fn
 
 !--------------------------------------------------------------------------------------------------
 
-  function return_count_of_matching_strings_fn(this, substr, match_case)    result(count)
+  pure function return_count_of_matching_strings_fn(this, substr, match_case)    result(count)
 
-    class (FSTRING_LIST_T), intent(inout)       :: this
+    class (FSTRING_LIST_T), intent(in)          :: this
     character (len=*), intent(in)               :: substr
 
     logical (c_bool), intent(in), optional  :: match_case
@@ -919,7 +907,6 @@ end function retrieve_values_as_logical_fn
 
     ! [ LOCALS ]
     integer (c_int)  :: i
-    integer (c_int)  :: status
     logical (c_bool) :: match_case_
 
     if ( present( match_case ) ) then

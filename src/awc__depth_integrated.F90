@@ -65,7 +65,6 @@ contains
     integer (c_int)               :: iIndex, iIndex2
     integer (c_int)               :: iIndex_x, iIndex_y
     real (c_float)                :: fRooting_Depth_inches
-    real (c_float)                :: fSoil_Thickness_Total
 
    call slList%append("LU_Code")
    call slList%append("Landuse_Code")

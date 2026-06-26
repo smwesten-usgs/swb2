@@ -47,11 +47,7 @@ contains
     logical (c_bool)             :: lAreLengthsEqual
     character (len=:), allocatable    :: sTemp
     type (FSTRING_LIST_T)              :: sl_temp_list
-    type (FSTRING_LIST_T)              :: sl_growing_season_begin
-    type (FSTRING_LIST_T)              :: sl_growing_season_end
-    character (len=32)                :: str_buffer
     real (c_float), allocatable  :: temp_values(:)
-    integer (c_int)              :: indx
     integer (c_int)              :: status
 
     !> Determine how many landuse codes are present

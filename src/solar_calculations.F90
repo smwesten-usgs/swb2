@@ -528,7 +528,7 @@ contains
       "Internal programming error: solar zenith angle must be in radians and in the range 0 to pi/2", &
       __FILE__, __LINE__)
 
-    dAlpha = HALFPI - dAlpha
+    dAlpha = HALFPI - dTheta_z
 
   end function solar_altitude__alpha
 

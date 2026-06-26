@@ -96,9 +96,11 @@ module et__zone_values
     integer (c_int)    :: iIndex
     integer (c_int)    :: iNumLines
     integer (c_int)    :: iNumFields
-    type (ASCII_FILE_T)     :: ET_RATIO_FILE
+    type (ASCII_FILE_T), allocatable :: ET_RATIO_FILE
 
     integer (c_int), parameter :: ET_ZONE_FIELD = 1
+
+    allocate(ET_RATIO_FILE)
 
     call ET_RATIO_FILE%open( sFilename = sFilename, &
                   sCommentChars = "#%!", &
@@ -167,7 +169,6 @@ module et__zone_values
     integer (c_int)  :: iLineNum
     integer (c_int)  :: iFieldNum
     integer (c_int)  :: iET_zone_id
-    real (c_float)   :: fFactor
     integer (c_int)  :: iCount
 
     ET_RATIOS = 0.0_c_float
@@ -186,7 +187,7 @@ module et__zone_values
 
         do iLineNum = lbound(ET_TABLE_VALUES, 1), ubound(ET_TABLE_VALUES, 1)
 
-          iET_zone_id = ET_TABLE_VALUES(iLineNum, 1)
+          iET_zone_id = int(ET_TABLE_VALUES(iLineNum, 1), c_int)
           iCount = iCount + count( ET_ZONE == iFieldNum )
 
           where ( ET_ZONE == iET_zone_id )

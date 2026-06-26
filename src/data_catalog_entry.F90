@@ -498,7 +498,6 @@ subroutine initialize_netcdf_data_object_sub( this, &
    character (len=*), intent(in), optional    :: sPROJ4_string
 
   ! [ LOCALS ]
-  type ( GENERAL_GRID_T ), pointer           :: pGrdBase
 
 
    if (present(sPROJ4_string) ) then
@@ -621,13 +620,13 @@ end subroutine initialize_netcdf_data_object_sub
 
 elemental subroutine apply_scale_and_offset_float(fResult, fValue, dUserScaleFactor, dUserSubOffset, dUserAddOffset )
 
-  real (c_float), intent(out)  :: fResult
+  real (c_float), intent(inout) :: fResult
   real (c_float), intent(in)   :: fValue
   real (c_double), intent(in)   :: dUserScaleFactor
   real (c_double), intent(in)   :: dUserSubOffset
   real (c_double), intent(in)   :: dUserAddOffset
 
-  fResult = ( (fValue - dUserSubOffset) * dUserScaleFactor ) + dUserAddOffset
+  fResult = real(( (fValue - dUserSubOffset) * dUserScaleFactor ) + dUserAddOffset, c_float)
 
 end subroutine apply_scale_and_offset_float
 
@@ -635,13 +634,13 @@ end subroutine apply_scale_and_offset_float
 
 elemental subroutine apply_scale_and_offset_int(iResult, iValue, dUserScaleFactor, dUserSubOffset, dUserAddOffset )
 
-  integer (c_int), intent(out) :: iResult
+  integer (c_int), intent(inout) :: iResult
   integer (c_int), intent(in)  :: iValue
   real (c_double), intent(in)   :: dUserScaleFactor
   real (c_double), intent(in)   :: dUserSubOffset
   real (c_double), intent(in)   :: dUserAddOffset
 
-  iResult = ( ( real( iValue, c_float) - dUserSubOffset ) * dUserScaleFactor ) + dUserAddOffset
+  iResult = int(( ( real( iValue, c_float) - dUserSubOffset ) * dUserScaleFactor ) + dUserAddOffset, c_int)
 
 end subroutine apply_scale_and_offset_int
 
@@ -824,8 +823,8 @@ subroutine getvalues_constant_sub( this  )
 
     class (DATA_CATALOG_ENTRY_T)   :: this
     type (DATETIME_T), optional    :: dt
-    logical (c_bool) :: lExist
-    logical (c_bool) :: lOpened
+    logical :: lExist
+    logical :: lOpened
 
     this%lGridHasChanged = FALSE
 
@@ -1063,19 +1062,16 @@ end subroutine set_constant_value_real
     type (DATETIME_T), intent(in), optional :: dt
 
     ! [ LOCALS ]
-    character (len=256) :: sNewFilename
-    character (len=256) :: sUppercaseFilename
+    character (len=512) :: sNewFilename
     character (len=256) :: sCWD
     character (len=256) :: sBuf2
     integer (c_int) :: iPos_Y, iPos_D, iPos_M, iPos_0D, iPos_0M, iPos_B,  &
                             iPos_BF, iPos_j, iPos, iPos2, iLen, iCount
     integer (c_int) :: iNumZeros, iNumZerosToPrint
     logical (c_bool) :: lMatch
-    logical (c_bool) :: lExist
     character (len=16) :: sBuf
     character (len=12) :: sNumber
     character (len=1) :: sDelimiter
-    integer (c_int) :: iStatus
     logical (c_bool) :: lAnnual
 
     iPos_Y = 0; iPos_M = 0; iPos_D = 0; iPos = 0; iPos_B = 0; iPos_BF = 0; sNumber = ""
@@ -1287,7 +1283,7 @@ end subroutine set_constant_value_real
     type (DATETIME_T), intent(in) :: dt
 
     ! [ LOCALS ]
-    logical (c_bool) :: lExist
+    logical :: lExist
     integer (c_int)  :: iDaysLeftInMonth
     integer (c_int)  :: iPos
     logical (c_bool) :: lNeedToPadData
@@ -1364,8 +1360,6 @@ end subroutine set_constant_value_real
     type (DATETIME_T), intent(in)  :: dt
 
     ! [ LOCALS ]
-    integer (c_int) :: iTimeIndex
-    integer (c_int) :: iStat
     logical (c_bool) :: lDateTimeFound
     real (c_double) :: dAddOffset
     real (c_double) :: dScaleFactor
@@ -1611,7 +1605,7 @@ end subroutine set_constant_value_real
         dAddOffset = this%NCFILE%rAddOffset(NC_Z)
         dScaleFactor = this%NCFILE%rScaleFactor(NC_Z)
 
-        this%pGrdNative%rData = this%pGrdNative%rData * dScaleFactor + dAddOffset
+        this%pGrdNative%rData = real(this%pGrdNative%rData * dScaleFactor + dAddOffset, c_float)
 
         call this%handle_missing_values(this%pGrdNative%rData)
         call this%enforce_limits(this%pGrdNative%rData)
@@ -1645,40 +1639,6 @@ end subroutine set_constant_value_real
   end subroutine getvalues_dynamic_netcdf_sub
 
 
-  subroutine minmaxmean_float( variable , varname, nodata_value )
-
-    real (c_float), dimension(:,:)  :: variable
-    character (len=*), intent(in)        :: varname
-    real (c_float), intent(in)      :: nodata_value
-
-    ! [ LOCALS ]
-    integer (c_int) :: iCount
-    character (len=20)   :: sVarname
-    character (len=14)   :: sMin
-    character (len=14)   :: sMax
-    character (len=14)   :: sMean
-    character (len=10)   :: sCount
-
-    write (sVarname, fmt="(a20)") adjustl(varname)
-
-    if (size( variable, 1) > 0 ) then
-      write (sMin, fmt="(g14.3)")   minval(variable, variable < nodata_value )
-      write (sMax, fmt="(g14.3)")   maxval(variable, variable < nodata_value )
-      write (sMean, fmt="(g14.3)")  sum(variable, variable < nodata_value ) / count( variable < nodata_value )
-      write (sCount, fmt="(i10)") count( variable < nodata_value )
-    else
-      write (sMin, fmt="(g14.3)")   -9999.
-      write (sMax, fmt="(g14.3)")   -9999.
-      write (sMean, fmt="(g14.3)")  -9999.
-      write (sCount, fmt="(i10)")       0
-    endif
-
-
-    print *, adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
-       //" | "//adjustl(sMean)//" | "//adjustl(sCount)
-
-
-  end subroutine minmaxmean_float
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1687,7 +1647,6 @@ end subroutine set_constant_value_real
     class (DATA_CATALOG_ENTRY_T) :: this
 
     ! [ LOCALS ]
-    integer (c_int) :: iStat
     real (c_double) :: dAddOffset
     real (c_double) :: dScaleFactor
 
@@ -1811,7 +1770,7 @@ end subroutine set_constant_value_real
 
     dAddOffset = this%NCFILE%rAddOffset(NC_Z)
     dScaleFactor = this%NCFILE%rScaleFactor(NC_Z)
-    this%pGrdNative%rData = this%pGrdNative%rData * dScaleFactor + dAddOffset
+    this%pGrdNative%rData = real(this%pGrdNative%rData * dScaleFactor + dAddOffset, c_float)
 
     call this%handle_missing_values(this%pGrdNative%rData)
 
@@ -1872,6 +1831,8 @@ end subroutine set_constant_value_real
 
      class (DATA_CATALOG_ENTRY_T) :: this
      integer (c_int) :: iFileType
+
+     iFileType = -1
 
      if ( (this%sSourceFileType .strequal. "ARC_GRID") &
          .or. (this%sSourceFileType .strequal. "ARC_ASCII") ) then
@@ -2060,25 +2021,6 @@ end subroutine set_majority_filter_flag_sub
 
 !--------------------------------------------------------------------------------------------------
 
-subroutine set_missing_value_int_sub(this, iMissingVal)
-
-  class (DATA_CATALOG_ENTRY_T) :: this
-  integer (c_int)         :: iMissingVal
-
-  this%iMissingValuesCode = iMissingVal
-
-end subroutine set_missing_value_int_sub
-
-!--------------------------------------------------------------------------------------------------
-
-subroutine set_missing_value_real_sub(this, rMissingVal)
-
-  class (DATA_CATALOG_ENTRY_T) :: this
-  integer (c_int)         :: rMissingVal
-
-  this%rMissingValuesCode = rMissingVal
-
-end subroutine set_missing_value_real_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2144,7 +2086,6 @@ end subroutine set_maximum_allowable_value_real_sub
 
     ! [ LOCALS ]
     integer (c_int) :: iRetVal
-    real (c_float) :: rMultiplier = 0.
     real (c_double), dimension(4) :: rX, rY
 
     ! ensure that there is sufficient coverage on all sides of grid

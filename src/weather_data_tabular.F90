@@ -33,7 +33,6 @@ contains
     type (DATETIME_T)                  :: firstdate
     type (DATETIME_T)                  :: lastdate
     integer (c_int)                    :: error_count
-    integer (c_int)                    :: first_indx
 
 
     call PARAMS%get_parameters(sKey="PRCP", fValues=PRECIP)
