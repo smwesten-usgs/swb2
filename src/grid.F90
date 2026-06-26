@@ -1862,13 +1862,13 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
   ! Fix missing values
 
   do iRow=1,pGrd%iNY
-    if ( pGrd%rData(ia, iRow) == rNoData .and. pGrd%rData(ib, iRow) == rNoData ) then
+    if ( pGrd%rData(ia, iRow) <= rNoData .and. pGrd%rData(ib, iRow) <= rNoData ) then
       rCol(iRow) = rNoData
-    else if ( pGrd%rData(ib,iRow) == rNoData .and. u>0.9_c_float ) then
+    else if ( pGrd%rData(ib,iRow) <= rNoData .and. u>0.9_c_float ) then
       rCol(iRow) = pGrd%rData(ia,iRow)
-    else if ( pGrd%rData(ia,iRow) == rNoData .and. u<0.1_c_float ) then
+    else if ( pGrd%rData(ia,iRow) <= rNoData .and. u<0.1_c_float ) then
       rCol(iRow) = pGrd%rData(ib,iRow)
-    else if ( pGrd%rData(ia,iRow) == rNoData .or. pGrd%rData(ib,iRow) == rNoData ) then
+    else if ( pGrd%rData(ia,iRow) <= rNoData .or. pGrd%rData(ib,iRow) <= rNoData ) then
       rCol(iRow) = rNoData
     end if
   end do
@@ -1878,8 +1878,8 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
   rprev = rNoData
   rValue = rNoData
   do iRow=1,pGrd%iNY
-    if ( rCol(iRow) == rNoData ) then
-      if ( rprev == rNoData ) then
+    if ( rCol(iRow) <= rNoData ) then
+      if ( rprev <= rNoData ) then
         ! keep skipping missing values...
         continue
       else
@@ -1889,10 +1889,13 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
         exit
       endif
     else
-      if ( rprev == rNoData ) then
+      if ( rprev <= rNoData ) then
         rprev = rCol(iRow)
       else
-        if ( sign( 1.0_c_float ,rCol(iRow)-rZval) /= sign( 1.0_c_float ,rprev-rZval) ) then
+        ! Detect sign change: a negative product means rCol(iRow) and rprev
+        ! straddle rZval (one above, one below), indicating the target value
+        ! lies between these two consecutive table entries.
+        if ( (rCol(iRow) - rZval) * (rprev - rZval) < 0.0_c_float ) then
           ! Found it!
           frac = (rZval-rCol(iRow-1)) / (rCol(iRow)-rCol(iRow-1))
           ! Note: it's 'iRow-2' in the next expr to account for one-based indexing
