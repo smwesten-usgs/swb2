@@ -230,47 +230,5 @@ contains
 
   end subroutine perform_daily_calculation
 
-!--------------------------------------------------------------------------------------------------
-
-  subroutine minmaxmean( variable , varname, logical_vector )
-
-    real (c_float), dimension(:)           :: variable
-    character (len=*), intent(in)               :: varname
-    logical, intent(in), optional               :: logical_vector(:)
-
-    ! [ LOCALS ]
-    character (len=30)   :: sVarname
-    character (len=14)   :: sMin
-    character (len=14)   :: sMax
-    character (len=14)   :: sMean
-    character (len=10)   :: sCount
-
-    write (sVarname, fmt="(a30)") adjustl(varname)
-
-    if (size( variable, 1) > 0 .and. present( logical_vector ) ) then
-      write (sMin, fmt="(g14.3)")   minval(variable, logical_vector)
-      write (sMax, fmt="(g14.3)")   maxval(variable, logical_vector)
-      write (sMean, fmt="(g14.3)")  sum(variable, logical_vector)     &
-                                     / count( logical_vector )
-      write (sCount, fmt="(i10)") count( logical_vector )
-
-    elseif (size( variable, 1) > 0 ) then
-      write (sMin, fmt="(g14.3)")   minval(variable)
-      write (sMax, fmt="(g14.3)")   maxval(variable)
-      write (sMean, fmt="(g14.3)")  sum(variable) / size(variable,1)
-      write (sCount, fmt="(i10)") size(variable,1)
-
-    else
-      write (sMin, fmt="(g14.3)")   -9999.
-      write (sMax, fmt="(g14.3)")   -9999.
-      write (sMean, fmt="(g14.3)")  -9999.
-      write (sCount, fmt="(i10)")       0
-    endif
-
-    call LOGS%write( adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
-       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_DEBUG, lEcho=.true._c_bool )
-
-  end subroutine minmaxmean
-
 
 end module daily_calculation

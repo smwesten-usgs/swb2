@@ -46,8 +46,6 @@ module direct_net_infiltration__gridded_data
   real (c_float), allocatable     :: fWATER_MAIN_TABLE(:)
   real (c_float), allocatable     :: fANNUAL_RECHARGE_RATE_TABLE(:)
 
-  type (T_NETCDF4_FILE), pointer       :: pNCFILE
-
   type ( DATETIME_T )                  :: DATE_OF_LAST_RETRIEVAL
 
 contains

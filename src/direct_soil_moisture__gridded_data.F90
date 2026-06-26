@@ -36,8 +36,6 @@ module direct_soil_moisture__gridded_data
   real (c_float), allocatable     :: fSEPTIC_DISCHARGE_TABLE(:)
   real (c_float), allocatable     :: fANNUAL_SEPTIC_DISCHARGE_TABLE(:)
 
-  type (T_NETCDF4_FILE), pointer       :: pNCFILE
-
   type ( DATETIME_T )                  :: DATE_OF_LAST_RETRIEVAL
 
 contains

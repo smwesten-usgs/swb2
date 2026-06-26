@@ -62,7 +62,7 @@ contains
 
   subroutine actual_et_FAO56_two_stage_initialize( )
 
-    use parameters, only        : PARAMS, PARAMS_DICT
+    use parameters, only        : PARAMS
 
     integer (c_int)               :: number_of_landuses
     integer (c_int)               :: number_of_records

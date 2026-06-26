@@ -33,7 +33,6 @@ module maximum_net_infiltration__gridded_data
   real (c_float), allocatable     :: fMAXIMUM_NET_INFILTRATION(:)
   real (c_float), allocatable     :: fMAXIMUM_NET_INFILTRATION_ARRAY(:,:)
   real (c_float), allocatable     :: fMAXIMUM_NET_INFILTRATION_TABLE(:,:)
-  type ( DATETIME_T ), pointer         :: DATE_OF_LAST_RETRIEVAL
 
 contains
 

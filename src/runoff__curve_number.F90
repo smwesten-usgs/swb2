@@ -109,24 +109,6 @@ contains
 
   end subroutine runoff_curve_number_initialize
 
-!--------------------------------------------------------------------------------------------------
-
-  elemental function return_landuse_index_fn(iLanduseCode)      result(iLanduseIndex)
-
-    integer (c_int), intent(in)         :: iLanduseCode
-    integer (c_int)                     :: iLanduseIndex
-
-    iLanduseIndex = 0
-
-    do while (iLanduseIndex < ubound( iLanduseCodes, 1) )
-
-      iLanduseIndex = iLanduseIndex + 1
-
-      if (iLanduseCode == iLanduseCodes(iLanduseIndex) ) exit
-
-    end do
-
-  end function return_landuse_index_fn
 
 !--------------------------------------------------------------------------------------------------
 

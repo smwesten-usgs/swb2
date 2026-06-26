@@ -66,13 +66,10 @@ module crop_coefficients__fao56
 !  real (c_float), allocatable   :: TEW(:,:)
   real (c_float), allocatable   :: KCB_l(:,:)
   integer (c_int), allocatable  :: KCB_METHOD(:)
-  real (c_float), allocatable   :: GROWTH_STAGE_SHIFT_DAYS(:)
   real (c_float), allocatable   :: GROWTH_STAGE_LENGTH_IN_DAYS(:,:)
   real (c_float), allocatable   :: GROWTH_STAGE_GDD(:,:)
   type (DATETIME_T), allocatable     :: GROWTH_STAGE_DATE(:,:)
   type (FSTRING_LIST_T)         :: SL_PLANTING_DATE
-
-  integer (c_int)               :: LU_SOILS_CSV
 
 contains
 

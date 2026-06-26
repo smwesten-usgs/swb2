@@ -151,10 +151,6 @@ module fstring
     procedure :: return_left_part_of_string_fn
   end interface left
 
-  interface strip_full_pathname
-    procedure :: strip_full_pathname_fn
-  end interface strip_full_pathname
-
   public :: f_to_c_str
   interface f_to_c_str
     procedure :: f_to_c_string_fn
@@ -183,17 +179,6 @@ module fstring
   real (c_double), parameter  :: NA_DOUBLE = - (huge(1._c_double)-1._c_double)
 
 contains
-
-  ! remove file path from a filename
-  function strip_full_pathname_fn( filename )   result(value)
-
-    character (len=*), intent(in)   :: filename
-    character (len=:), allocatable  :: value
-
-    if (filename  .contains. "/") value = right( value, substring="/")
-    if (filename  .contains. "\") value = right( value, substring="\")
-
-  end function strip_full_pathname_fn  
 
 
   impure elemental function string_to_integer_fn(text)  result(value)
@@ -767,68 +752,6 @@ contains
     sText = trim(sBuf)
 
   end function remove_multiple_characters_fn
-
-  !--------------------------------------------------------------------------------------------------
-
-  !> Strip repeated characters from string.
-  !!
-  !! Remove repeated characters from a string. By default the function looks for repeated spaces and eliminates them.
-  !! @param[in] sTextIn
-  function remove_repeats(sText1, sChar)            result(sText)
-
-    ! ARGUMENTS
-    character (len=*), intent(inout)           :: sText1
-    character (len=*), intent(in), optional    :: sChar
-    character (len=:), allocatable :: sText
-
-    ! LOCALS
-    character (len=256)            :: sBuf
-    integer (c_int)           :: iR                 ! Index in sRecord
-    integer (c_int)           :: iIndex1, iIndex2
-    character (len=1)              :: sChar_l
-    logical (c_bool)          :: lPreviouslyFound
-
-    ! eliminate any leading spaces
-    sText1 = adjustl(sText1)
-    sBuf = ""
-    iIndex2 = 0
-    lPreviouslyFound = .FALSE._c_bool
-
-    if (present(sChar) ) then
-      sChar_l = sChar
-    else
-      sChar_l = " "
-    endif
-
-    do iIndex1 = 1,len_trim(sText1)
-
-      iR = scan(sText1(iIndex1:iIndex1), sChar_l)
-
-      if(iR==0) then
-        ! sChar_l was not found
-        iIndex2 = iIndex2 + 1
-        sBuf(iIndex2:iIndex2) = sText1(iIndex1:iIndex1)
-        lPreviouslyFound = .FALSE._c_bool
-
-      elseif( lPreviouslyFound ) then
-        ! sChar_l was found, and was also found in the position preceding this one
-
-        ! No OP
-
-      else
-        ! sChar_l was found, but was *not* found in the preceding position
-
-        iIndex2 = iIndex2 + 1
-        sBuf(iIndex2:iIndex2) = sText1(iIndex1:iIndex1)
-        lPreviouslyFound = .TRUE._c_bool
-
-      end if
-
-    enddo
-
-    sText = trim(sBuf)
-
-  end function remove_repeats
 
   !--------------------------------------------------------------------------------------------------
 

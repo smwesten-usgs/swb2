@@ -415,17 +415,6 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function dquote(sText1)    result(sText)
-
-    character (len=*), intent(in)         :: sText1
-    character (len=len_trim(sText1)+2)    :: sText
-
-    sText = '"'//trim(sText1)//'"'
-
-  end function dquote
-
-!--------------------------------------------------------------------------------------------------
-
   function make_timestamp()    result(sDatetime)
 
     character (len=:), allocatable   :: sDatetime

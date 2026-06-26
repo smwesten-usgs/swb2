@@ -9,7 +9,6 @@ module interception__gash
   use file_operations
   use parameters, only          : PARAMS
   use grid
-  use netcdf4_support, only      : T_NETCDF4_FILE
   use simulation_datetime
   use fstring
   use fstring_list
@@ -40,8 +39,6 @@ module interception__gash
   real (c_float), allocatable   :: GASH_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON(:)
 
   real (c_float), allocatable   :: P_SAT(:)
-
-  type (T_NETCDF4_FILE), pointer     :: pNCFILE           ! pointer to OUTPUT NetCDF file
 
 contains
 

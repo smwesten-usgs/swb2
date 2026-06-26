@@ -322,16 +322,6 @@ end subroutine append_fstring_to_fstring_sub
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine list_finalize_sub(this)
-
-    type (FSTRING_LIST_T), intent(inout)          :: this
-
-    call this%clear()
-
-  end subroutine list_finalize_sub
-
-!--------------------------------------------------------------------------------------------------
-
   subroutine clear_list_sub(this)
 
     class (FSTRING_LIST_T), intent(inout)        :: this

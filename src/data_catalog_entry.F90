@@ -1639,39 +1639,6 @@ end subroutine set_constant_value_real
   end subroutine getvalues_dynamic_netcdf_sub
 
 
-  subroutine minmaxmean_float( variable , varname, nodata_value )
-
-    real (c_float), dimension(:,:)  :: variable
-    character (len=*), intent(in)        :: varname
-    real (c_float), intent(in)      :: nodata_value
-
-    ! [ LOCALS ]
-    character (len=20)   :: sVarname
-    character (len=14)   :: sMin
-    character (len=14)   :: sMax
-    character (len=14)   :: sMean
-    character (len=10)   :: sCount
-
-    write (sVarname, fmt="(a20)") adjustl(varname)
-
-    if (size( variable, 1) > 0 ) then
-      write (sMin, fmt="(g14.3)")   minval(variable, variable < nodata_value )
-      write (sMax, fmt="(g14.3)")   maxval(variable, variable < nodata_value )
-      write (sMean, fmt="(g14.3)")  sum(variable, variable < nodata_value ) / count( variable < nodata_value )
-      write (sCount, fmt="(i10)") count( variable < nodata_value )
-    else
-      write (sMin, fmt="(g14.3)")   -9999.
-      write (sMax, fmt="(g14.3)")   -9999.
-      write (sMean, fmt="(g14.3)")  -9999.
-      write (sCount, fmt="(i10)")       0
-    endif
-
-
-    print *, adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
-       //" | "//adjustl(sMean)//" | "//adjustl(sCount)
-
-
-  end subroutine minmaxmean_float
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2052,25 +2019,6 @@ end subroutine set_majority_filter_flag_sub
 
 !--------------------------------------------------------------------------------------------------
 
-subroutine set_missing_value_int_sub(this, iMissingVal)
-
-  class (DATA_CATALOG_ENTRY_T) :: this
-  integer (c_int)         :: iMissingVal
-
-  this%iMissingValuesCode = iMissingVal
-
-end subroutine set_missing_value_int_sub
-
-!--------------------------------------------------------------------------------------------------
-
-subroutine set_missing_value_real_sub(this, rMissingVal)
-
-  class (DATA_CATALOG_ENTRY_T) :: this
-  integer (c_int)         :: rMissingVal
-
-  this%rMissingValuesCode = rMissingVal
-
-end subroutine set_missing_value_real_sub
 
 !--------------------------------------------------------------------------------------------------
 

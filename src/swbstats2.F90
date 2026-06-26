@@ -1,8 +1,7 @@
 program swbstats2
 
   use iso_c_binding
-  use constants_and_conversions, only : TRUE, FALSE, DATATYPE_INT,             &
-                                        DATATYPE_FLOAT, BNDS, asFloat,         &
+  use constants_and_conversions, only : TRUE, FALSE, asFloat,                  &
                                         OS_NATIVE_PATH_DELIMITER
   use exceptions, only                : assert, die
   use datetime, only                  : DATETIME_T, assignment(=), operator(>)

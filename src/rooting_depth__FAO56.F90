@@ -28,7 +28,7 @@ contains
 
 subroutine initialize_rooting_depth( )
 
-  use parameters, only        : PARAMS, PARAMS_DICT
+  use parameters, only        : PARAMS
 
   integer (c_int)               :: number_of_landuses
   integer (c_int)               :: number_of_records

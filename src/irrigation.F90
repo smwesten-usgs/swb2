@@ -50,8 +50,6 @@ module irrigation
   integer (c_short), allocatable  :: MONTHLY_IRRIGATION_SCHEDULE(:,:)
   real (c_float), allocatable     :: APPLICATION_AMOUNT(:)
 
-  type (DATA_CATALOG_ENTRY_T), pointer :: pIRRIGATION_MASK
-
 contains
 
 !> Estimate the irrigation water required to sustain plant growth.

@@ -1385,43 +1385,7 @@ function is_leap_year_fn(this)   result(lIsLeapYear)
 
 end function is_leap_year_fn
 
-!------------------------------------------------------------------------------
 
-function mmddyyyy2julian(sMMDDYYYY)  result(iJD)
-
-  character (len=*) :: sMMDDYYYY
-  integer (c_int) :: iJD
-
-  ! [ LOCALS ]
-  integer (c_int) :: iMonth
-  integer (c_int) :: iDay
-  integer (c_int) :: iYear
-  character (len=256) :: sItem, sBuf
-  integer (c_int) :: iStat
-
-  sItem = sMMDDYYYY
-
-  ! parse month value
-  call chomp(sItem, sBuf, "/-")
-  read(sBuf,*,iostat = iStat) iMonth
-  call Assert(iStat==0, "Problem reading month value from string "//TRIM(sMMDDYYYY), &
-    __FILE__,__LINE__)
-
-  ! parse day value
-  call chomp(sItem, sBuf, "/-")
-  read(sBuf,*,iostat=iStat) iDay
-  call Assert(iStat==0, "Problem reading day value from string "//TRIM(sMMDDYYYY), &
-    __FILE__,__LINE__)
-
-  ! parse year value
-  call chomp(sItem, sBuf, "/-")
-  read(sBuf,*,iostat=iStat) iYear
-  call Assert(iStat==0, "Problem reading year value from string "//TRIM(sMMDDYYYY), &
-    __FILE__,__LINE__)
-
-  iJD = julian_day ( iYear, iMonth, iDay)
-
-end function mmddyyyy2julian
 
 !------------------------------------------------------------------------------
 
@@ -1475,46 +1439,7 @@ end function mmdd2doy
 
 !------------------------------------------------------------------------------
 
-function mmddyyyy2doy(sMMDDYYYY)  result(iDOY)
 
-  character (len=*) :: sMMDDYYYY
-  integer (c_int) :: iDOY
-
-  ! [ LOCALS ]
-  integer (c_int) :: iMonth
-  integer (c_int) :: iDay
-  integer (c_int) :: iYear
-  character (len=256) :: sItem, sBuf
-  integer (c_int) :: iStat
-  integer (c_int) :: iJD
-  integer (c_int) :: iStartingJD
-
-  sItem = sMMDDYYYY
-
-  ! parse month value
-  call chomp(sItem, sBuf, "/-")
-  read(sBuf,*,iostat = iStat) iMonth
-  call assert(iStat==0, "Problem reading month value from string "//TRIM(sMMDDYYYY), &
-    __FILE__,__LINE__)
-
-  ! parse day value
-  call chomp(sItem, sBuf, "/-")
-  read(sBuf,*,iostat=iStat) iDay
-  call assert(iStat==0, "Problem reading day value from string "//TRIM(sMMDDYYYY), &
-    __FILE__,__LINE__)
-
-  ! parse year value
-  call chomp(sItem, sBuf, "/-")
-  read(sBuf,*,iostat=iStat) iYear
-  call assert(iStat==0, "Problem reading year value from string "//TRIM(sMMDDYYYY), &
-    __FILE__,__LINE__)
-
-  iStartingJD = julian_day ( iYear, 1, 1)
-  iJD = julian_day ( iYear, iMonth, iDay)
-
-  iDOY = iJD - iStartingJD + 1
-
-end function mmddyyyy2doy
 
 !--------------------------------------------------------------------------
 

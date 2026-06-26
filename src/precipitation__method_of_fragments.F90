@@ -105,13 +105,8 @@ module precipitation__method_of_fragments
     integer (c_int) :: sim_selected_set
   end type FRAGMENTS_SEQUENCE_T
 
-  !> Pointer to all or some of the FRAGMENTS_SEQUENCE array
-  type ( FRAGMENTS_SEQUENCE_T ), pointer :: pFRAGMENTS_SEQUENCE
-
   !> Array of fragment sequence sets
   type (FRAGMENTS_SEQUENCE_T), allocatable, public  :: FRAGMENTS_SEQUENCE(:)
-
-  type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR
 
   integer (c_int) :: LU_FRAGMENTS_ECHO
 
