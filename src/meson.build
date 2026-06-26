@@ -91,12 +91,22 @@ swb_library = static_library('swb_library',
 )
 
 # NetCDF and related dependencies
-zlib = cc.find_library('zlib', dirs: [netcdf_root / 'lib'], required: false)
-hdf5 = cc.find_library('hdf5', dirs: [netcdf_root / 'lib'], required: true)
-hdf5_hl = cc.find_library('hdf5_hl', dirs: [netcdf_root / 'lib'], required: true)
-netcdf = cc.find_library('netcdf', dirs: [netcdf_root / 'lib'], required: true)
+# Prefer pkg-config (works inside pixi, works on Linux with system packages)
+netcdf_dep = dependency('netcdf', required: false)
+hdf5_dep = dependency('hdf5', required: false)
 
-swb_deps = [zlib, hdf5, hdf5_hl, netcdf]
+if netcdf_dep.found() and hdf5_dep.found()
+  swb_deps = [netcdf_dep, hdf5_dep]
+  message('Dependencies found via pkg-config')
+else
+  # Fallback: manual search using netcdf_root
+  message('pkg-config not available; using netcdf_root: ' + netcdf_root)
+  zlib = cc.find_library('zlib', dirs: [netcdf_root / 'lib'], required: false)
+  hdf5 = cc.find_library('hdf5', dirs: [netcdf_root / 'lib'], required: true)
+  hdf5_hl = cc.find_library('hdf5_hl', dirs: [netcdf_root / 'lib'], required: true)
+  netcdf = cc.find_library('netcdf', dirs: [netcdf_root / 'lib'], required: true)
+  swb_deps = [zlib, hdf5, hdf5_hl, netcdf]
+endif
 
 executable('swb2',
     files('main.F90'),

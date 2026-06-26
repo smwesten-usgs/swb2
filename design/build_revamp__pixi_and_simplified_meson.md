@@ -1,8 +1,76 @@
 # Build Process Revamp: pixi + Simplified Meson
 
 **Date:** June 2026  
-**Status:** Proposed  
+**Status:** In progress — `pixi.toml` and pkg-config detection created; needs testing  
 **Goal:** Eliminate hardcoded paths, platform hacks, and manual dependency installation. One command to build on any platform.
+
+---
+
+## Next Steps (Week of June 30, 2026)
+
+### Step 1: Install pixi (if not already installed)
+
+```powershell
+# From PowerShell (no admin required):
+irm get.pixi.sh/install.ps1 | iex
+```
+
+Or from MSYS2: `curl -fsSL https://pixi.sh/install.sh | bash`
+
+Verify: `pixi --version`
+
+### Step 2: Run `pixi install` from the repo root
+
+```
+cd E:\projects\swb_development\git\swb2
+pixi install
+```
+
+**What to watch for:**
+- If `gfortran` package name fails, try replacing `gfortran = ">=13"` in `pixi.toml` with `gfortran_win-64 = "*"` or `m2w64-gcc-fortran = "*"` — conda-forge naming varies.
+- If `libnetcdf` doesn't pull in HDF5 automatically, you already have `hdf5` listed explicitly so it should be fine.
+- This step downloads ~200–500 MB into `.pixi/` on first run.
+
+### Step 3: Test the build
+
+```
+pixi run setup
+pixi run build
+```
+
+**If setup fails** with "netcdf not found via pkg-config":
+- Check that `.pixi/envs/default/Library/lib/pkgconfig/netcdf.pc` exists (Windows) or `.pixi/envs/default/lib/pkgconfig/netcdf.pc` (Linux/Mac)
+- If the `.pc` file exists but isn't found, the `PKG_CONFIG_PATH` in `pixi.toml` may need adjusting. Run `pixi run -- pkg-config --list-all | grep netcdf` to debug.
+- If it falls through to the `netcdf_root` fallback and that fails too, something is wrong with the pixi environment.
+
+**If compile fails** with linker errors (undefined symbols):
+- This likely means ABI mismatch: conda-forge's netCDF was built with MSVC, but gfortran uses MinGW. The fix is to ensure dynamic linking (`.dll.a` import libraries). Check if `.pixi/envs/default/Library/lib/netcdf.lib` or `libnetcdf.dll.a` exists.
+- If static-only MSVC `.lib` files are provided, you may need to add `static: false` to the `dependency()` calls, or stick with MSYS2's MinGW packages for the actual link libraries while using pixi for everything else.
+
+### Step 4: Test the executable
+
+```
+cd test\unit_tests
+copy ..\..\build\meson\builddir\test\unit_tests\swbtest.exe .
+swbtest.exe
+```
+
+### Step 5: If it all works — clean up
+
+- Add `.pixi/` to `.gitignore`
+- Add `pixi.lock` to `.gitignore` (or commit it for reproducibility — your call)
+- Update README with the pixi build instructions
+- Existing MSYS2 build scripts remain as-is (fallback path still works)
+
+### Step 6: If gfortran-from-pixi doesn't work on Windows
+
+Fall back to the **hybrid approach**:
+- Remove `gfortran`, `gcc`, `gxx` from `pixi.toml` (keep just `meson`, `ninja`, `pkg-config`, `libnetcdf`, `hdf5`, `zlib`)
+- Use your system gfortran (MSYS2/ucrt64) as the compiler
+- Use pixi only for library management and pkg-config
+- Build command becomes: `pixi run -- meson setup builddir` (pixi provides PKG_CONFIG_PATH, system provides gfortran)
+
+This still eliminates the "where is netCDF installed?" problem while keeping your known-good compiler.
 
 ---
 

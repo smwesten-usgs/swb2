@@ -1,0 +1,29 @@
+[workspace]
+name = "swb2"
+channels = ["conda-forge"]
+platforms = ["win-64", "linux-64", "osx-arm64"]
+version = "2.3.5"
+
+[dependencies]
+meson = ">=1.6.0"
+ninja = "*"
+pkg-config = "*"
+libnetcdf = "*"
+hdf5 = "*"
+zlib = "*"
+gfortran = ">=13"
+gcc = ">=13"
+gxx = ">=13"
+
+[tasks]
+setup = { cmd = "meson setup builddir --wipe -Dprofile=release", env = { PKG_CONFIG_PATH = "$CONDA_PREFIX/lib/pkgconfig" } }
+setup-dev = { cmd = "meson setup builddir --wipe -Dprofile=develop -Doptimization=0", env = { PKG_CONFIG_PATH = "$CONDA_PREFIX/lib/pkgconfig" } }
+setup-sa = { cmd = "meson setup builddir --wipe -Dprofile=static_analysis", env = { PKG_CONFIG_PATH = "$CONDA_PREFIX/lib/pkgconfig" } }
+build = "meson compile -C builddir"
+test = "meson test -C builddir"
+clean = "rm -rf builddir"
+
+[target.win-64.tasks]
+setup = { cmd = "meson setup builddir --wipe -Dprofile=release", env = { PKG_CONFIG_PATH = "%CONDA_PREFIX%\\Library\\lib\\pkgconfig" } }
+setup-dev = { cmd = "meson setup builddir --wipe -Dprofile=develop -Doptimization=0", env = { PKG_CONFIG_PATH = "%CONDA_PREFIX%\\Library\\lib\\pkgconfig" } }
+setup-sa = { cmd = "meson setup builddir --wipe -Dprofile=static_analysis", env = { PKG_CONFIG_PATH = "%CONDA_PREFIX%\\Library\\lib\\pkgconfig" } }
