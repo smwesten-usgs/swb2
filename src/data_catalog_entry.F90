@@ -1062,7 +1062,7 @@ end subroutine set_constant_value_real
     type (DATETIME_T), intent(in), optional :: dt
 
     ! [ LOCALS ]
-    character (len=256) :: sNewFilename
+    character (len=512) :: sNewFilename
     character (len=256) :: sCWD
     character (len=256) :: sBuf2
     integer (c_int) :: iPos_Y, iPos_D, iPos_M, iPos_0D, iPos_0M, iPos_B,  &

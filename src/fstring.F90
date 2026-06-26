@@ -366,7 +366,7 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-   function is_char_equal_to_char_case_sensitive_fn(sText1, sText2)   result(lBool)
+   pure function is_char_equal_to_char_case_sensitive_fn(sText1, sText2)   result(lBool)
 
     character (len=*), intent(in)      :: sText1
     character (len=*), intent(in)      :: sText2

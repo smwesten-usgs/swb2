@@ -462,7 +462,7 @@ end function retrieve_values_as_logical_fn
 
 !--------------------------------------------------------------------------------------------------
 
-  function retrieve_value_from_list_at_index_fn(this, index_val)   result(text)
+  pure function retrieve_value_from_list_at_index_fn(this, index_val)   result(text)
 
     class (FSTRING_LIST_T), intent(in)        :: this
     integer (c_int), intent(in)               :: index_val
@@ -897,9 +897,9 @@ end function retrieve_values_as_logical_fn
 
 !--------------------------------------------------------------------------------------------------
 
-  function return_count_of_matching_strings_fn(this, substr, match_case)    result(count)
+  pure function return_count_of_matching_strings_fn(this, substr, match_case)    result(count)
 
-    class (FSTRING_LIST_T), intent(inout)       :: this
+    class (FSTRING_LIST_T), intent(in)          :: this
     character (len=*), intent(in)               :: substr
 
     logical (c_bool), intent(in), optional  :: match_case

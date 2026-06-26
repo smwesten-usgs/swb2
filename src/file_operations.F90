@@ -286,9 +286,9 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function is_file_open_fn(this) result(lIsOpen)
+  pure function is_file_open_fn(this) result(lIsOpen)
 
-    class (ASCII_FILE_T) :: this
+    class (ASCII_FILE_T), intent(in) :: this
     logical(c_bool) :: lIsOpen
 
     lIsOpen = this%lIsOpen
