@@ -340,7 +340,7 @@ contains
     mean_val = 0.0; mean_val_comp = 0.0
     max_val = 0.0; max_val_comp = 0.0
     min_val = 0.0; min_val_comp = 0.0
-    sum_val = 0.0; sum_val = 0.0
+    sum_val = 0.0; sum_val_comp = 0.0
     n_val = 0.0; n_val_comp = 0.0
 
     n_val = count( zone_ids==target_id .and. values > NC_FILL_FLOAT )
@@ -413,7 +413,7 @@ contains
     mean_val = 0.0; mean_val_comp = 0.0
     max_val = 0.0; max_val_comp = 0.0
     min_val = 0.0; min_val_comp = 0.0
-    sum_val = 0.0; sum_val = 0.0
+    sum_val = 0.0; sum_val_comp = 0.0
     n_val = 0.0; n_val_comp = 0.0
 
     n_val = count( zone_ids==target_id .and. zone2_ids==target2_id             &

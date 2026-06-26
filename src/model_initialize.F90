@@ -1328,6 +1328,10 @@ contains
     integer (c_int)                  :: iNX, iNY
     real (c_float)                   :: fTempVal
 
+    rX1 = 0.0_c_double
+    rY1 = 0.0_c_double
+    rGridCellSize = 0.0_c_double
+
     ! For MODEL directive, obtain the associated dictionary entries
     call CF_DICT%get_values( "GRID", myOptions )
 

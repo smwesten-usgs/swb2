@@ -452,6 +452,8 @@ function grid_Read ( sFilename, sFileType, iDataType ) result ( pGrd )
   ! RETURN VALUE
   type (GENERAL_GRID_T), pointer :: pGrd
 
+  pGrd => null()
+
   if ( trim(sFileType) == "ARC_GRID" ) then
       pGrd => grid_ReadArcGrid_fn( sFileName, iDataType )
   else if ( trim(sFileType) == "SURFER" ) then

@@ -1832,6 +1832,8 @@ end subroutine set_constant_value_real
      class (DATA_CATALOG_ENTRY_T) :: this
      integer (c_int) :: iFileType
 
+     iFileType = -1
+
      if ( (this%sSourceFileType .strequal. "ARC_GRID") &
          .or. (this%sSourceFileType .strequal. "ARC_ASCII") ) then
 

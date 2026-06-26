@@ -29,6 +29,7 @@ contains
     character (len=:), allocatable :: standard_parallels
     character (len=:), allocatable :: proj4_string_local
 
+    standard_parallels = ""
     proj4_string_local = proj4_string
 
     proj4_list = create_list( proj4_string_local, delimiter_chr=WHITESPACE )

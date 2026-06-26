@@ -248,6 +248,8 @@ contains
     character (len=*), intent(in) :: sKey
     type (DICT_ENTRY_T), pointer  :: pDict
 
+    pDict => null()
+
     ! if "current" location is not null, it will point to the location of the
     ! last key value found. move forward by one before examining the next key...
     if (associated( this%current) ) pDict => this%current%next

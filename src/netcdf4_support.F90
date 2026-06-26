@@ -606,6 +606,7 @@ function nf_return_DimSize( NCFILE, iDimID)   result(iDimSize)
    integer (c_int) :: iIndex
    logical (c_bool) :: lFound
 
+  pNC_DIM => null()
   lFound = FALSE
 
   do iIndex=0, NCFILE%iNumberOfDimensions - 1
@@ -2092,6 +2093,9 @@ subroutine netcdf_get_variable_slice(NCFILE, rValues, dpValues, iValues)
   real (c_double), allocatable    :: dpTempVals(:,:)
   integer (c_int)                 :: nrow, ncol
 
+  nrow = 0
+  ncol = 0
+
   if (present( rValues) ) then
     nrow = size(rValues,2)
     ncol = size(rValues,1)
@@ -3149,6 +3153,8 @@ function nf_return_index_double(rValues, rTargetValue, rOffsetValue)  result(iIn
   ! [ LOCALS ]
   integer (c_int) :: iCount
   real (c_double) :: rDiff, rDiffMin
+
+  iIndex = -1
 
   ! attempting to account for the fact that coordinates are specified
   ! initially relative toi cell edges, but are stored internally within netCDF
