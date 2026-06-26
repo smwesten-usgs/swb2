@@ -184,4 +184,14 @@ String assignment where RHS is longer than LHS.
 | June 23, 2026 | Revised: added gfortran results, documented min/max as fatal |
 | June 24, 2026 | Fixed min/max, pure functions, conversions, bulk unused var removal |
 | June 25, 2026 | Unused variables fully eliminated; all 89 `-Wconversion` warnings eliminated |
-| June 26, 2026 | Tiered unused-function approach: 12 stale deleted, 19 intentional retained; normal builds suppress `-Wunused-function` |
+| June 26, 2026 | Tiered unused-function approach: 12 stale deleted, 20 intentional retained |
+| June 26, 2026 | All unused module variables and imports eliminated (16) |
+| June 26, 2026 | All maybe-uninitialized fixed (13); found 3 real bugs |
+| June 26, 2026 | Float comparisons fixed (10): inequality test + product-based sign change |
+| June 26, 2026 | Stack-to-static fixed (10): changed to allocatable |
+| June 26, 2026 | Impure function warnings fixed (5): marked functions `pure` |
+| June 26, 2026 | Character truncation fixed; argument aliasing fixed (intent(inout)) |
+| June 26, 2026 | ifx: `/MDd` vs `/MT` conflict resolved via `b_vscrt` in Meson (76 warnings) |
+| June 26, 2026 | ifx: INQUIRE `logical(c_bool)` → default `logical` (16 warnings) |
+| June 26, 2026 | ifx: Long lines >132 chars wrapped (6 warnings) |
+| June 26, 2026 | **COMPLETE**: zero actionable warnings on both compilers |
