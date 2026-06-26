@@ -114,7 +114,7 @@ contains
     ! [ LOCALS ]
     integer (c_int)                :: iFileIndex, iColIndex
     integer (c_int)                :: iStat
-    type (ASCII_FILE_T)            :: DF
+    type (ASCII_FILE_T), allocatable :: DF
     type (DICT_ENTRY_T), pointer   :: pDict
     type (DICT_ENTRY_T), pointer   :: pCurrentDict
     character (len=256)            :: column_name
@@ -126,6 +126,8 @@ contains
     integer (kind=c_int)           :: row_indx
     integer (c_int)                :: number_of_columns
     character (len=MAX_TABLE_RECORD_LEN) :: sRecord, sItem
+
+    allocate(DF)
 
     if ( present(comment_chars) ) then
       comment_chars_ = trim(comment_chars)

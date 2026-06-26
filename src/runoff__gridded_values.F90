@@ -87,7 +87,9 @@ module runoff__gridded_values
     integer (c_int)    :: iIndex
     integer (c_int)    :: iNumLines
     integer (c_int)    :: iNumFields
-    type (ASCII_FILE_T)     :: RUNOFF_RATIO_FILE
+    type (ASCII_FILE_T), allocatable :: RUNOFF_RATIO_FILE
+
+    allocate(RUNOFF_RATIO_FILE)
 
     call RUNOFF_RATIO_FILE%open( sFilename = sFilename, &
                   sCommentChars = "#%!", &

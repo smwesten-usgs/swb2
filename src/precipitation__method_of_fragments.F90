@@ -223,8 +223,9 @@ contains
     integer (c_int)  :: last_month
     integer (c_int)  :: iNumLines
     real (c_float)   :: fTempValue
-    type (ASCII_FILE_T)   :: FRAGMENTS_FILE
+    type (ASCII_FILE_T), allocatable :: FRAGMENTS_FILE
 
+    allocate(FRAGMENTS_FILE)
 
     call FRAGMENTS_FILE%open( sFilename = sFilename,         &
                               sCommentChars = "#%!",         &
@@ -475,7 +476,7 @@ contains
     integer (c_int)  :: iCount
     integer (c_int)  :: iIndex
     integer (c_int)  :: iNumLines
-    type (ASCII_FILE_T)   :: SEQUENCE_FILE
+    type (ASCII_FILE_T), allocatable :: SEQUENCE_FILE
     character (len=10)     :: sBuf0
     character (len=10)     :: sBuf1
     character (len=12)     :: sBuf2
@@ -487,6 +488,7 @@ contains
     integer (c_int)   :: max_rain_gage_number
     integer (c_int)   :: max_simulation_number
 
+    allocate(SEQUENCE_FILE)
 
     call SEQUENCE_FILE%open( sFilename = sFilename,         &
                              sCommentChars = "#%!",         &

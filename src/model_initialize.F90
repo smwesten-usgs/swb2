@@ -814,10 +814,11 @@ contains
     character (len=:), allocatable  :: sText
     integer (c_int)            :: iIndex
     integer (c_int)            :: iCount
-    type (ASCII_FILE_T)             :: CF
+    type (ASCII_FILE_T), allocatable :: CF
     type (DICT_ENTRY_T), pointer    :: pDict
 
     pDict => null()
+    allocate(CF)
 
     call CF%open( sFilename = sFilename )
 
@@ -868,9 +869,10 @@ contains
     ! [ LOCALS ]
     character (len=256)   :: sRecord, sKey, sValue
     integer (c_int)       :: iStat
-    type (ASCII_FILE_T)   :: CF
+    type (ASCII_FILE_T), allocatable :: CF
     integer (c_int)       :: dumpfile_count
 
+    allocate(CF)
     dumpfile_count = 0
 
     ! open the control file and define the comment characters and delimiters to be used in

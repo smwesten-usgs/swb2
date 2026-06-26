@@ -1366,8 +1366,10 @@ contains
     type (FSTRING_LIST_T), intent(out)  :: end_date_list
 
     ! [ LOCALS ]
-    type (ASCII_FILE_T)            :: DF
+    type (ASCII_FILE_T), allocatable :: DF
     character (len=256)            :: sRecord, sItem
+
+    allocate(DF)
 
    ! open the file associated with current file index value
     call DF%open(sFilename = csv_filename,                               &
@@ -1418,8 +1420,10 @@ contains
     type (FSTRING_LIST_T), intent(out)  :: comparison_grid_file_list
 
     ! [ LOCALS ]
-    type (ASCII_FILE_T)            :: DF
+    type (ASCII_FILE_T), allocatable :: DF
     character (len=256)            :: sRecord, sItem
+
+    allocate(DF)
 
    ! open the file associated with current file index value
     call DF%open(sFilename = csv_filename,                               &
@@ -1473,8 +1477,10 @@ contains
     type (FSTRING_LIST_T), intent(out)  :: zonal_stats_grid_file_list
 
     ! [ LOCALS ]
-    type (ASCII_FILE_T)            :: DF
+    type (ASCII_FILE_T), allocatable :: DF
     character (len=256)            :: sRecord, sItem
+
+    allocate(DF)
 
    ! open the file associated with current file index value
     call DF%open(sFilename = csv_filename,                               &
