@@ -11,19 +11,24 @@
 | Metric | Value |
 |--------|-------|
 | gfortran build | ✅ Compiles + links (zero errors) |
-| gfortran Fortran warnings | **~61** total; **~41** actionable (20 are acknowledged reserve API) |
-| ifx build | ✅ Compiles + links |
-| ifx Fortran diagnostics | ~400 est. (down from 487) |
+| gfortran Fortran warnings | **20** — all intentional reserve API. **Zero actionable.** |
+| ifx build | ✅ Compiles + links (zero errors) |
+| ifx diagnostics | **181** (down from 487): 76 build-config, 83 remarks, 16 INQUIRE type, 6 long lines |
 
 ### Completed
 
 - ✅ Mixed-kind min/max (18 instances) — all fixed
-- ✅ Impure function warnings — 64 of 69 eliminated (5 remain in `fstring_list`)
+- ✅ **Impure function warnings — ALL eliminated** (69 → 0)
 - ✅ **Implicit narrowing `-Wconversion` — ALL 89 instances eliminated**
 - ✅ **Unused variables — ALL Fortran instances eliminated** (289 → 0)
 - ✅ Meson build refactored (DRY source lists, `profile` option, Cray paths removed)
 - ✅ **Unused functions — 12 stale functions deleted; 20 retained as intentional reserve API**
 - ✅ **Unused module variables and imports — ALL 16 instances eliminated**
+- ✅ **Maybe-uninitialized — ALL 13 instances fixed** (found 3 real bugs)
+- ✅ **Float comparisons — ALL 10 instances fixed** (inequality + product test)
+- ✅ **Stack-to-static — ALL 10 instances fixed** (allocatable)
+- ✅ **Character truncation — fixed** (widened local variable)
+- ✅ **gfortran actionable warnings: ZERO remaining**
 
 ---
 
@@ -130,32 +135,30 @@ String assignment where RHS is longer than LHS.
 
 ## ifx-Specific Remaining Issues
 
-These are in addition to items shared with gfortran:
-
 | Issue | Count | Fix |
 |-------|-------|-----|
 | `/MDd` vs `/MT` conflict (#10121) | 76 | Add `b_vscrt=mt` to meson default_options |
+| Unused dummy args (#7712) | 83 | Remarks only (informational); same as gfortran `-Wno-unused-dummy-argument` |
 | INQUIRE with `logical(c_bool)` (#6048) | 16 | Use default `logical` for INQUIRE specifiers |
-| Lines > 132 chars (#5268) | 5 | Wrap or delete |
-| Unused `this`/`indx` in stubs (#7712) | ~25 | `associate` pattern |
+| Lines > 132 chars (#5268) | 6 | Wrap or shorten |
 
 ---
 
 ## Recommended Next Steps (by ROI)
 
-| # | Task | Warnings eliminated | Effort |
-|---|------|--------------------:|--------|
-| 1 | ~~Fix `-Wconversion` (89)~~ | ✅ 89 | Done |
-| 2 | ~~Delete stale unused functions (12 of 31)~~ | ✅ 12 | Done |
-| 3 | ~~Delete unused module vars / imports (16)~~ | ✅ 16 | Done |
-| 4 | Fix maybe-uninitialized (13) | 13 | 1 hr |
-| 5 | Fix stack-to-static (10) | 10 | 30 min |
-| 6 | Address float comparisons (10) | 10 | 20 min |
-| 7 | Remaining impure function (5) | 5 | 30 min |
-| 8 | Fix character truncation (1) + argument aliasing (2) | 3 | 10 min |
-| | **Total actionable remaining** | **~41** | **~2.5 hr** |
+**gfortran: COMPLETE** — zero actionable warnings remain.
 
-**Note:** 20 `-Wunused-function` warnings are acknowledged intentional reserve API (documented in `unused_functions_analysis.md`). These will be suppressed in normal builds.
+**ifx remaining work:**
+
+| # | Task | Diagnostics eliminated | Effort |
+|---|------|--------------------:|--------|
+| 1 | Fix `/MDd` vs `/MT` meson config | 76 | 5 min |
+| 2 | Fix INQUIRE `logical(c_bool)` → default logical | 16 | 20 min |
+| 3 | Wrap lines >132 chars | 6 | 10 min |
+| 4 | (Optional) Suppress unused dummy arg remarks | 83 | Build flag or leave as remarks |
+| | **Total** | **181** | **~35 min** + optional |
+
+**Note:** 20 `-Wunused-function` warnings (gfortran) are acknowledged intentional reserve API (documented in `unused_functions_analysis.md`). Suppressed in normal builds.
 
 ---
 
@@ -168,7 +171,7 @@ These are in addition to items shared with gfortran:
 | June 24 PM | 476 → 191 | Fixed 11 conversions, removed 271 unused vars |
 | June 25 AM | 191 → 176 | All Fortran unused variables eliminated (289 → 0) |
 | June 25 PM | 176 → **~140** | All 89 `-Wconversion` instances eliminated |
-| June 26 | ~140 → **~61** | 12 stale unused functions deleted; 19 retained as intentional reserve API; all 16 unused module vars/imports eliminated |
+| June 26 | ~140 → **20** (0 actionable) | 12 stale functions deleted; unused module vars/imports eliminated; all maybe-uninitialized fixed (3 real bugs found); float comparisons fixed; stack-to-static fixed; impure functions fixed; character truncation fixed. **gfortran complete.** |
 
 ---
 

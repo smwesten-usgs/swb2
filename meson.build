@@ -176,7 +176,6 @@ if (fc_id == 'intel-llvm-cl') and (system == 'windows')
     '/fp-speculation=safe',
     '/fp-model=precise',
     '/no-fma',
-    '/MT',
   ]
 
   if profile == 'release' or profile == 'develop'
@@ -184,7 +183,6 @@ if (fc_id == 'intel-llvm-cl') and (system == 'windows')
       '/heap-arrays:0',
       '/traceback',
       '/W0',
-      '/MT',
       '/fp:precise',
       '/fpp',
       '/Qdiag-disable:7416',
@@ -199,7 +197,6 @@ if (fc_id == 'intel-llvm-cl') and (system == 'windows')
     compile_args += [
       '/heap-arrays:0',
       '/traceback',
-      '/MT',
       '/fp:precise',
       '/fpp',
       '/warn:all',
