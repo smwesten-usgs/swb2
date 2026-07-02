@@ -7,8 +7,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Soil Water Balance (SWB2): Data Fields - Functions/Subroutines</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="codefolding.js"></script>
-<script type="text/javascript" src="clipboard.js"></script>
+<!-- jQuery (required by doxygen-awesome JS extensions) -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- doxygen-awesome extensions -->
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeParagraphLink.init()
+    DoxygenAwesomeTabs.init()
+</script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
@@ -23,22 +34,16 @@ MathJax.Hub.Config({
 });
 </script>
 <script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
-<script type="module">
-import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
-mermaid.initialize({ startOnLoad: true, theme: theme });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<link href="custom-modified-doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
  <tbody>
- <tr id="projectrow">
-  <td id="projectalign">
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Soil Water Balance (SWB2)
    </div>
   </td>
@@ -129,14 +134,14 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('functions_func
 
 
 <h3 class="doxsection"><a id="index_o" name="index_o"></a>- o -</h3><ul>
-<li>open()&#160;:&#160;<a class="el" href="structfile__operations_1_1ascii__file__t.html#a9f9c29183c74a6cd38786cd3ce91ef3a">file_operations::ascii_file_t</a>, <a class="el" href="structlogfiles_1_1logfile__t.html#af6fd6468ea508f8de559b421e3d264aa">logfiles::logfile_t</a></li>
-<li>open_file_read_access_sub()&#160;:&#160;<a class="el" href="structfile__operations_1_1ascii__file__t.html#a199f2153c49445610871a76395f3b2e5">file_operations::ascii_file_t</a></li>
-<li>open_file_write_access_sub()&#160;:&#160;<a class="el" href="structfile__operations_1_1ascii__file__t.html#af243b04e6ffe94268ecba2a04d2b112b">file_operations::ascii_file_t</a></li>
-<li>open_files_write_access_sub()&#160;:&#160;<a class="el" href="structlogfiles_1_1logfile__t.html#a445af018212d2fbaebe048fa5a117f7c">logfiles::logfile_t</a></li>
-<li>open_output_netcdf_files()&#160;:&#160;<a class="el" href="structswbstats2__support_1_1swbstats__t.html#aecd1cf3c4d76ba081d02ea17993ca062">swbstats2_support::swbstats_t</a></li>
-<li>open_zonal_stats_output_file()&#160;:&#160;<a class="el" href="structswbstats2__support_1_1swbstats__t.html#aab781c6a03cb61a45a5cf4eeb467faf4">swbstats2_support::swbstats_t</a></li>
-<li>operator()&#160;:&#160;<a class="el" href="structdatetime_1_1datetime__t.html#abddaea7bd5b6cc31f473762ee6ca6125">datetime::datetime_t</a></li>
-<li>output_zonal_stats()&#160;:&#160;<a class="el" href="structswbstats2__support_1_1swbstats__t.html#ae129dec65117b91273511190b3044d48">swbstats2_support::swbstats_t</a></li>
+<li>open()&#160;:&#160;<a class="el" href="a00430.html#a9f9c29183c74a6cd38786cd3ce91ef3a">file_operations::ascii_file_t</a>, <a class="el" href="a00590.html#af6fd6468ea508f8de559b421e3d264aa">logfiles::logfile_t</a></li>
+<li>open_file_read_access_sub()&#160;:&#160;<a class="el" href="a00430.html#a199f2153c49445610871a76395f3b2e5">file_operations::ascii_file_t</a></li>
+<li>open_file_write_access_sub()&#160;:&#160;<a class="el" href="a00430.html#af243b04e6ffe94268ecba2a04d2b112b">file_operations::ascii_file_t</a></li>
+<li>open_files_write_access_sub()&#160;:&#160;<a class="el" href="a00590.html#a445af018212d2fbaebe048fa5a117f7c">logfiles::logfile_t</a></li>
+<li>open_output_netcdf_files()&#160;:&#160;<a class="el" href="a00874.html#aecd1cf3c4d76ba081d02ea17993ca062">swbstats2_support::swbstats_t</a></li>
+<li>open_zonal_stats_output_file()&#160;:&#160;<a class="el" href="a00874.html#aab781c6a03cb61a45a5cf4eeb467faf4">swbstats2_support::swbstats_t</a></li>
+<li>operator()&#160;:&#160;<a class="el" href="a00406.html#abddaea7bd5b6cc31f473762ee6ca6125">datetime::datetime_t</a></li>
+<li>output_zonal_stats()&#160;:&#160;<a class="el" href="a00874.html#ae129dec65117b91273511190b3044d48">swbstats2_support::swbstats_t</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

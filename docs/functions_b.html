@@ -7,8 +7,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Soil Water Balance (SWB2): Data Fields</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="codefolding.js"></script>
-<script type="text/javascript" src="clipboard.js"></script>
+<!-- jQuery (required by doxygen-awesome JS extensions) -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- doxygen-awesome extensions -->
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeParagraphLink.init()
+    DoxygenAwesomeTabs.init()
+</script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
@@ -23,22 +34,16 @@ MathJax.Hub.Config({
 });
 </script>
 <script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
-<script type="module">
-import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
-mermaid.initialize({ startOnLoad: true, theme: theme });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<link href="custom-modified-doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
  <tbody>
- <tr id="projectrow">
-  <td id="projectalign">
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Soil Water Balance (SWB2)
    </div>
   </td>
@@ -129,15 +134,16 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('functions_b.ht
 
 
 <h3 class="doxsection"><a id="index_b" name="index_b"></a>- b -</h3><ul>
-<li>bare_soil_evap&#160;:&#160;<a class="el" href="structmodel__domain_1_1model__domain__t.html#aec37f366d751a23febc77acda84a407c">model_domain::model_domain_t</a></li>
-<li>bool2dbl()&#160;:&#160;<a class="el" href="interfaceconstants__and__conversions_1_1asdouble.html#ab15072c1779fb3d827958f8c495c3ca5">constants_and_conversions::asdouble</a></li>
-<li>bool2real()&#160;:&#160;<a class="el" href="interfaceconstants__and__conversions_1_1asfloat.html#a7776ac8156b49fa412237159d9669e68">constants_and_conversions::asfloat</a></li>
-<li>bounds_check_double_1d()&#160;:&#160;<a class="el" href="interfaceexceptions_1_1index__values__valid.html#a639bc6640301edbfa045858862536799">exceptions::index_values_valid</a></li>
-<li>bounds_check_double_2d()&#160;:&#160;<a class="el" href="interfaceexceptions_1_1index__values__valid.html#a6bc4f729ee2d284c789680616e052691">exceptions::index_values_valid</a></li>
-<li>bounds_check_float_1d()&#160;:&#160;<a class="el" href="interfaceexceptions_1_1index__values__valid.html#acf6cc35ec2aab3db8d2a4038afb505a3">exceptions::index_values_valid</a></li>
-<li>bounds_check_float_2d()&#160;:&#160;<a class="el" href="interfaceexceptions_1_1index__values__valid.html#aee3faeb2729a1cc352435291d494e0d5">exceptions::index_values_valid</a></li>
-<li>bounds_check_integer_1d()&#160;:&#160;<a class="el" href="interfaceexceptions_1_1index__values__valid.html#a4e28180e2003da2d20197c75035dbb42">exceptions::index_values_valid</a></li>
-<li>bounds_check_integer_2d()&#160;:&#160;<a class="el" href="interfaceexceptions_1_1index__values__valid.html#a10d8359a1076bc690b79f20ab59569b1">exceptions::index_values_valid</a></li>
+<li>bare_soil_evap&#160;:&#160;<a class="el" href="a00594.html#aec37f366d751a23febc77acda84a407c">model_domain::model_domain_t</a></li>
+<li>bool2dbl()&#160;:&#160;<a class="el" href="a00358.html#ab15072c1779fb3d827958f8c495c3ca5">constants_and_conversions::asdouble</a></li>
+<li>bool2int()&#160;:&#160;<a class="el" href="a00362.html#abfc8be28df8b97ea008102cbbb5f9b7e">constants_and_conversions::asint</a></li>
+<li>bool2real()&#160;:&#160;<a class="el" href="a00354.html#a7776ac8156b49fa412237159d9669e68">constants_and_conversions::asfloat</a></li>
+<li>bounds_check_double_1d()&#160;:&#160;<a class="el" href="a00426.html#a639bc6640301edbfa045858862536799">exceptions::index_values_valid</a></li>
+<li>bounds_check_double_2d()&#160;:&#160;<a class="el" href="a00426.html#a6bc4f729ee2d284c789680616e052691">exceptions::index_values_valid</a></li>
+<li>bounds_check_float_1d()&#160;:&#160;<a class="el" href="a00426.html#acf6cc35ec2aab3db8d2a4038afb505a3">exceptions::index_values_valid</a></li>
+<li>bounds_check_float_2d()&#160;:&#160;<a class="el" href="a00426.html#aee3faeb2729a1cc352435291d494e0d5">exceptions::index_values_valid</a></li>
+<li>bounds_check_integer_1d()&#160;:&#160;<a class="el" href="a00426.html#a4e28180e2003da2d20197c75035dbb42">exceptions::index_values_valid</a></li>
+<li>bounds_check_integer_2d()&#160;:&#160;<a class="el" href="a00426.html#a10d8359a1076bc690b79f20ab59569b1">exceptions::index_values_valid</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

@@ -7,8 +7,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Soil Water Balance (SWB2): Module Members</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="codefolding.js"></script>
-<script type="text/javascript" src="clipboard.js"></script>
+<!-- jQuery (required by doxygen-awesome JS extensions) -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- doxygen-awesome extensions -->
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeParagraphLink.init()
+    DoxygenAwesomeTabs.init()
+</script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
@@ -23,22 +34,16 @@ MathJax.Hub.Config({
 });
 </script>
 <script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
-<script type="module">
-import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
-mermaid.initialize({ startOnLoad: true, theme: theme });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<link href="custom-modified-doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
  <tbody>
- <tr id="projectrow">
-  <td id="projectalign">
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Soil Water Balance (SWB2)
    </div>
   </td>
@@ -127,34 +132,34 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('namespacemembe
 <div class="textblock">Here is a list of all module members with links to the module documentation for each member:</div>
 
 <h3 class="doxsection"><a id="index_e" name="index_e"></a>- e -</h3><ul>
-<li>earth_sun_dist_dr&#160;:&#160;<a class="el" href="namespacesolar__calculations.html#a4a58162c913b7cc91745089597e90a9d">solar_calculations</a></li>
-<li>eight_cells&#160;:&#160;<a class="el" href="namespacegrid.html#a308c1a7dd520f9936b372740500e04d4">grid</a></li>
-<li>enddate_dev&#160;:&#160;<a class="el" href="namespacecrop__coefficients____fao56.html#adeb4ae39cc22d86abc4714e942f54092a7375cef89e3e4b6a5f39e57fb30040e8">crop_coefficients__fao56</a></li>
-<li>enddate_fallow&#160;:&#160;<a class="el" href="namespacecrop__coefficients____fao56.html#adeb4ae39cc22d86abc4714e942f54092afabbe55a81a074801805e1bf05e78e0f">crop_coefficients__fao56</a></li>
-<li>enddate_ini&#160;:&#160;<a class="el" href="namespacecrop__coefficients____fao56.html#adeb4ae39cc22d86abc4714e942f54092abf6428b82e537714b566ddab7fe47311">crop_coefficients__fao56</a></li>
-<li>enddate_late&#160;:&#160;<a class="el" href="namespacecrop__coefficients____fao56.html#adeb4ae39cc22d86abc4714e942f54092a2f6a069dede04d36aa91a2787e0ddd57">crop_coefficients__fao56</a></li>
-<li>enddate_mid&#160;:&#160;<a class="el" href="namespacecrop__coefficients____fao56.html#adeb4ae39cc22d86abc4714e942f54092ac0f918b26a372c1ca82c3d42f6997b26">crop_coefficients__fao56</a></li>
-<li>enforce_bounds_dbl_fn()&#160;:&#160;<a class="el" href="namespaceconstants__and__conversions.html#a29e0db48a0031ed9a3f8c025bf7d2d12">constants_and_conversions</a></li>
-<li>enforce_bounds_int_fn()&#160;:&#160;<a class="el" href="namespaceconstants__and__conversions.html#ad3fd09151348d9c69e8564a474f32aa3">constants_and_conversions</a></li>
-<li>enforce_bounds_sgl_fn()&#160;:&#160;<a class="el" href="namespaceconstants__and__conversions.html#aa34b83131ce2c515efab4759a9a803ac">constants_and_conversions</a></li>
-<li>equivalent_evaporation()&#160;:&#160;<a class="el" href="namespacemeteorological__calculations.html#a226f7ed381e189128b68638283413efe">meteorological_calculations</a></li>
-<li>estimate_percent_of_possible_sunshine__psun()&#160;:&#160;<a class="el" href="namespacesolar__calculations.html#a420de8a02e94159d2c2ea3e2b331682c">solar_calculations</a></li>
-<li>et0_hargreaves()&#160;:&#160;<a class="el" href="namespaceet____hargreaves__samani.html#aa4970400403cd4ba4c201a15d7c62b8d">et__hargreaves_samani</a></li>
-<li>et_constant&#160;:&#160;<a class="el" href="namespaceet____hargreaves__samani.html#a5a60bc6adb02a5942561820f7f28f392">et__hargreaves_samani</a></li>
-<li>et_exponent&#160;:&#160;<a class="el" href="namespaceet____hargreaves__samani.html#a7dde6cb8f3282f642bf47a1dd2d3984f">et__hargreaves_samani</a></li>
-<li>et_gridded_values_calculate()&#160;:&#160;<a class="el" href="namespaceet____gridded__values.html#a47620ef47e89b4af2dadbae1b0b7b70b">et__gridded_values</a></li>
-<li>et_gridded_values_initialize()&#160;:&#160;<a class="el" href="namespaceet____gridded__values.html#a8e210030f6900702d0d6408e5ce1286a">et__gridded_values</a></li>
-<li>et_hargreaves_calculate()&#160;:&#160;<a class="el" href="namespaceet____hargreaves__samani.html#a77b1c6dd3a4c112c6192becc9f879893">et__hargreaves_samani</a></li>
-<li>et_hargreaves_initialize()&#160;:&#160;<a class="el" href="namespaceet____hargreaves__samani.html#a8512a837baefd57047e55c7a53b03cf3">et__hargreaves_samani</a></li>
-<li>et_jh_calculate()&#160;:&#160;<a class="el" href="namespaceet____jensen__haise.html#a4a0eca59dd1e6202cac124d00881215a">et__jensen_haise</a></li>
-<li>et_ratios&#160;:&#160;<a class="el" href="namespaceet____zone__values.html#a1519707d407b4358f4b374d9d13f7af2">et__zone_values</a></li>
-<li>et_slope&#160;:&#160;<a class="el" href="namespaceet____hargreaves__samani.html#a87aaaab114756b2e907badf129812bee">et__hargreaves_samani</a></li>
-<li>et_table_values&#160;:&#160;<a class="el" href="namespaceet____zone__values.html#a6f22e94e1eb18e3111f1329bbc45e680">et__zone_values</a></li>
-<li>et_zone&#160;:&#160;<a class="el" href="namespaceet____zone__values.html#ac3f0c7e02df8d3fee16f1f4b6d6e4db8">et__zone_values</a></li>
-<li>et_zone_values_calculate()&#160;:&#160;<a class="el" href="namespaceet____zone__values.html#afc61abb429d560fccdf982d2dfb0f226">et__zone_values</a></li>
-<li>et_zone_values_initialize()&#160;:&#160;<a class="el" href="namespaceet____zone__values.html#a581e4a797f2627d6c18485b3a9afe717">et__zone_values</a></li>
-<li>evaporation_to_rainfall_ratio&#160;:&#160;<a class="el" href="namespaceinterception____gash.html#a67d18c50e96ed256f68cbcccffaf6031">interception__gash</a></li>
-<li>extraterrestrial_radiation__ra()&#160;:&#160;<a class="el" href="namespacesolar__calculations.html#ac38767af2ab93521ff1d1624c4ef8188">solar_calculations</a></li>
+<li>earth_sun_dist_dr&#160;:&#160;<a class="el" href="a00311.html#a4a58162c913b7cc91745089597e90a9d">solar_calculations</a></li>
+<li>eight_cells&#160;:&#160;<a class="el" href="a00278.html#a308c1a7dd520f9936b372740500e04d4">grid</a></li>
+<li>enddate_dev&#160;:&#160;<a class="el" href="a00260.html#adeb4ae39cc22d86abc4714e942f54092a7375cef89e3e4b6a5f39e57fb30040e8">crop_coefficients__fao56</a></li>
+<li>enddate_fallow&#160;:&#160;<a class="el" href="a00260.html#adeb4ae39cc22d86abc4714e942f54092afabbe55a81a074801805e1bf05e78e0f">crop_coefficients__fao56</a></li>
+<li>enddate_ini&#160;:&#160;<a class="el" href="a00260.html#adeb4ae39cc22d86abc4714e942f54092abf6428b82e537714b566ddab7fe47311">crop_coefficients__fao56</a></li>
+<li>enddate_late&#160;:&#160;<a class="el" href="a00260.html#adeb4ae39cc22d86abc4714e942f54092a2f6a069dede04d36aa91a2787e0ddd57">crop_coefficients__fao56</a></li>
+<li>enddate_mid&#160;:&#160;<a class="el" href="a00260.html#adeb4ae39cc22d86abc4714e942f54092ac0f918b26a372c1ca82c3d42f6997b26">crop_coefficients__fao56</a></li>
+<li>enforce_bounds_dbl_fn()&#160;:&#160;<a class="el" href="a00258.html#a29e0db48a0031ed9a3f8c025bf7d2d12">constants_and_conversions</a></li>
+<li>enforce_bounds_int_fn()&#160;:&#160;<a class="el" href="a00258.html#ad3fd09151348d9c69e8564a474f32aa3">constants_and_conversions</a></li>
+<li>enforce_bounds_sgl_fn()&#160;:&#160;<a class="el" href="a00258.html#aa34b83131ce2c515efab4759a9a803ac">constants_and_conversions</a></li>
+<li>equivalent_evaporation()&#160;:&#160;<a class="el" href="a00292.html#a226f7ed381e189128b68638283413efe">meteorological_calculations</a></li>
+<li>estimate_percent_of_possible_sunshine__psun()&#160;:&#160;<a class="el" href="a00311.html#a420de8a02e94159d2c2ea3e2b331682c">solar_calculations</a></li>
+<li>et0_hargreaves()&#160;:&#160;<a class="el" href="a00270.html#aa4970400403cd4ba4c201a15d7c62b8d">et__hargreaves_samani</a></li>
+<li>et_constant&#160;:&#160;<a class="el" href="a00270.html#a5a60bc6adb02a5942561820f7f28f392">et__hargreaves_samani</a></li>
+<li>et_exponent&#160;:&#160;<a class="el" href="a00270.html#a7dde6cb8f3282f642bf47a1dd2d3984f">et__hargreaves_samani</a></li>
+<li>et_gridded_values_calculate()&#160;:&#160;<a class="el" href="a00269.html#a47620ef47e89b4af2dadbae1b0b7b70b">et__gridded_values</a></li>
+<li>et_gridded_values_initialize()&#160;:&#160;<a class="el" href="a00269.html#a8e210030f6900702d0d6408e5ce1286a">et__gridded_values</a></li>
+<li>et_hargreaves_calculate()&#160;:&#160;<a class="el" href="a00270.html#a77b1c6dd3a4c112c6192becc9f879893">et__hargreaves_samani</a></li>
+<li>et_hargreaves_initialize()&#160;:&#160;<a class="el" href="a00270.html#a8512a837baefd57047e55c7a53b03cf3">et__hargreaves_samani</a></li>
+<li>et_jh_calculate()&#160;:&#160;<a class="el" href="a00271.html#a4a0eca59dd1e6202cac124d00881215a">et__jensen_haise</a></li>
+<li>et_ratios&#160;:&#160;<a class="el" href="a00272.html#a1519707d407b4358f4b374d9d13f7af2">et__zone_values</a></li>
+<li>et_slope&#160;:&#160;<a class="el" href="a00270.html#a87aaaab114756b2e907badf129812bee">et__hargreaves_samani</a></li>
+<li>et_table_values&#160;:&#160;<a class="el" href="a00272.html#a6f22e94e1eb18e3111f1329bbc45e680">et__zone_values</a></li>
+<li>et_zone&#160;:&#160;<a class="el" href="a00272.html#ac3f0c7e02df8d3fee16f1f4b6d6e4db8">et__zone_values</a></li>
+<li>et_zone_values_calculate()&#160;:&#160;<a class="el" href="a00272.html#afc61abb429d560fccdf982d2dfb0f226">et__zone_values</a></li>
+<li>et_zone_values_initialize()&#160;:&#160;<a class="el" href="a00272.html#a581e4a797f2627d6c18485b3a9afe717">et__zone_values</a></li>
+<li>evaporation_to_rainfall_ratio&#160;:&#160;<a class="el" href="a00283.html#a67d18c50e96ed256f68cbcccffaf6031">interception__gash</a></li>
+<li>extraterrestrial_radiation__ra()&#160;:&#160;<a class="el" href="a00311.html#ac38767af2ab93521ff1d1624c4ef8188">solar_calculations</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

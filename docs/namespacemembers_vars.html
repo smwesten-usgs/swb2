@@ -7,8 +7,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Soil Water Balance (SWB2): Module Members</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="codefolding.js"></script>
-<script type="text/javascript" src="clipboard.js"></script>
+<!-- jQuery (required by doxygen-awesome JS extensions) -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- doxygen-awesome extensions -->
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeParagraphLink.init()
+    DoxygenAwesomeTabs.init()
+</script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
@@ -23,22 +34,16 @@ MathJax.Hub.Config({
 });
 </script>
 <script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
-<script type="module">
-import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
-mermaid.initialize({ startOnLoad: true, theme: theme });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<link href="custom-modified-doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
  <tbody>
- <tr id="projectrow">
-  <td id="projectalign">
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Soil Water Balance (SWB2)
    </div>
   </td>
@@ -127,20 +132,20 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('namespacemembe
 <div class="textblock">Here is a list of all namespace variables with links to the namespace documentation for each variable:</div>
 
 <h3 class="doxsection"><a id="index_a" name="index_a"></a>- a -</h3><ul>
-<li>actual_et&#160;:&#160;<a class="el" href="namespaceactual__et____gridded__values.html#aa62a7ba4a6b0a2d3d399f990c09acf19">actual_et__gridded_values</a></li>
-<li>actual_et_per_sim&#160;:&#160;<a class="el" href="namespacemodel__iterate__multiple__simulations.html#a60a581f96c0793cf33177d39d111e2b3">model_iterate_multiple_simulations</a></li>
-<li>amc_dry_dormant&#160;:&#160;<a class="el" href="namespacerunoff____curve__number.html#ab408634d8cab273b74b2bd02b9c979bd">runoff__curve_number</a></li>
-<li>amc_dry_growing&#160;:&#160;<a class="el" href="namespacerunoff____curve__number.html#a5cbe1da72b3eef09c25c54d965def16c">runoff__curve_number</a></li>
-<li>amc_wet_dormant&#160;:&#160;<a class="el" href="namespacerunoff____curve__number.html#ac3b7bf5a9cd91873a763e9d5f8b90179">runoff__curve_number</a></li>
-<li>amc_wet_growing&#160;:&#160;<a class="el" href="namespacerunoff____curve__number.html#a9b5c67164bd62a278a93746d74ac9300">runoff__curve_number</a></li>
-<li>annual_actual_et_stats&#160;:&#160;<a class="el" href="namespacemodel__iterate__multiple__simulations.html#a57b1450057745d6940afc8baf94d784c">model_iterate_multiple_simulations</a></li>
-<li>annual_net_infiltration_stats&#160;:&#160;<a class="el" href="namespacemodel__iterate__multiple__simulations.html#a440b6a59dc6aac3aa849a0ef33ac6d98">model_iterate_multiple_simulations</a></li>
-<li>annual_rainfall_stats&#160;:&#160;<a class="el" href="namespacemodel__iterate__multiple__simulations.html#a6f2bdc0ad9d55cf5f4da69cd97c3863d">model_iterate_multiple_simulations</a></li>
-<li>anything_to_summarize&#160;:&#160;<a class="el" href="namespacesummary__statistics.html#ac7d398f3801b55c8eb348c6903809d25">summary_statistics</a></li>
-<li>app_option_name&#160;:&#160;<a class="el" href="namespaceirrigation.html#a11247bb40e255eefd332278d8deea03b">irrigation</a></li>
-<li>application_amount&#160;:&#160;<a class="el" href="namespaceirrigation.html#ae44bc07ec03bccab8fd3636b04bf7138">irrigation</a></li>
-<li>application_method_code&#160;:&#160;<a class="el" href="namespaceirrigation.html#afb9298aa88b08637646142b01abe0da6">irrigation</a></li>
-<li>available_water_content&#160;:&#160;<a class="el" href="namespaceawc____depth__integrated.html#afd92c4d0943a23ad9d8d464b261f6d15">awc__depth_integrated</a></li>
+<li>actual_et&#160;:&#160;<a class="el" href="a00254.html#aa62a7ba4a6b0a2d3d399f990c09acf19">actual_et__gridded_values</a></li>
+<li>actual_et_per_sim&#160;:&#160;<a class="el" href="a00296.html#a60a581f96c0793cf33177d39d111e2b3">model_iterate_multiple_simulations</a></li>
+<li>amc_dry_dormant&#160;:&#160;<a class="el" href="a00306.html#ab408634d8cab273b74b2bd02b9c979bd">runoff__curve_number</a></li>
+<li>amc_dry_growing&#160;:&#160;<a class="el" href="a00306.html#a5cbe1da72b3eef09c25c54d965def16c">runoff__curve_number</a></li>
+<li>amc_wet_dormant&#160;:&#160;<a class="el" href="a00306.html#ac3b7bf5a9cd91873a763e9d5f8b90179">runoff__curve_number</a></li>
+<li>amc_wet_growing&#160;:&#160;<a class="el" href="a00306.html#a9b5c67164bd62a278a93746d74ac9300">runoff__curve_number</a></li>
+<li>annual_actual_et_stats&#160;:&#160;<a class="el" href="a00296.html#a57b1450057745d6940afc8baf94d784c">model_iterate_multiple_simulations</a></li>
+<li>annual_net_infiltration_stats&#160;:&#160;<a class="el" href="a00296.html#a440b6a59dc6aac3aa849a0ef33ac6d98">model_iterate_multiple_simulations</a></li>
+<li>annual_rainfall_stats&#160;:&#160;<a class="el" href="a00296.html#a6f2bdc0ad9d55cf5f4da69cd97c3863d">model_iterate_multiple_simulations</a></li>
+<li>anything_to_summarize&#160;:&#160;<a class="el" href="a00313.html#ac7d398f3801b55c8eb348c6903809d25">summary_statistics</a></li>
+<li>app_option_name&#160;:&#160;<a class="el" href="a00284.html#a11247bb40e255eefd332278d8deea03b">irrigation</a></li>
+<li>application_amount&#160;:&#160;<a class="el" href="a00284.html#ae44bc07ec03bccab8fd3636b04bf7138">irrigation</a></li>
+<li>application_method_code&#160;:&#160;<a class="el" href="a00284.html#afb9298aa88b08637646142b01abe0da6">irrigation</a></li>
+<li>available_water_content&#160;:&#160;<a class="el" href="a00256.html#afd92c4d0943a23ad9d8d464b261f6d15">awc__depth_integrated</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

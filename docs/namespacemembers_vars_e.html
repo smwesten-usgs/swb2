@@ -7,8 +7,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Soil Water Balance (SWB2): Module Members</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="codefolding.js"></script>
-<script type="text/javascript" src="clipboard.js"></script>
+<!-- jQuery (required by doxygen-awesome JS extensions) -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- doxygen-awesome extensions -->
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeParagraphLink.init()
+    DoxygenAwesomeTabs.init()
+</script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
@@ -23,22 +34,16 @@ MathJax.Hub.Config({
 });
 </script>
 <script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
-<script type="module">
-import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
-mermaid.initialize({ startOnLoad: true, theme: theme });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<link href="custom-modified-doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
  <tbody>
- <tr id="projectrow">
-  <td id="projectalign">
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Soil Water Balance (SWB2)
    </div>
   </td>
@@ -127,15 +132,15 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('namespacemembe
 <div class="textblock">Here is a list of all namespace variables with links to the namespace documentation for each variable:</div>
 
 <h3 class="doxsection"><a id="index_e" name="index_e"></a>- e -</h3><ul>
-<li>earth_sun_dist_dr&#160;:&#160;<a class="el" href="namespacesolar__calculations.html#a4a58162c913b7cc91745089597e90a9d">solar_calculations</a></li>
-<li>eight_cells&#160;:&#160;<a class="el" href="namespacegrid.html#a308c1a7dd520f9936b372740500e04d4">grid</a></li>
-<li>et_constant&#160;:&#160;<a class="el" href="namespaceet____hargreaves__samani.html#a5a60bc6adb02a5942561820f7f28f392">et__hargreaves_samani</a></li>
-<li>et_exponent&#160;:&#160;<a class="el" href="namespaceet____hargreaves__samani.html#a7dde6cb8f3282f642bf47a1dd2d3984f">et__hargreaves_samani</a></li>
-<li>et_ratios&#160;:&#160;<a class="el" href="namespaceet____zone__values.html#a1519707d407b4358f4b374d9d13f7af2">et__zone_values</a></li>
-<li>et_slope&#160;:&#160;<a class="el" href="namespaceet____hargreaves__samani.html#a87aaaab114756b2e907badf129812bee">et__hargreaves_samani</a></li>
-<li>et_table_values&#160;:&#160;<a class="el" href="namespaceet____zone__values.html#a6f22e94e1eb18e3111f1329bbc45e680">et__zone_values</a></li>
-<li>et_zone&#160;:&#160;<a class="el" href="namespaceet____zone__values.html#ac3f0c7e02df8d3fee16f1f4b6d6e4db8">et__zone_values</a></li>
-<li>evaporation_to_rainfall_ratio&#160;:&#160;<a class="el" href="namespaceinterception____gash.html#a67d18c50e96ed256f68cbcccffaf6031">interception__gash</a></li>
+<li>earth_sun_dist_dr&#160;:&#160;<a class="el" href="a00311.html#a4a58162c913b7cc91745089597e90a9d">solar_calculations</a></li>
+<li>eight_cells&#160;:&#160;<a class="el" href="a00278.html#a308c1a7dd520f9936b372740500e04d4">grid</a></li>
+<li>et_constant&#160;:&#160;<a class="el" href="a00270.html#a5a60bc6adb02a5942561820f7f28f392">et__hargreaves_samani</a></li>
+<li>et_exponent&#160;:&#160;<a class="el" href="a00270.html#a7dde6cb8f3282f642bf47a1dd2d3984f">et__hargreaves_samani</a></li>
+<li>et_ratios&#160;:&#160;<a class="el" href="a00272.html#a1519707d407b4358f4b374d9d13f7af2">et__zone_values</a></li>
+<li>et_slope&#160;:&#160;<a class="el" href="a00270.html#a87aaaab114756b2e907badf129812bee">et__hargreaves_samani</a></li>
+<li>et_table_values&#160;:&#160;<a class="el" href="a00272.html#a6f22e94e1eb18e3111f1329bbc45e680">et__zone_values</a></li>
+<li>et_zone&#160;:&#160;<a class="el" href="a00272.html#ac3f0c7e02df8d3fee16f1f4b6d6e4db8">et__zone_values</a></li>
+<li>evaporation_to_rainfall_ratio&#160;:&#160;<a class="el" href="a00283.html#a67d18c50e96ed256f68cbcccffaf6031">interception__gash</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

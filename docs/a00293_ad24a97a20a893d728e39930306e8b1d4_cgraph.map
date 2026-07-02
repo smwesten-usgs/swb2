@@ -1,0 +1,9 @@
+<map id="model_domain::model_initialize_fog_monthly_grid" name="model_domain::model_initialize_fog_monthly_grid">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,187,65"/>
+<area shape="rect" id="Node000002" href="$a00275.html#a7975561757f406875f0241f101aa4310" title="Initialize the fog drip algorithm." alt="" coords="235,23,409,65"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,41,222,44,216,44,187,47"/>
+<area shape="rect" id="Node000003" href="$a00273.html#afd73029531ee5ba631b7838d2f6395dd" title=" " alt="" coords="462,5,572,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="409,30,445,28,450,27,410,35"/>
+<area shape="rect" id="Node000004" href="$a00273.html#a865c266d00ec8abab13dc671fd1f2d84" title=" " alt="" coords="457,56,577,83"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="409,53,444,60,439,60,409,58"/>
+</map>

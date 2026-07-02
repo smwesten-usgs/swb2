@@ -13,6 +13,8 @@ zlib = "*"
 gfortran = ">=13"
 gcc = ">=13"
 gxx = ">=13"
+doxygen = "*"
+graphviz = "*"
 
 [tasks]
 # Note: CONDA_PREFIX is set automatically by pixi when running tasks.
@@ -23,6 +25,7 @@ setup-sa = { cmd = "meson setup builddir --wipe -Dprofile=static_analysis -Dnetc
 build = "meson compile -C builddir"
 test = { cmd = "../../builddir/test/unit_tests/swbtest", cwd = "test/unit_tests" }
 clean = "rm -rf builddir"
+docs = { cmd = "cmd /c \"if exist ..\\docs rmdir /s /q ..\\docs & doxygen Doxyfile\"", cwd = "doxygen" }
 
 [target.win-64.tasks]
 setup = { cmd = "cmd /c meson setup builddir --wipe -Dprofile=release -Dnetcdf_root=%CONDA_PREFIX%/Library" }
@@ -32,3 +35,4 @@ clean = { cmd = "cmd /c \"rmdir /s /q builddir 2>nul || exit /b 0\"" }
 test = { cmd = "cmd /c ..\\..\\builddir\\test\\unit_tests\\swbtest.exe", cwd = "test/unit_tests" }
 integration-test = { cmd = "cmd /c \"rmdir /s /q output 2>nul & rmdir /s /q logfile 2>nul & mkdir output & mkdir logfile & ..\\..\\..\\builddir\\src\\swb2.exe --output_prefix=central_sands_ --data_dir=..\\..\\test_data\\cs --weather_data_dir=..\\..\\test_data\\cs --output_dir=output --logfile_dir=logfile --lookup_dir=..\\..\\test_data\\tables central_sands_swb2.ctl\"", cwd = "test/integration_tests/cs" }
 dist = { cmd = "cmd /c \"if not exist dist mkdir dist & copy builddir\\src\\swb2.exe dist\\ & copy builddir\\src\\swbstats2.exe dist\\ & copy builddir\\test\\unit_tests\\swbtest.exe dist\\ & echo Executables copied to dist/ — run via pixi (these are dynamically linked)\"" }
+docs = { cmd = "cmd /c \"if exist ..\\docs rmdir /s /q ..\\docs & doxygen Doxyfile\"", cwd = "doxygen" }

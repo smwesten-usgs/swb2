@@ -7,8 +7,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Soil Water Balance (SWB2): Module Members</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="codefolding.js"></script>
-<script type="text/javascript" src="clipboard.js"></script>
+<!-- jQuery (required by doxygen-awesome JS extensions) -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- doxygen-awesome extensions -->
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeParagraphLink.init()
+    DoxygenAwesomeTabs.init()
+</script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
@@ -23,22 +34,16 @@ MathJax.Hub.Config({
 });
 </script>
 <script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
-<script type="module">
-import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
-mermaid.initialize({ startOnLoad: true, theme: theme });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<link href="custom-modified-doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
  <tbody>
- <tr id="projectrow">
-  <td id="projectalign">
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Soil Water Balance (SWB2)
    </div>
   </td>
@@ -127,23 +132,22 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('namespacemembe
 <div class="textblock">Here is a list of all namespace variables with links to the namespace documentation for each variable:</div>
 
 <h3 class="doxsection"><a id="index_g" name="index_g"></a>- g -</h3><ul>
-<li>gash_interception_storage_max_growing_season&#160;:&#160;<a class="el" href="namespaceinterception____gash.html#ae8634eae43584ab89cf251d94b24c2b7">interception__gash</a></li>
-<li>gash_interception_storage_max_nongrowing_season&#160;:&#160;<a class="el" href="namespaceinterception____gash.html#a89be1cbc51e26068cd0c11609cd5f6e1">interception__gash</a></li>
-<li>gdd_base&#160;:&#160;<a class="el" href="namespacegrowing__degree__day.html#aacfa259bbbe00271e8a8cd7b974c7b1d">growing_degree_day</a>, <a class="el" href="namespacegrowing__degree__day__baskerville__emin.html#a7468f06218936a314c13f9b2e5248634">growing_degree_day_baskerville_emin</a></li>
-<li>gdd_first_day_of_growing_season&#160;:&#160;<a class="el" href="namespacegrowing__season.html#ae264c8ec9e2acf8ae09069ffc4de45dc">growing_season</a></li>
-<li>gdd_max&#160;:&#160;<a class="el" href="namespacegrowing__degree__day.html#a60c068934a808d9c7d004029ba044f66">growing_degree_day</a>, <a class="el" href="namespacegrowing__degree__day__baskerville__emin.html#acb8a7b23e8bf6765f9b2220ac7013225">growing_degree_day_baskerville_emin</a></li>
-<li>gdd_reset_date&#160;:&#160;<a class="el" href="namespacegrowing__degree__day.html#a7d529916dac673917aba382d0f40fecc">growing_degree_day</a>, <a class="el" href="namespacegrowing__degree__day__baskerville__emin.html#a0dc27f2f486b5f60973cc35340248324">growing_degree_day_baskerville_emin</a></li>
-<li>grid_active_cell&#160;:&#160;<a class="el" href="namespacegrid.html#a3952feed675471167198f992a76916fe">grid</a></li>
-<li>grid_datatype_double&#160;:&#160;<a class="el" href="namespacegrid.html#aedc9fb9576632b6bf549f326f2fc96e3">grid</a></li>
-<li>grid_datatype_int&#160;:&#160;<a class="el" href="namespacegrid.html#a6f3edd9dfab0cf1847f6126835444fa6">grid</a></li>
-<li>grid_datatype_real&#160;:&#160;<a class="el" href="namespacegrid.html#a95e2f2513fb7f2d11d0130f643931676">grid</a></li>
-<li>grid_nodata_double&#160;:&#160;<a class="el" href="namespacegrid.html#a7db264619d440b0ffe4957b4d158a533">grid</a></li>
-<li>grid_nodata_int&#160;:&#160;<a class="el" href="namespacegrid.html#a93f96949287e2fc24c4a94033e5173af">grid</a></li>
-<li>grid_nodata_real&#160;:&#160;<a class="el" href="namespacegrid.html#a1842368fbcc3fc0f6cabc0b58b8916bd">grid</a></li>
-<li>growth_stage_date&#160;:&#160;<a class="el" href="namespacecrop__coefficients____fao56.html#ac65046b44c2a3ce959c663cfcecc9bf3">crop_coefficients__fao56</a></li>
-<li>growth_stage_gdd&#160;:&#160;<a class="el" href="namespacecrop__coefficients____fao56.html#aa1e1f5f3c27dcb08bf4216edddefda5b">crop_coefficients__fao56</a></li>
-<li>growth_stage_length_in_days&#160;:&#160;<a class="el" href="namespacecrop__coefficients____fao56.html#a531c0e3a3889cc1bc0ff7ce91e304131">crop_coefficients__fao56</a></li>
-<li>growth_stage_shift_days&#160;:&#160;<a class="el" href="namespacecrop__coefficients____fao56.html#a777917a9f02e144df2e0367a41d947c7">crop_coefficients__fao56</a></li>
+<li>gash_interception_storage_max_growing_season&#160;:&#160;<a class="el" href="a00283.html#ae8634eae43584ab89cf251d94b24c2b7">interception__gash</a></li>
+<li>gash_interception_storage_max_nongrowing_season&#160;:&#160;<a class="el" href="a00283.html#a89be1cbc51e26068cd0c11609cd5f6e1">interception__gash</a></li>
+<li>gdd_base&#160;:&#160;<a class="el" href="a00279.html#aacfa259bbbe00271e8a8cd7b974c7b1d">growing_degree_day</a>, <a class="el" href="a00280.html#a7468f06218936a314c13f9b2e5248634">growing_degree_day_baskerville_emin</a></li>
+<li>gdd_first_day_of_growing_season&#160;:&#160;<a class="el" href="a00281.html#ae264c8ec9e2acf8ae09069ffc4de45dc">growing_season</a></li>
+<li>gdd_max&#160;:&#160;<a class="el" href="a00279.html#a60c068934a808d9c7d004029ba044f66">growing_degree_day</a>, <a class="el" href="a00280.html#acb8a7b23e8bf6765f9b2220ac7013225">growing_degree_day_baskerville_emin</a></li>
+<li>gdd_reset_date&#160;:&#160;<a class="el" href="a00279.html#a7d529916dac673917aba382d0f40fecc">growing_degree_day</a>, <a class="el" href="a00280.html#a0dc27f2f486b5f60973cc35340248324">growing_degree_day_baskerville_emin</a></li>
+<li>grid_active_cell&#160;:&#160;<a class="el" href="a00278.html#a3952feed675471167198f992a76916fe">grid</a></li>
+<li>grid_datatype_double&#160;:&#160;<a class="el" href="a00278.html#aedc9fb9576632b6bf549f326f2fc96e3">grid</a></li>
+<li>grid_datatype_int&#160;:&#160;<a class="el" href="a00278.html#a6f3edd9dfab0cf1847f6126835444fa6">grid</a></li>
+<li>grid_datatype_real&#160;:&#160;<a class="el" href="a00278.html#a95e2f2513fb7f2d11d0130f643931676">grid</a></li>
+<li>grid_nodata_double&#160;:&#160;<a class="el" href="a00278.html#a7db264619d440b0ffe4957b4d158a533">grid</a></li>
+<li>grid_nodata_int&#160;:&#160;<a class="el" href="a00278.html#a93f96949287e2fc24c4a94033e5173af">grid</a></li>
+<li>grid_nodata_real&#160;:&#160;<a class="el" href="a00278.html#a1842368fbcc3fc0f6cabc0b58b8916bd">grid</a></li>
+<li>growth_stage_date&#160;:&#160;<a class="el" href="a00260.html#ac65046b44c2a3ce959c663cfcecc9bf3">crop_coefficients__fao56</a></li>
+<li>growth_stage_gdd&#160;:&#160;<a class="el" href="a00260.html#aa1e1f5f3c27dcb08bf4216edddefda5b">crop_coefficients__fao56</a></li>
+<li>growth_stage_length_in_days&#160;:&#160;<a class="el" href="a00260.html#a531c0e3a3889cc1bc0ff7ce91e304131">crop_coefficients__fao56</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

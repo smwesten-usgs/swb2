@@ -7,8 +7,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Soil Water Balance (SWB2): Data Fields - Functions/Subroutines</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="codefolding.js"></script>
-<script type="text/javascript" src="clipboard.js"></script>
+<!-- jQuery (required by doxygen-awesome JS extensions) -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- doxygen-awesome extensions -->
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeParagraphLink.init()
+    DoxygenAwesomeTabs.init()
+</script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
@@ -23,22 +34,16 @@ MathJax.Hub.Config({
 });
 </script>
 <script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
-<script type="module">
-import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
-mermaid.initialize({ startOnLoad: true, theme: theme });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<link href="custom-modified-doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
  <tbody>
- <tr id="projectrow">
-  <td id="projectalign">
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Soil Water Balance (SWB2)
    </div>
   </td>
@@ -129,40 +134,40 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('functions_func
 
 
 <h3 class="doxsection"><a id="index_r" name="index_r"></a>- r -</h3><ul>
-<li>rad_to_deg_dbl_fn()&#160;:&#160;<a class="el" href="interfaceconstants__and__conversions_1_1rad__to__deg.html#aa4f9acace35c99aa142d0183dfe1ab96">constants_and_conversions::rad_to_deg</a></li>
-<li>rad_to_deg_sgl_fn()&#160;:&#160;<a class="el" href="interfaceconstants__and__conversions_1_1rad__to__deg.html#a76f92c5a0661c67e160edc614ffe772a">constants_and_conversions::rad_to_deg</a></li>
-<li>read_comparison_period_file()&#160;:&#160;<a class="el" href="structswbstats2__support_1_1swbstats__t.html#a2f35cbbd6c4f5263c95aa6198697a852">swbstats2_support::swbstats_t</a></li>
-<li>read_date_range_file()&#160;:&#160;<a class="el" href="structswbstats2__support_1_1swbstats__t.html#a50afb52c59356cac585d3be1f1d9fd17">swbstats2_support::swbstats_t</a></li>
-<li>read_header_fn()&#160;:&#160;<a class="el" href="structfile__operations_1_1ascii__file__t.html#a86c12777f0721d38513b7b032534d9d9">file_operations::ascii_file_t</a></li>
-<li>read_line_of_data_fn()&#160;:&#160;<a class="el" href="structfile__operations_1_1ascii__file__t.html#a7c135ed67b8ab93b566ac1b4bf1cbcfc">file_operations::ascii_file_t</a></li>
-<li>read_zone_period_file()&#160;:&#160;<a class="el" href="structswbstats2__support_1_1swbstats__t.html#afac6641a2ee41ff28256d1174880ec4f">swbstats2_support::swbstats_t</a></li>
-<li>readheader()&#160;:&#160;<a class="el" href="structfile__operations_1_1ascii__file__t.html#a9079bfddb641a5fbe6b77830eafdf206">file_operations::ascii_file_t</a></li>
-<li>readline()&#160;:&#160;<a class="el" href="structfile__operations_1_1ascii__file__t.html#a76609bc4fb2a504e9f77a78238aa0caa">file_operations::ascii_file_t</a></li>
-<li>real2dbl()&#160;:&#160;<a class="el" href="interfaceconstants__and__conversions_1_1asdouble.html#ac84360d00052f8c6c886e8b05b66b421">constants_and_conversions::asdouble</a></li>
-<li>real2int()&#160;:&#160;<a class="el" href="interfaceconstants__and__conversions_1_1asint.html#a4845d4bcef77439b6ff09c090f4bdf30">constants_and_conversions::asint</a></li>
-<li>real2logical()&#160;:&#160;<a class="el" href="interfaceconstants__and__conversions_1_1aslogical.html#af866e06cd2e9f2689564e8c62935a8aa">constants_and_conversions::aslogical</a></li>
-<li>replace()&#160;:&#160;<a class="el" href="structfstring__list_1_1fstring__list__t.html#a428066a076cbe9059747b753a631c94e">fstring_list::fstring_list_t</a></li>
-<li>replace_value_at_index_sub()&#160;:&#160;<a class="el" href="structfstring__list_1_1fstring__list__t.html#a54e7ff774a0682eb2759a929807b5ac8">fstring_list::fstring_list_t</a></li>
-<li>reset()&#160;:&#160;<a class="el" href="structtimer_1_1timer__t.html#ad2d41d970a99bdaae4adc4ac6c5742a9">timer::timer_t</a></li>
-<li>reset_at_yearend_filecount()&#160;:&#160;<a class="el" href="structdata__catalog__entry_1_1data__catalog__entry__t.html#a7b48f17e86b50022af9ed042224ca3c2">data_catalog_entry::data_catalog_entry_t</a></li>
-<li>reset_filecount()&#160;:&#160;<a class="el" href="structdata__catalog__entry_1_1data__catalog__entry__t.html#a812f2b3e06721b128b1e4d048e823a82">data_catalog_entry::data_catalog_entry_t</a></li>
-<li>reset_timer_sub()&#160;:&#160;<a class="el" href="structtimer_1_1timer__t.html#a55a829e9000a27584182775c92befeb4">timer::timer_t</a></li>
-<li>retrieve_value_from_list_at_index_fn()&#160;:&#160;<a class="el" href="structfstring__list_1_1fstring__list__t.html#a1adba435ac772c4036e6de0eb5ebb68f">fstring_list::fstring_list_t</a></li>
-<li>retrieve_values_as_double_fn()&#160;:&#160;<a class="el" href="structfstring__list_1_1fstring__list__t.html#a65bf0fdc24b1747bb44ce48e2295dfa1">fstring_list::fstring_list_t</a></li>
-<li>retrieve_values_as_float_fn()&#160;:&#160;<a class="el" href="structfstring__list_1_1fstring__list__t.html#a8f91c86683aefb50f3346203d1108276">fstring_list::fstring_list_t</a></li>
-<li>retrieve_values_as_integer_fn()&#160;:&#160;<a class="el" href="structfstring__list_1_1fstring__list__t.html#aa3ca56b7721a5eb6c0eec4eb5d1b906d">fstring_list::fstring_list_t</a></li>
-<li>retrieve_values_as_logical_fn()&#160;:&#160;<a class="el" href="structfstring__list_1_1fstring__list__t.html#a85836556c6710361daaf1dea2c283437">fstring_list::fstring_list_t</a></li>
-<li>retrieve_values_for_range_of_indices_fn()&#160;:&#160;<a class="el" href="structfstring__list_1_1fstring__list__t.html#a725231d3033f359127f996d8bbef9157">fstring_list::fstring_list_t</a></li>
-<li>return_count_of_matching_strings_fn()&#160;:&#160;<a class="el" href="structfstring__list_1_1fstring__list__t.html#a0869e785918a3b6ba345ddd6d54b880e">fstring_list::fstring_list_t</a></li>
-<li>return_current_linenum_fn()&#160;:&#160;<a class="el" href="structfile__operations_1_1ascii__file__t.html#ad9adf30cbce7bfa20fd5c99003d47ecd">file_operations::ascii_file_t</a></li>
-<li>return_fortran_unit_number_fn()&#160;:&#160;<a class="el" href="structfile__operations_1_1ascii__file__t.html#a7c20fb74d0d56c4364aba69a7043402f">file_operations::ascii_file_t</a></li>
-<li>return_indices_of_matching_list_entries_fn()&#160;:&#160;<a class="el" href="structfstring__list_1_1fstring__list__t.html#abbcdae248f9bb222ac8738083d4f261b">fstring_list::fstring_list_t</a></li>
-<li>return_list_of_unique_values_fn()&#160;:&#160;<a class="el" href="structfstring__list_1_1fstring__list__t.html#afe27395691a34447ac9aa48b7b37f25a">fstring_list::fstring_list_t</a></li>
-<li>return_num_lines_fn()&#160;:&#160;<a class="el" href="structfile__operations_1_1ascii__file__t.html#a8a0d7b823e36d2cfaab883bf05712ee7">file_operations::ascii_file_t</a></li>
-<li>return_num_records_fn()&#160;:&#160;<a class="el" href="structfile__operations_1_1ascii__file__t.html#ab8a17b9f9d911a27de22c7e82e472f4b">file_operations::ascii_file_t</a></li>
-<li>return_subset_of_partial_matches_fn()&#160;:&#160;<a class="el" href="structfstring__list_1_1fstring__list__t.html#af281a2ac3bdd1859f54aace866f49b05">fstring_list::fstring_list_t</a></li>
-<li>row_column_to_index()&#160;:&#160;<a class="el" href="structmodel__domain_1_1model__domain__t.html#acb3f9828b72c53bf7939d8febd419c65">model_domain::model_domain_t</a></li>
-<li>row_column_to_index_fn()&#160;:&#160;<a class="el" href="structmodel__domain_1_1model__domain__t.html#a0fbc21e2232acad310d8b03fafdd0af5">model_domain::model_domain_t</a></li>
+<li>rad_to_deg_dbl_fn()&#160;:&#160;<a class="el" href="a00350.html#aa4f9acace35c99aa142d0183dfe1ab96">constants_and_conversions::rad_to_deg</a></li>
+<li>rad_to_deg_sgl_fn()&#160;:&#160;<a class="el" href="a00350.html#a76f92c5a0661c67e160edc614ffe772a">constants_and_conversions::rad_to_deg</a></li>
+<li>read_comparison_period_file()&#160;:&#160;<a class="el" href="a00874.html#a2f35cbbd6c4f5263c95aa6198697a852">swbstats2_support::swbstats_t</a></li>
+<li>read_date_range_file()&#160;:&#160;<a class="el" href="a00874.html#a50afb52c59356cac585d3be1f1d9fd17">swbstats2_support::swbstats_t</a></li>
+<li>read_header_fn()&#160;:&#160;<a class="el" href="a00430.html#a86c12777f0721d38513b7b032534d9d9">file_operations::ascii_file_t</a></li>
+<li>read_line_of_data_fn()&#160;:&#160;<a class="el" href="a00430.html#a7c135ed67b8ab93b566ac1b4bf1cbcfc">file_operations::ascii_file_t</a></li>
+<li>read_zone_period_file()&#160;:&#160;<a class="el" href="a00874.html#afac6641a2ee41ff28256d1174880ec4f">swbstats2_support::swbstats_t</a></li>
+<li>readheader()&#160;:&#160;<a class="el" href="a00430.html#a9079bfddb641a5fbe6b77830eafdf206">file_operations::ascii_file_t</a></li>
+<li>readline()&#160;:&#160;<a class="el" href="a00430.html#a76609bc4fb2a504e9f77a78238aa0caa">file_operations::ascii_file_t</a></li>
+<li>real2dbl()&#160;:&#160;<a class="el" href="a00358.html#ac84360d00052f8c6c886e8b05b66b421">constants_and_conversions::asdouble</a></li>
+<li>real2int()&#160;:&#160;<a class="el" href="a00362.html#a4845d4bcef77439b6ff09c090f4bdf30">constants_and_conversions::asint</a></li>
+<li>real2logical()&#160;:&#160;<a class="el" href="a00366.html#af866e06cd2e9f2689564e8c62935a8aa">constants_and_conversions::aslogical</a></li>
+<li>replace()&#160;:&#160;<a class="el" href="a00546.html#a428066a076cbe9059747b753a631c94e">fstring_list::fstring_list_t</a></li>
+<li>replace_value_at_index_sub()&#160;:&#160;<a class="el" href="a00546.html#a54e7ff774a0682eb2759a929807b5ac8">fstring_list::fstring_list_t</a></li>
+<li>reset()&#160;:&#160;<a class="el" href="a00878.html#ad2d41d970a99bdaae4adc4ac6c5742a9">timer::timer_t</a></li>
+<li>reset_at_yearend_filecount()&#160;:&#160;<a class="el" href="a00386.html#a7b48f17e86b50022af9ed042224ca3c2">data_catalog_entry::data_catalog_entry_t</a></li>
+<li>reset_filecount()&#160;:&#160;<a class="el" href="a00386.html#a812f2b3e06721b128b1e4d048e823a82">data_catalog_entry::data_catalog_entry_t</a></li>
+<li>reset_timer_sub()&#160;:&#160;<a class="el" href="a00878.html#a55a829e9000a27584182775c92befeb4">timer::timer_t</a></li>
+<li>retrieve_value_from_list_at_index_fn()&#160;:&#160;<a class="el" href="a00546.html#a1adba435ac772c4036e6de0eb5ebb68f">fstring_list::fstring_list_t</a></li>
+<li>retrieve_values_as_double_fn()&#160;:&#160;<a class="el" href="a00546.html#a65bf0fdc24b1747bb44ce48e2295dfa1">fstring_list::fstring_list_t</a></li>
+<li>retrieve_values_as_float_fn()&#160;:&#160;<a class="el" href="a00546.html#a8f91c86683aefb50f3346203d1108276">fstring_list::fstring_list_t</a></li>
+<li>retrieve_values_as_integer_fn()&#160;:&#160;<a class="el" href="a00546.html#aa3ca56b7721a5eb6c0eec4eb5d1b906d">fstring_list::fstring_list_t</a></li>
+<li>retrieve_values_as_logical_fn()&#160;:&#160;<a class="el" href="a00546.html#a85836556c6710361daaf1dea2c283437">fstring_list::fstring_list_t</a></li>
+<li>retrieve_values_for_range_of_indices_fn()&#160;:&#160;<a class="el" href="a00546.html#a725231d3033f359127f996d8bbef9157">fstring_list::fstring_list_t</a></li>
+<li>return_count_of_matching_strings_fn()&#160;:&#160;<a class="el" href="a00546.html#a0869e785918a3b6ba345ddd6d54b880e">fstring_list::fstring_list_t</a></li>
+<li>return_current_linenum_fn()&#160;:&#160;<a class="el" href="a00430.html#ad9adf30cbce7bfa20fd5c99003d47ecd">file_operations::ascii_file_t</a></li>
+<li>return_fortran_unit_number_fn()&#160;:&#160;<a class="el" href="a00430.html#a7c20fb74d0d56c4364aba69a7043402f">file_operations::ascii_file_t</a></li>
+<li>return_indices_of_matching_list_entries_fn()&#160;:&#160;<a class="el" href="a00546.html#abbcdae248f9bb222ac8738083d4f261b">fstring_list::fstring_list_t</a></li>
+<li>return_list_of_unique_values_fn()&#160;:&#160;<a class="el" href="a00546.html#afe27395691a34447ac9aa48b7b37f25a">fstring_list::fstring_list_t</a></li>
+<li>return_num_lines_fn()&#160;:&#160;<a class="el" href="a00430.html#a8a0d7b823e36d2cfaab883bf05712ee7">file_operations::ascii_file_t</a></li>
+<li>return_num_records_fn()&#160;:&#160;<a class="el" href="a00430.html#ab8a17b9f9d911a27de22c7e82e472f4b">file_operations::ascii_file_t</a></li>
+<li>return_subset_of_partial_matches_fn()&#160;:&#160;<a class="el" href="a00546.html#af281a2ac3bdd1859f54aace866f49b05">fstring_list::fstring_list_t</a></li>
+<li>row_column_to_index()&#160;:&#160;<a class="el" href="a00594.html#acb3f9828b72c53bf7939d8febd419c65">model_domain::model_domain_t</a></li>
+<li>row_column_to_index_fn()&#160;:&#160;<a class="el" href="a00594.html#a0fbc21e2232acad310d8b03fafdd0af5">model_domain::model_domain_t</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

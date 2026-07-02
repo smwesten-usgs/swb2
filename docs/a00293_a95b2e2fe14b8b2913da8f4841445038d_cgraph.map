@@ -1,0 +1,13 @@
+<map id="model_domain::model_update_crop_coefficient_fao56" name="model_domain::model_update_crop_coefficient_fao56">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,153,210,196"/>
+<area shape="rect" id="Node000002" href="$a00260.html#aabd842fb2d61ea3ce8deca465fe8b833" title=" " alt="" coords="290,104,456,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="209,156,277,148,272,150,211,161"/>
+<area shape="rect" id="Node000005" href="$a00260.html#a7d38167cc2ba756a05ad21ec000e1ded" title=" " alt="" coords="258,187,488,245"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="210,188,245,195,240,196,210,193"/>
+<area shape="rect" id="Node000003" href="$a00260.html#a8a0d4e2713c1af56909eb81d44ddf0aa" title="Update the current basal crop coefficient (Kcb) for a SINGLE irrigation table entry." alt="" coords="564,5,704,80"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="456,102,547,73,552,71,457,107"/>
+<area shape="rect" id="Node000004" href="$a00260.html#a1b6fc6cc23790211919c445b56dce2ca" title="Update the current basal crop coefficient (Kcb), with GDD as the threhold." alt="" coords="536,104,732,163"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="456,131,523,133,518,134,457,136"/>
+<area shape="rect" id="Node000006" href="$a00260.html#aef90b0d53dfe9e47eed02649d4dc7806" title=" " alt="" coords="551,187,717,245"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="488,213,538,216,533,216,488,219"/>
+</map>

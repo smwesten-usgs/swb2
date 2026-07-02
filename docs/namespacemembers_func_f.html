@@ -7,8 +7,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Soil Water Balance (SWB2): Module Members</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="codefolding.js"></script>
-<script type="text/javascript" src="clipboard.js"></script>
+<!-- jQuery (required by doxygen-awesome JS extensions) -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- doxygen-awesome extensions -->
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeParagraphLink.init()
+    DoxygenAwesomeTabs.init()
+</script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
@@ -23,22 +34,16 @@ MathJax.Hub.Config({
 });
 </script>
 <script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
-<script type="module">
-import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
-mermaid.initialize({ startOnLoad: true, theme: theme });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<link href="custom-modified-doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
  <tbody>
- <tr id="projectrow">
-  <td id="projectalign">
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Soil Water Balance (SWB2)
    </div>
   </td>
@@ -127,20 +132,20 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('namespacemembe
 <div class="textblock">Here is a list of all namespace functions with links to the namespace documentation for each function:</div>
 
 <h3 class="doxsection"><a id="index_f" name="index_f"></a>- f -</h3><ul>
-<li>f_to_c_string_fn()&#160;:&#160;<a class="el" href="namespacefstring.html#a58dfda7bf1bb05fb309be9ba6a52159e">fstring</a></li>
-<li>finalize_accumulators()&#160;:&#160;<a class="el" href="namespacemodel__iterate__multiple__simulations.html#a61f2e84fbf44fc09c75b7d92b57eb7e1">model_iterate_multiple_simulations</a></li>
-<li>finalize_output()&#160;:&#160;<a class="el" href="namespaceoutput.html#abc630d954d77cf09d14c87eb776151de">output</a></li>
-<li>find_dict_entry_fn()&#160;:&#160;<a class="el" href="namespacedictionary.html#ab7ae56f8ebd622e70f4ad2efd61a132a">dictionary</a></li>
-<li>fix_pathname()&#160;:&#160;<a class="el" href="namespaceconstants__and__conversions.html#a033541136836ab3a090e3e1c31d7df33">constants_and_conversions</a></li>
-<li>float_to_char_fn()&#160;:&#160;<a class="el" href="namespacefstring.html#a7ce8fffd5ca8f05e12b95b0056f97d55">fstring</a></li>
-<li>fog_monthly_grid_calculate()&#160;:&#160;<a class="el" href="namespacefog____monthly__grid.html#a9cfb281a09715dad0f591a91af4fda56">fog__monthly_grid</a></li>
-<li>fog_monthly_grid_initialize()&#160;:&#160;<a class="el" href="namespacefog____monthly__grid.html#a7975561757f406875f0241f101aa4310">fog__monthly_grid</a></li>
-<li>fortran_to_c_string()&#160;:&#160;<a class="el" href="namespaceconstants__and__conversions.html#a18c2e8f3b08da9d6b3625f0f694f93c6">constants_and_conversions</a></li>
-<li>ftoc_dbl_fn()&#160;:&#160;<a class="el" href="namespaceconstants__and__conversions.html#a508590e05d896e844aa0cfc4318c6db1">constants_and_conversions</a></li>
-<li>ftoc_sgl_fn()&#160;:&#160;<a class="el" href="namespaceconstants__and__conversions.html#a70f1ffbea49dc631469a606f91c85ed5">constants_and_conversions</a></li>
-<li>ftok_dbl_fn()&#160;:&#160;<a class="el" href="namespaceconstants__and__conversions.html#a3898e7af552961599a211e7444a7eb81">constants_and_conversions</a></li>
-<li>ftok_sgl_fn()&#160;:&#160;<a class="el" href="namespaceconstants__and__conversions.html#a97d4910caf88f3019cdb423157c3071c">constants_and_conversions</a></li>
-<li>fully_qualified_filename()&#160;:&#160;<a class="el" href="namespacefile__operations.html#a34279c59c086d32d4a2c9962a373ef16">file_operations</a></li>
+<li>f_to_c_string_fn()&#160;:&#160;<a class="el" href="a00276.html#a58dfda7bf1bb05fb309be9ba6a52159e">fstring</a></li>
+<li>finalize_accumulators()&#160;:&#160;<a class="el" href="a00296.html#a61f2e84fbf44fc09c75b7d92b57eb7e1">model_iterate_multiple_simulations</a></li>
+<li>finalize_output()&#160;:&#160;<a class="el" href="a00299.html#abc630d954d77cf09d14c87eb776151de">output</a></li>
+<li>find_dict_entry_fn()&#160;:&#160;<a class="el" href="a00265.html#ab7ae56f8ebd622e70f4ad2efd61a132a">dictionary</a></li>
+<li>fix_pathname()&#160;:&#160;<a class="el" href="a00258.html#a033541136836ab3a090e3e1c31d7df33">constants_and_conversions</a></li>
+<li>float_to_char_fn()&#160;:&#160;<a class="el" href="a00276.html#a7ce8fffd5ca8f05e12b95b0056f97d55">fstring</a></li>
+<li>fog_monthly_grid_calculate()&#160;:&#160;<a class="el" href="a00275.html#a9cfb281a09715dad0f591a91af4fda56">fog__monthly_grid</a></li>
+<li>fog_monthly_grid_initialize()&#160;:&#160;<a class="el" href="a00275.html#a7975561757f406875f0241f101aa4310">fog__monthly_grid</a></li>
+<li>fortran_to_c_string()&#160;:&#160;<a class="el" href="a00258.html#a18c2e8f3b08da9d6b3625f0f694f93c6">constants_and_conversions</a></li>
+<li>ftoc_dbl_fn()&#160;:&#160;<a class="el" href="a00258.html#a508590e05d896e844aa0cfc4318c6db1">constants_and_conversions</a></li>
+<li>ftoc_sgl_fn()&#160;:&#160;<a class="el" href="a00258.html#a70f1ffbea49dc631469a606f91c85ed5">constants_and_conversions</a></li>
+<li>ftok_dbl_fn()&#160;:&#160;<a class="el" href="a00258.html#a3898e7af552961599a211e7444a7eb81">constants_and_conversions</a></li>
+<li>ftok_sgl_fn()&#160;:&#160;<a class="el" href="a00258.html#a97d4910caf88f3019cdb423157c3071c">constants_and_conversions</a></li>
+<li>fully_qualified_filename()&#160;:&#160;<a class="el" href="a00274.html#a34279c59c086d32d4a2c9962a373ef16">file_operations</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

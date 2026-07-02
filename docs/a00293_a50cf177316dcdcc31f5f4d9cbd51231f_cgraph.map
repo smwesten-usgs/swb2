@@ -1,0 +1,21 @@
+<map id="model_domain::model_calculate_actual_et_fao56__two_stage" name="model_domain::model_calculate_actual_et_fao56__two_stage">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,295,154,353"/>
+<area shape="rect" id="Node000002" href="$a00253.html#af3228b9b89331d91550f11e04f3f2a8e" title=" " alt="" coords="202,295,364,353"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,322,188,322,184,326,155,326"/>
+<area shape="rect" id="Node000003" href="$a00253.html#a76e6ada7405afce49a4a59f0b4ff2e1b" title="Adjust the depletion fraction based on current reference ET0." alt="" coords="429,5,591,64"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="290,293,305,246,330,188,365,128,386,99,410,74,418,70,415,74,414,78,390,103,369,131,335,191,310,248,295,296"/>
+<area shape="rect" id="Node000004" href="$a00253.html#ab91f127ee51113f148398b40359bcf96" title=" " alt="" coords="413,88,607,147"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="298,293,344,226,375,189,410,157,419,153,415,157,414,161,379,193,348,229,303,296"/>
+<area shape="rect" id="Node000005" href="$a00253.html#a2c55e5cfc033ad9832cc6d414b6b3e0c" title="This function estimates the fraction of the ground covered by vegetation during the growing season." alt="" coords="412,171,608,229"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="325,292,411,239,424,235,419,238,413,244,328,296"/>
+<area shape="rect" id="Node000006" href="$a00253.html#ad53aaae7fdb07a8deab46ecfb2d6302f" title="This function estimates Ke, the bare surface evaporation coefficient." alt="" coords="425,253,595,312"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="364,307,412,300,407,302,366,312"/>
+<area shape="rect" id="Node000007" href="$a00253.html#a5ca6e96aa217849c3e545542fbff4468" title="This subroutine updates the total available water (TAW) (water within the rootzone) for a gridcell." alt="" coords="432,336,588,395"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="364,336,419,348,414,349,365,341"/>
+<area shape="rect" id="Node000008" href="$a00253.html#a813969f340b581bf800357bea36617d0" title="This function estimates Ks, water stress coefficient." alt="" coords="430,419,590,477"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="327,351,413,404,424,412,419,412,411,409,326,356"/>
+<area shape="rect" id="Node000009" href="$a00253.html#a8be8682bb1cc3e01a5f9da40836cf06b" title=" " alt="" coords="422,501,599,560"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="301,351,348,419,379,455,414,487,419,493,414,492,410,491,375,459,344,422,300,356"/>
+<area shape="rect" id="Node000010" href="$a00253.html#a209a8ec04b7602e960bd1755064dcfe4" title="This function updates the plant height by scaling values relative to the position of the current Kcb ..." alt="" coords="432,584,588,643"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="293,351,310,400,335,457,369,517,390,545,414,570,422,579,417,578,410,574,386,549,365,520,330,460,305,402,291,356"/>
+</map>

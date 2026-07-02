@@ -1,0 +1,9 @@
+<map id="model_domain::model_initialize_crop_coefficient_fao56" name="model_domain::model_initialize_crop_coefficient_fao56">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,47,218,89"/>
+<area shape="rect" id="Node000002" href="$a00260.html#a12966098ef34ed15c09876a3add78312" title=" " alt="" coords="266,39,432,97"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="218,65,253,68,247,68,218,71"/>
+<area shape="rect" id="Node000003" href="$a00260.html#aef90b0d53dfe9e47eed02649d4dc7806" title=" " alt="" coords="480,5,646,64"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="432,52,462,50,467,50,433,58"/>
+<area shape="rect" id="Node000004" href="$a00273.html#a865c266d00ec8abab13dc671fd1f2d84" title=" " alt="" coords="503,88,623,115"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="433,78,491,90,486,90,432,84"/>
+</map>

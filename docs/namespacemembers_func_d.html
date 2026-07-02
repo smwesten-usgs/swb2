@@ -7,8 +7,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Soil Water Balance (SWB2): Module Members</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="codefolding.js"></script>
-<script type="text/javascript" src="clipboard.js"></script>
+<!-- jQuery (required by doxygen-awesome JS extensions) -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- doxygen-awesome extensions -->
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeParagraphLink.init()
+    DoxygenAwesomeTabs.init()
+</script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
@@ -23,22 +34,16 @@ MathJax.Hub.Config({
 });
 </script>
 <script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
-<script type="module">
-import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
-mermaid.initialize({ startOnLoad: true, theme: theme });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<link href="custom-modified-doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
  <tbody>
- <tr id="projectrow">
-  <td id="projectalign">
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Soil Water Balance (SWB2)
    </div>
   </td>
@@ -127,43 +132,42 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('namespacemembe
 <div class="textblock">Here is a list of all namespace functions with links to the namespace documentation for each function:</div>
 
 <h3 class="doxsection"><a id="index_d" name="index_d"></a>- d -</h3><ul>
-<li>data_gridenforcelimits_int()&#160;:&#160;<a class="el" href="namespacedata__catalog__entry.html#a73de4485306eb47ab8239a4f0587f937">data_catalog_entry</a></li>
-<li>data_gridenforcelimits_real()&#160;:&#160;<a class="el" href="namespacedata__catalog__entry.html#a68377ba92087fdeb57b26d6b0e617341">data_catalog_entry</a></li>
-<li>data_gridhandlemissingdata_int()&#160;:&#160;<a class="el" href="namespacedata__catalog__entry.html#a152db80682a51005eb53ebfcc866af6a">data_catalog_entry</a></li>
-<li>data_gridhandlemissingdata_real()&#160;:&#160;<a class="el" href="namespacedata__catalog__entry.html#a0a54d67ae790dcf088234de12d303723">data_catalog_entry</a></li>
-<li>date_advance_to_last_day_of_month_sub()&#160;:&#160;<a class="el" href="namespacedatetime.html#ad742a0c71d15dc3fb6fa3771a6f04e27">datetime</a></li>
-<li>date_minus_date_fn()&#160;:&#160;<a class="el" href="namespacedatetime.html#adcb8dfb9a486a9a5d1da8448d96678de">datetime</a></li>
-<li>date_minus_day_sub()&#160;:&#160;<a class="el" href="namespacedatetime.html#aa0a19c7a6a935a20f439e028fd232a09">datetime</a></li>
-<li>date_minus_float_fn()&#160;:&#160;<a class="el" href="namespacedatetime.html#a1d76f679e958eb943e46454317e7ae6c">datetime</a></li>
-<li>date_minus_int_fn()&#160;:&#160;<a class="el" href="namespacedatetime.html#a4ab84aa346dc329d22c8b70b4626378e">datetime</a></li>
-<li>date_minus_year_sub()&#160;:&#160;<a class="el" href="namespacedatetime.html#a51938d7f0014a1c73f307a30212d46c8">datetime</a></li>
-<li>date_plus_day_sub()&#160;:&#160;<a class="el" href="namespacedatetime.html#a2611f483f15e0b445da4837abec37705">datetime</a></li>
-<li>date_plus_float_fn()&#160;:&#160;<a class="el" href="namespacedatetime.html#a982b02e513ea5d5bb0383761ce58a51c">datetime</a></li>
-<li>date_plus_year_sub()&#160;:&#160;<a class="el" href="namespacedatetime.html#afd0a60a481e99e5668b7e5d8d8837daf">datetime</a></li>
-<li>date_set_day_sub()&#160;:&#160;<a class="el" href="namespacedatetime.html#a398c7479c4373d569f68554e52dc9b7a">datetime</a></li>
-<li>date_set_month_sub()&#160;:&#160;<a class="el" href="namespacedatetime.html#abaa34819828a4204913967cea02d18d8">datetime</a></li>
-<li>date_set_year_sub()&#160;:&#160;<a class="el" href="namespacedatetime.html#a90d4d2b495f7e59326828e5ccdc49e11">datetime</a></li>
-<li>day_angle__gamma()&#160;:&#160;<a class="el" href="namespacesolar__calculations.html#aafa5ae580c2811d38e2f345ccf8caf42">solar_calculations</a></li>
-<li>day_of_year()&#160;:&#160;<a class="el" href="namespacedatetime.html#a06e1494ae58157ef6a2c65707726bc84">datetime</a></li>
-<li>daylight_hours()&#160;:&#160;<a class="el" href="namespacesolar__calculations.html#a81a357c44b34b44b1caa7e2c77e0093b">solar_calculations</a></li>
-<li>days_from_origin_fn()&#160;:&#160;<a class="el" href="namespacesimulation__datetime.html#aed4abefffe3f0b4c7a4c217fa67bf0d4">simulation_datetime</a></li>
-<li>dbl2int()&#160;:&#160;<a class="el" href="namespaceconstants__and__conversions.html#a181db695c70686dc228f9f3228f2dbd7">constants_and_conversions</a></li>
-<li>dbl2logical()&#160;:&#160;<a class="el" href="namespaceconstants__and__conversions.html#a3a321ef654e946d294cddb6edf9e3e73">constants_and_conversions</a></li>
-<li>dbl2real()&#160;:&#160;<a class="el" href="namespaceconstants__and__conversions.html#affbb5eee5aacf1235688fbefa63e2237">constants_and_conversions</a></li>
-<li>deg_to_rad_dbl_fn()&#160;:&#160;<a class="el" href="namespaceconstants__and__conversions.html#abd84e067ccbe8663ebb2952c06eca4a2">constants_and_conversions</a></li>
-<li>deg_to_rad_sgl_fn()&#160;:&#160;<a class="el" href="namespaceconstants__and__conversions.html#a26d4e6c7f2de04536a6957a24f263a35">constants_and_conversions</a></li>
-<li>delete_entry_by_key_sub()&#160;:&#160;<a class="el" href="namespacedictionary.html#aa2a85c30ef77c80cbdacd0b2c52f452f">dictionary</a></li>
-<li>dewpoint_vapor_pressure__e_a()&#160;:&#160;<a class="el" href="namespacemeteorological__calculations.html#ab524a36d5793556fc7942c1f037c08cb">meteorological_calculations</a></li>
-<li>die()&#160;:&#160;<a class="el" href="namespaceexceptions.html#afd73029531ee5ba631b7838d2f6395dd">exceptions</a></li>
-<li>direct_net_infiltration_calculate()&#160;:&#160;<a class="el" href="namespacedirect__net__infiltration____gridded__data.html#a5f235b69879767f4f351e8a78faa737d">direct_net_infiltration__gridded_data</a></li>
-<li>direct_net_infiltration_initialize()&#160;:&#160;<a class="el" href="namespacedirect__net__infiltration____gridded__data.html#af8fe0eaf0373b76901058e65aa5a4b19">direct_net_infiltration__gridded_data</a></li>
-<li>direct_soil_moisture_calculate()&#160;:&#160;<a class="el" href="namespacedirect__soil__moisture____gridded__data.html#a911efed4fc9495831db9589bc3d0b384">direct_soil_moisture__gridded_data</a></li>
-<li>direct_soil_moisture_initialize()&#160;:&#160;<a class="el" href="namespacedirect__soil__moisture____gridded__data.html#ac0f17d28e297cf4148454928320e5515">direct_soil_moisture__gridded_data</a></li>
-<li>does_file_exist_fn()&#160;:&#160;<a class="el" href="namespacefile__operations.html#afd401012a38a1808aac6b6c746804527">file_operations</a></li>
-<li>double_to_char_fn()&#160;:&#160;<a class="el" href="namespacefstring.html#a973a59891ad9f938c2a8b954c3377501">fstring</a></li>
-<li>dquote()&#160;:&#160;<a class="el" href="namespacelogfiles.html#a1fb422476aaf22c38ac9926b7ea90417">logfiles</a></li>
-<li>dquote_char_fn()&#160;:&#160;<a class="el" href="namespacefstring.html#a257ae972101bb14ccb47f8eadd230f02">fstring</a></li>
-<li>dump_data_structure_sub()&#160;:&#160;<a class="el" href="namespacedata__catalog__entry.html#ae25b374c1170fdd0c122e92a781e22ad">data_catalog_entry</a></li>
+<li>data_gridenforcelimits_int()&#160;:&#160;<a class="el" href="a00263.html#a73de4485306eb47ab8239a4f0587f937">data_catalog_entry</a></li>
+<li>data_gridenforcelimits_real()&#160;:&#160;<a class="el" href="a00263.html#a68377ba92087fdeb57b26d6b0e617341">data_catalog_entry</a></li>
+<li>data_gridhandlemissingdata_int()&#160;:&#160;<a class="el" href="a00263.html#a152db80682a51005eb53ebfcc866af6a">data_catalog_entry</a></li>
+<li>data_gridhandlemissingdata_real()&#160;:&#160;<a class="el" href="a00263.html#a0a54d67ae790dcf088234de12d303723">data_catalog_entry</a></li>
+<li>date_advance_to_last_day_of_month_sub()&#160;:&#160;<a class="el" href="a00264.html#ad742a0c71d15dc3fb6fa3771a6f04e27">datetime</a></li>
+<li>date_minus_date_fn()&#160;:&#160;<a class="el" href="a00264.html#adcb8dfb9a486a9a5d1da8448d96678de">datetime</a></li>
+<li>date_minus_day_sub()&#160;:&#160;<a class="el" href="a00264.html#aa0a19c7a6a935a20f439e028fd232a09">datetime</a></li>
+<li>date_minus_float_fn()&#160;:&#160;<a class="el" href="a00264.html#a1d76f679e958eb943e46454317e7ae6c">datetime</a></li>
+<li>date_minus_int_fn()&#160;:&#160;<a class="el" href="a00264.html#a4ab84aa346dc329d22c8b70b4626378e">datetime</a></li>
+<li>date_minus_year_sub()&#160;:&#160;<a class="el" href="a00264.html#a51938d7f0014a1c73f307a30212d46c8">datetime</a></li>
+<li>date_plus_day_sub()&#160;:&#160;<a class="el" href="a00264.html#a2611f483f15e0b445da4837abec37705">datetime</a></li>
+<li>date_plus_float_fn()&#160;:&#160;<a class="el" href="a00264.html#a982b02e513ea5d5bb0383761ce58a51c">datetime</a></li>
+<li>date_plus_year_sub()&#160;:&#160;<a class="el" href="a00264.html#afd0a60a481e99e5668b7e5d8d8837daf">datetime</a></li>
+<li>date_set_day_sub()&#160;:&#160;<a class="el" href="a00264.html#a398c7479c4373d569f68554e52dc9b7a">datetime</a></li>
+<li>date_set_month_sub()&#160;:&#160;<a class="el" href="a00264.html#abaa34819828a4204913967cea02d18d8">datetime</a></li>
+<li>date_set_year_sub()&#160;:&#160;<a class="el" href="a00264.html#a90d4d2b495f7e59326828e5ccdc49e11">datetime</a></li>
+<li>day_angle__gamma()&#160;:&#160;<a class="el" href="a00311.html#aafa5ae580c2811d38e2f345ccf8caf42">solar_calculations</a></li>
+<li>day_of_year()&#160;:&#160;<a class="el" href="a00264.html#a06e1494ae58157ef6a2c65707726bc84">datetime</a></li>
+<li>daylight_hours()&#160;:&#160;<a class="el" href="a00311.html#a81a357c44b34b44b1caa7e2c77e0093b">solar_calculations</a></li>
+<li>days_from_origin_fn()&#160;:&#160;<a class="el" href="a00308.html#aed4abefffe3f0b4c7a4c217fa67bf0d4">simulation_datetime</a></li>
+<li>dbl2int()&#160;:&#160;<a class="el" href="a00258.html#a181db695c70686dc228f9f3228f2dbd7">constants_and_conversions</a></li>
+<li>dbl2logical()&#160;:&#160;<a class="el" href="a00258.html#a3a321ef654e946d294cddb6edf9e3e73">constants_and_conversions</a></li>
+<li>dbl2real()&#160;:&#160;<a class="el" href="a00258.html#affbb5eee5aacf1235688fbefa63e2237">constants_and_conversions</a></li>
+<li>deg_to_rad_dbl_fn()&#160;:&#160;<a class="el" href="a00258.html#abd84e067ccbe8663ebb2952c06eca4a2">constants_and_conversions</a></li>
+<li>deg_to_rad_sgl_fn()&#160;:&#160;<a class="el" href="a00258.html#a26d4e6c7f2de04536a6957a24f263a35">constants_and_conversions</a></li>
+<li>delete_entry_by_key_sub()&#160;:&#160;<a class="el" href="a00265.html#aa2a85c30ef77c80cbdacd0b2c52f452f">dictionary</a></li>
+<li>dewpoint_vapor_pressure__e_a()&#160;:&#160;<a class="el" href="a00292.html#ab524a36d5793556fc7942c1f037c08cb">meteorological_calculations</a></li>
+<li>die()&#160;:&#160;<a class="el" href="a00273.html#afd73029531ee5ba631b7838d2f6395dd">exceptions</a></li>
+<li>direct_net_infiltration_calculate()&#160;:&#160;<a class="el" href="a00266.html#a5f235b69879767f4f351e8a78faa737d">direct_net_infiltration__gridded_data</a></li>
+<li>direct_net_infiltration_initialize()&#160;:&#160;<a class="el" href="a00266.html#af8fe0eaf0373b76901058e65aa5a4b19">direct_net_infiltration__gridded_data</a></li>
+<li>direct_soil_moisture_calculate()&#160;:&#160;<a class="el" href="a00267.html#a911efed4fc9495831db9589bc3d0b384">direct_soil_moisture__gridded_data</a></li>
+<li>direct_soil_moisture_initialize()&#160;:&#160;<a class="el" href="a00267.html#ac0f17d28e297cf4148454928320e5515">direct_soil_moisture__gridded_data</a></li>
+<li>does_file_exist_fn()&#160;:&#160;<a class="el" href="a00274.html#ae39e5c251a6dee9b8ce4c93679e7b525">file_operations</a></li>
+<li>double_to_char_fn()&#160;:&#160;<a class="el" href="a00276.html#a973a59891ad9f938c2a8b954c3377501">fstring</a></li>
+<li>dquote_char_fn()&#160;:&#160;<a class="el" href="a00276.html#a257ae972101bb14ccb47f8eadd230f02">fstring</a></li>
+<li>dump_data_structure_sub()&#160;:&#160;<a class="el" href="a00263.html#ae25b374c1170fdd0c122e92a781e22ad">data_catalog_entry</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

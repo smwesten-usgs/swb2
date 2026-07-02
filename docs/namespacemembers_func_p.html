@@ -7,8 +7,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Soil Water Balance (SWB2): Module Members</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="codefolding.js"></script>
-<script type="text/javascript" src="clipboard.js"></script>
+<!-- jQuery (required by doxygen-awesome JS extensions) -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- doxygen-awesome extensions -->
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeParagraphLink.init()
+    DoxygenAwesomeTabs.init()
+</script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
@@ -23,22 +34,16 @@ MathJax.Hub.Config({
 });
 </script>
 <script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
-<script type="module">
-import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
-mermaid.initialize({ startOnLoad: true, theme: theme });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<link href="custom-modified-doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
  <tbody>
- <tr id="projectrow">
-  <td id="projectalign">
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Soil Water Balance (SWB2)
    </div>
   </td>
@@ -127,23 +132,23 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('namespacemembe
 <div class="textblock">Here is a list of all namespace functions with links to the namespace documentation for each function:</div>
 
 <h3 class="doxsection"><a id="index_p" name="index_p"></a>- p -</h3><ul>
-<li>parse_text_to_date_sub()&#160;:&#160;<a class="el" href="namespacedatetime.html#aa24f133dcadacc1bb33594cccbfdf55c">datetime</a></li>
-<li>parse_text_to_time_sub()&#160;:&#160;<a class="el" href="namespacedatetime.html#a9680208aefbe287eefe50cb59788240f">datetime</a></li>
-<li>percent_complete_fn()&#160;:&#160;<a class="el" href="namespacesimulation__datetime.html#a388bd77e7441de61d08754fd38de9a48">simulation_datetime</a></li>
-<li>perform_daily_calculation()&#160;:&#160;<a class="el" href="namespacedaily__calculation.html#ac74b5b0ab616d2c459e1668bc36c1784">daily_calculation</a></li>
-<li>perform_summary_statistics()&#160;:&#160;<a class="el" href="namespacesummary__statistics.html#aa50a22375e9a0d1e1cba93980102adbd">summary_statistics</a></li>
-<li>precipitation_at_saturation()&#160;:&#160;<a class="el" href="namespaceinterception____gash.html#a0535364fae3a469f8e5c1ab1a6f2f677">interception__gash</a></li>
-<li>precipitation_method_of_fragments_calculate()&#160;:&#160;<a class="el" href="namespaceprecipitation____method__of__fragments.html#a21e98f9e400f9ca056e46d4291bf0b1d">precipitation__method_of_fragments</a></li>
-<li>precipitation_method_of_fragments_initialize()&#160;:&#160;<a class="el" href="namespaceprecipitation____method__of__fragments.html#a4d0a7fd5f83ff361ebf94c8bde158aa1">precipitation__method_of_fragments</a></li>
-<li>preflight_check_method_pointers()&#160;:&#160;<a class="el" href="namespacemodel__domain.html#a8b44126db8cf2bbb08761485f4d2b9da">model_domain</a></li>
-<li>print_all_dictionary_entries_sub()&#160;:&#160;<a class="el" href="namespacedictionary.html#a5a299a69c5ab00d544699a158231ead6">dictionary</a></li>
-<li>print_all_entries_sub()&#160;:&#160;<a class="el" href="namespacefstring__list.html#ae3faf4d18e98687799d27df4c51f7797">fstring_list</a></li>
-<li>print_all_options()&#160;:&#160;<a class="el" href="namespaceswbstats2__support.html#a4348e3834883ca9d18c24e3b7ba3607a">swbstats2_support</a></li>
-<li>print_as_markdown_sub()&#160;:&#160;<a class="el" href="namespacefstring__list.html#a6de6ca123e361a9bb8da5529fe1d4c9f">fstring_list</a></li>
-<li>prob_runoff_enhancement()&#160;:&#160;<a class="el" href="namespacerunoff____curve__number.html#af135ba33e85d0e2f775836d8418e0282">runoff__curve_number</a></li>
-<li>process_fragment_sets()&#160;:&#160;<a class="el" href="namespaceprecipitation____method__of__fragments.html#a8333b8ad450ca979b691760de96116b8">precipitation__method_of_fragments</a></li>
-<li>push_sub()&#160;:&#160;<a class="el" href="namespacerunning__grid__stats.html#a45975a9606b6a45d0366bb1adb44f0f3">running_grid_stats</a></li>
-<li>put_values_to_local_netcdf_sub()&#160;:&#160;<a class="el" href="namespacedata__catalog__entry.html#ab27b83d15851053a7c1099e92642e0db">data_catalog_entry</a></li>
+<li>parse_text_to_date_sub()&#160;:&#160;<a class="el" href="a00264.html#aa24f133dcadacc1bb33594cccbfdf55c">datetime</a></li>
+<li>parse_text_to_time_sub()&#160;:&#160;<a class="el" href="a00264.html#a9680208aefbe287eefe50cb59788240f">datetime</a></li>
+<li>percent_complete_fn()&#160;:&#160;<a class="el" href="a00308.html#a388bd77e7441de61d08754fd38de9a48">simulation_datetime</a></li>
+<li>perform_daily_calculation()&#160;:&#160;<a class="el" href="a00261.html#ac74b5b0ab616d2c459e1668bc36c1784">daily_calculation</a></li>
+<li>perform_summary_statistics()&#160;:&#160;<a class="el" href="a00313.html#aa50a22375e9a0d1e1cba93980102adbd">summary_statistics</a></li>
+<li>precipitation_at_saturation()&#160;:&#160;<a class="el" href="a00283.html#a0535364fae3a469f8e5c1ab1a6f2f677">interception__gash</a></li>
+<li>precipitation_method_of_fragments_calculate()&#160;:&#160;<a class="el" href="a00301.html#a21e98f9e400f9ca056e46d4291bf0b1d">precipitation__method_of_fragments</a></li>
+<li>precipitation_method_of_fragments_initialize()&#160;:&#160;<a class="el" href="a00301.html#a4d0a7fd5f83ff361ebf94c8bde158aa1">precipitation__method_of_fragments</a></li>
+<li>preflight_check_method_pointers()&#160;:&#160;<a class="el" href="a00293.html#a8b44126db8cf2bbb08761485f4d2b9da">model_domain</a></li>
+<li>print_all_dictionary_entries_sub()&#160;:&#160;<a class="el" href="a00265.html#a5a299a69c5ab00d544699a158231ead6">dictionary</a></li>
+<li>print_all_entries_sub()&#160;:&#160;<a class="el" href="a00277.html#ae3faf4d18e98687799d27df4c51f7797">fstring_list</a></li>
+<li>print_all_options()&#160;:&#160;<a class="el" href="a00314.html#a4348e3834883ca9d18c24e3b7ba3607a">swbstats2_support</a></li>
+<li>print_as_markdown_sub()&#160;:&#160;<a class="el" href="a00277.html#a6de6ca123e361a9bb8da5529fe1d4c9f">fstring_list</a></li>
+<li>prob_runoff_enhancement()&#160;:&#160;<a class="el" href="a00306.html#af135ba33e85d0e2f775836d8418e0282">runoff__curve_number</a></li>
+<li>process_fragment_sets()&#160;:&#160;<a class="el" href="a00301.html#a8333b8ad450ca979b691760de96116b8">precipitation__method_of_fragments</a></li>
+<li>push_sub()&#160;:&#160;<a class="el" href="a00305.html#a45975a9606b6a45d0366bb1adb44f0f3">running_grid_stats</a></li>
+<li>put_values_to_local_netcdf_sub()&#160;:&#160;<a class="el" href="a00263.html#ab27b83d15851053a7c1099e92642e0db">data_catalog_entry</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

@@ -7,8 +7,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Soil Water Balance (SWB2): Data Fields - Functions/Subroutines</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="codefolding.js"></script>
-<script type="text/javascript" src="clipboard.js"></script>
+<!-- jQuery (required by doxygen-awesome JS extensions) -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- doxygen-awesome extensions -->
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeParagraphLink.init()
+    DoxygenAwesomeTabs.init()
+</script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
@@ -23,22 +34,16 @@ MathJax.Hub.Config({
 });
 </script>
 <script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
-<script type="module">
-import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
-mermaid.initialize({ startOnLoad: true, theme: theme });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<link href="custom-modified-doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
  <tbody>
- <tr id="projectrow">
-  <td id="projectalign">
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Soil Water Balance (SWB2)
    </div>
   </td>
@@ -129,14 +134,14 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('functions_func
 
 
 <h3 class="doxsection"><a id="index_w" name="index_w"></a>- w -</h3><ul>
-<li>which()&#160;:&#160;<a class="el" href="structfstring__list_1_1fstring__list__t.html#a9e9cd9ecb1e8bea1aa1d1749fa4d657c">fstring_list::fstring_list_t</a></li>
-<li>write()&#160;:&#160;<a class="el" href="structlogfiles_1_1logfile__t.html#ada87c9f639b2b1762472cdbc66332219">logfiles::logfile_t</a></li>
-<li>write_line_of_data_sub()&#160;:&#160;<a class="el" href="structfile__operations_1_1ascii__file__t.html#aa470cfcdf5c4686a1f81438b12626151">file_operations::ascii_file_t</a></li>
-<li>write_monthly_stats_to_arcgrid()&#160;:&#160;<a class="el" href="structswbstats2__support_1_1swbstats__t.html#a9d609a2fcee3f139e710be96dce8e8a5">swbstats2_support::swbstats_t</a></li>
-<li>write_stats_to_arcgrid()&#160;:&#160;<a class="el" href="structswbstats2__support_1_1swbstats__t.html#ad4d8e3ec49ece5d97b523bf93f1dcd3d">swbstats2_support::swbstats_t</a></li>
-<li>write_stats_to_netcdf()&#160;:&#160;<a class="el" href="structswbstats2__support_1_1swbstats__t.html#ae10b62e9bb29d20f7907c6089214cbe0">swbstats2_support::swbstats_t</a></li>
-<li>write_to_logfiles_sub()&#160;:&#160;<a class="el" href="structlogfiles_1_1logfile__t.html#afbb24bb891d6eb324a18e87a9496f0e1">logfiles::logfile_t</a></li>
-<li>writeline()&#160;:&#160;<a class="el" href="structfile__operations_1_1ascii__file__t.html#a34f751556da5dcd121171b223007f065">file_operations::ascii_file_t</a></li>
+<li>which()&#160;:&#160;<a class="el" href="a00546.html#a9e9cd9ecb1e8bea1aa1d1749fa4d657c">fstring_list::fstring_list_t</a></li>
+<li>write()&#160;:&#160;<a class="el" href="a00590.html#ada87c9f639b2b1762472cdbc66332219">logfiles::logfile_t</a></li>
+<li>write_line_of_data_sub()&#160;:&#160;<a class="el" href="a00430.html#aa470cfcdf5c4686a1f81438b12626151">file_operations::ascii_file_t</a></li>
+<li>write_monthly_stats_to_arcgrid()&#160;:&#160;<a class="el" href="a00874.html#a9d609a2fcee3f139e710be96dce8e8a5">swbstats2_support::swbstats_t</a></li>
+<li>write_stats_to_arcgrid()&#160;:&#160;<a class="el" href="a00874.html#ad4d8e3ec49ece5d97b523bf93f1dcd3d">swbstats2_support::swbstats_t</a></li>
+<li>write_stats_to_netcdf()&#160;:&#160;<a class="el" href="a00874.html#ae10b62e9bb29d20f7907c6089214cbe0">swbstats2_support::swbstats_t</a></li>
+<li>write_to_logfiles_sub()&#160;:&#160;<a class="el" href="a00590.html#afbb24bb891d6eb324a18e87a9496f0e1">logfiles::logfile_t</a></li>
+<li>writeline()&#160;:&#160;<a class="el" href="a00430.html#a34f751556da5dcd121171b223007f065">file_operations::ascii_file_t</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

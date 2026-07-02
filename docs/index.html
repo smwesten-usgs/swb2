@@ -7,8 +7,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Soil Water Balance (SWB2): Online Documentation</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="codefolding.js"></script>
-<script type="text/javascript" src="clipboard.js"></script>
+<!-- jQuery (required by doxygen-awesome JS extensions) -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- doxygen-awesome extensions -->
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
+<script type="text/javascript" src="doxygen-awesome-fragment-copy-button.js"></script>
+<script type="text/javascript" src="doxygen-awesome-paragraph-link.js"></script>
+<script type="text/javascript" src="doxygen-awesome-tabs.js"></script>
+<script type="text/javascript">
+    DoxygenAwesomeDarkModeToggle.init()
+    DoxygenAwesomeFragmentCopyButton.init()
+    DoxygenAwesomeParagraphLink.init()
+    DoxygenAwesomeTabs.init()
+</script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
@@ -23,22 +34,16 @@ MathJax.Hub.Config({
 });
 </script>
 <script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
-<script type="module">
-import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default';
-mermaid.initialize({ startOnLoad: true, theme: theme });
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
-<link href="custom-modified-doxygen-awesome.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
  <tbody>
- <tr id="projectrow">
-  <td id="projectalign">
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Soil Water Balance (SWB2)
    </div>
   </td>
@@ -147,7 +152,7 @@ System Requirements</h2>
 Running SWB</h2>
 <p>SWB must be run from an operating system command line, with a control filename specified. If the command 'swb2' is entered at the command prompt without providing a control filename, SWB will print out some diagnostic information (fig 1.). The information includes the date of compilation and a Git hash that uniquely identifies the source code used in the compilation SWB also prints out a message that mentions six command-line options: <span class="tt">--output_prefix</span>, <span class="tt">--output_dir</span>, <span class="tt">--lookup_dir</span>, <span class="tt">--logfile_dir</span>, <span class="tt">--data_dir</span>, and <span class="tt">--weather_data_dir</span>.</p>
 <p>Within the control file, paths may be specified as relative or absolute paths. The <span class="tt">--output_prefix</span> option allows the user to specify a text string that will be affixed to the front of each output file name. The <span class="tt">--output_dir</span> and <span class="tt">--logfile_dir</span> options may be used to specify the location in which program output and logfiles, respectively, should be stored. <span class="tt">--lookup_dir</span> may be used to specify the location of the irrigation and landuse lookup tables. The <span class="tt">--data_dir</span> option may be used to specify the location on the disk that SWB will search for input data (such as the water capacity or hydrologic soil group grids). The <span class="tt">--weather_data_dir</span> may be used to specify the location of the input weather data grids or tables.</p>
-<p>If <span class="tt">swb2 my_control_file.ctl --output_prefix=WI_ --output_dir=<a class="el" href="namespaceoutput.html">output</a> --data_dir=input</span> is entered at the command line, an SWB run will begin with whatever options are contained within the control file. Output files will be prefixed with the characters <span class="tt">WI_</span> and saved in the output subdirectory, and the required data will be accessed in the input subdirectory.</p>
+<p>If <span class="tt">swb2 my_control_file.ctl --output_prefix=WI_ --output_dir=<a class="el" href="a00299.html">output</a> --data_dir=input</span> is entered at the command line, an SWB run will begin with whatever options are contained within the control file. Output files will be prefixed with the characters <span class="tt">WI_</span> and saved in the output subdirectory, and the required data will be accessed in the input subdirectory.</p>
 <h1 class="doxsection"><a class="anchor" id="input-and-output-files"></a>
 Input and Output Files</h1>
 <p>SWB requires a combination of gridded and tabular files as input and produces several gridded netCDF files and logfiles as output. This section discusses the input files required by and output files generated by SWB. </p>
@@ -216,8 +221,8 @@ Control File</h2>
 <div class="line">% Continuous Forzen Ground Index initial value and upper and lower limits</div>
 <div class="line">%-----------------------------------------------------------------------------</div>
 <div class="line">INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX CONSTANT 100.0</div>
-<div class="line">UPPER_LIMIT_CFGI 83.</div>
-<div class="line">LOWER_LIMIT_CFGI 55.</div>
+<div class="line">UPPER_LIMIT_CFGI CONSTANT 83.</div>
+<div class="line">LOWER_LIMIT_CFGI CONSTANT 55.</div>
 <div class="line"> </div>
 <div class="line">% Define flow direction, hydrologic soils group, land-use, available</div>
 <div class="line">% water-content grids</div>
