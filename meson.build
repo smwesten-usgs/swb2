@@ -1,9 +1,9 @@
 project(
   'swb2',
   ['fortran', 'c', 'cpp'],
-  version: 'v2.3.5-rc0',
+  version: 'v2.4.0-rc0',
   meson_version: '>= 1.6.0',
-  default_options: ['optimization=2', 'debug=true']
+  default_options: ['optimization=2', 'debug=true', 'fortran_std=f2018']
 )
 
 version = meson.project_version()
@@ -16,8 +16,14 @@ git_branch_str = '"' + git_branch.stdout().strip() + '"'
 git_hash = run_command(['git', 'log', '-1', '--format=%h'], capture: true, check: true)
 git_hash_str = '"' + git_hash.stdout().strip() + '"'
 
-build_number = run_command(['git', 'rev-list', version + '..', '--count'], capture: true, check: true)
-build_number_str = '"' + build_number.stdout().strip() + '"'
+build_number = run_command(['git', 'rev-list', version + '..', '--count'], capture: true, check: false)
+if build_number.returncode() == 0
+  build_number_str = '"' + build_number.stdout().strip() + '"'
+else
+  # Tag doesn't exist yet (e.g., new version number before first commit with that tag).
+  # Default to "0" — the tag will be created at release time.
+  build_number_str = '"0"'
+endif
 
 message('GIT BRANCH IS: ' + git_branch_str)
 message('GIT HASH IS: ' + git_hash_str)
@@ -56,20 +62,6 @@ elif system == 'windows'
   conf_data.set('WINDOWS_SYSTEM', 'True')
 endif
 
-# NetCDF root with platform defaults
-netcdf_root = get_option('netcdf_root')
-if netcdf_root == ''
-  if system == 'windows'
-    netcdf_root = 'C:/Program Files/netCDF 4.9.3'
-  elif system == 'darwin'
-    netcdf_root = '/opt/homebrew/opt/netcdf'
-  elif system == 'linux'
-    netcdf_root = '/usr/local'
-  else
-    error('Unsupported platform: ' + system)
-  endif
-endif
-
 # Build profile
 profile = get_option('profile')
 
@@ -86,7 +78,6 @@ cc = meson.get_compiler('c')
 cc_id = cc.get_id()
 
 message('Profile: ' + profile)
-message('netcdf_root: ' + netcdf_root)
 message('Fortran compiler: ' + fc_id)
 message('C compiler: ' + cc_id)
 message('Build machine: ' + system)
@@ -108,45 +99,26 @@ if fc_id == 'gcc'
   # --- Profile-specific flags ---
   if profile == 'release'
     compile_args += [
-      '-fall-intrinsics',
-      '-std=gnu',
-      '-fallow-argument-mismatch',
-      '-Wno-unused-dummy-argument',
-      '-Wno-maybe-uninitialized',
-      '-Wno-uninitialized',
-      '-Wno-conversion',
       '-ffpe-trap=overflow,zero',
-      '-g', '-fbacktrace',
+      '-fbacktrace',
     ]
 
   elif profile == 'develop'
     compile_args += [
-      '-fall-intrinsics',
-      '-std=gnu',
-      '-fallow-argument-mismatch',
-      '-Wno-unused-dummy-argument',
-      '-Wno-maybe-uninitialized',
-      '-Wno-uninitialized',
-      '-Wno-conversion',
       '-fcheck=all',
       '-finit-real=nan',
       '-ffpe-trap=overflow,zero',
-      '-g', '-fbacktrace',
+      '-fbacktrace',
     ]
 
   elif profile == 'static_analysis'
     # Goal: emit comprehensive warnings about everything non-conforming.
-    # -fallow-argument-mismatch downgrades type mismatches from errors to warnings
-    # so compilation continues and we get the full report.
     compile_args += [
-      '-std=f2018',
-      '-fallow-argument-mismatch',
       '-Wall',
       '-Wextra',
       '-Wimplicit-interface',
       '-Wno-unused-dummy-argument',
       '-pedantic',
-      '-g',
     ]
   endif
 

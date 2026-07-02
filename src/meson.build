@@ -91,22 +91,33 @@ swb_library = static_library('swb_library',
 )
 
 # NetCDF and related dependencies
-# Prefer pkg-config (works inside pixi, works on Linux with system packages)
-netcdf_dep = dependency('netcdf', required: false)
-hdf5_dep = dependency('hdf5', required: false)
+# Strategy: Use find_library() to locate netcdf and hdf5 directly.
+# This avoids broken Libs.private in conda-forge's netcdf.pc on Windows
+# (which contains leaked CMake target names like -lHDF5::HDF5).
 
-if netcdf_dep.found() and hdf5_dep.found()
-  swb_deps = [netcdf_dep, hdf5_dep]
-  message('Dependencies found via pkg-config')
-else
-  # Fallback: manual search using netcdf_root
-  message('pkg-config not available; using netcdf_root: ' + netcdf_root)
-  zlib = cc.find_library('zlib', dirs: [netcdf_root / 'lib'], required: false)
-  hdf5 = cc.find_library('hdf5', dirs: [netcdf_root / 'lib'], required: true)
-  hdf5_hl = cc.find_library('hdf5_hl', dirs: [netcdf_root / 'lib'], required: true)
-  netcdf = cc.find_library('netcdf', dirs: [netcdf_root / 'lib'], required: true)
-  swb_deps = [zlib, hdf5, hdf5_hl, netcdf]
+netcdf_root = get_option('netcdf_root')
+
+if netcdf_root == ''
+  # Platform-specific fallback defaults
+  if system == 'windows'
+    netcdf_root = 'C:/Program Files/netCDF 4.9.3'
+  elif system == 'darwin'
+    netcdf_root = '/opt/homebrew/opt/netcdf'
+  elif system == 'linux'
+    netcdf_root = '/usr/local'
+  else
+    error('Please specify -Dnetcdf_root=/path/to/netcdf')
+  endif
 endif
+
+message('Using netcdf_root: ' + netcdf_root)
+netcdf_lib_dir = netcdf_root / 'lib'
+
+netcdf = cc.find_library('netcdf', dirs: [netcdf_lib_dir], required: true)
+hdf5 = cc.find_library('hdf5', dirs: [netcdf_lib_dir], required: true)
+hdf5_hl = cc.find_library('hdf5_hl', dirs: [netcdf_lib_dir], required: true)
+zlib = cc.find_library('zlib', dirs: [netcdf_lib_dir], required: false)
+swb_deps = [netcdf, hdf5, hdf5_hl, zlib]
 
 executable('swb2',
     files('main.F90'),

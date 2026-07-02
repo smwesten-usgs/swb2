@@ -1,7 +1,7 @@
 # SWB2 Developer Quickstart Guide
 
 **Last updated:** May 2026  
-**SWB2 version:** v2.3.5-rc0  
+**SWB2 version:** v2.4.0-rc0  
 
 ---
 

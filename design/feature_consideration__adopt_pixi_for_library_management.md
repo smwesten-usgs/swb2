@@ -1,223 +1,214 @@
 # Feature Consideration: Adopt Pixi for Library and Build Management
 
-**Date:** May 2026  
-**Status:** Proposed (high-ROI, likely the single biggest build-friction reduction)  
+**Date:** May 2026 (proposed) → July 2, 2026 (adopted)  
+**Status:** ✅ ADOPTED — working on Windows with gfortran 15.2 via conda-forge  
+**Branch:** `pixi_build`
 
 ---
 
-## The Problem
+## Summary of Outcome
 
-SWB2's current build requires users to manually install NetCDF (with HDF5 and zlib) and tell meson where to find it. On Windows this is a major pain point:
-
-- NetCDF must be downloaded and installed manually
-- The user must know the exact installation path and pass `-Dnetcdf_root=...`
-- HDF5 and zlib versions must be compatible with the installed NetCDF
-- Platform-specific defaults are hardcoded in `meson.build`
-- pkg-config doesn't work on native Windows without a package manager
-- Static linking requires all libraries to be built with the same compiler/ABI
-
-The current `meson.build` has ~30 lines of platform-specific library detection code to cope with this.
+Pixi has been successfully adopted for SWB2's build workflow on Windows. The
+original proposal's promise — "from clean checkout to working executable in
+three commands" — has been realized. The effort estimate of ~1 day was roughly
+accurate once platform quirks were resolved.
 
 ---
 
-## What Pixi Is
+## What Was Implemented
 
-[Pixi](https://pixi.sh) is a cross-platform package manager and task runner built on conda-forge. It:
-
-- Installs pre-built libraries (netCDF, HDF5, zlib, PROJ, compilers) into a local `.pixi/` directory
-- Provides `pkg-config` and correctly-configured `.pc` files
-- Sets environment variables (`PKG_CONFIG_PATH`, `PATH`, etc.) when running tasks
-- Works identically on Windows, Linux, and macOS
-- Locks dependency versions for reproducibility (`pixi.lock`)
-- Requires no system-level installation — just a single binary
-
-MODFLOW6 uses pixi for exactly this purpose. Their key insight: the `setup` task sets `PKG_CONFIG_PATH = "$CONDA_PREFIX/lib/pkgconfig"`, which makes meson's `dependency()` calls find everything automatically.
-
----
-
-## How It Works on Windows (The Key Question)
-
-### Why pkg-config normally fails on Windows
-
-In a normal Windows development setup, pkg-config is either not installed, can't find `.pc` files (no standard location), or the paths inside `.pc` files use Unix-style paths.
-
-### How pixi makes it work
-
-1. `pixi install` downloads pre-built Windows packages from conda-forge
-2. Libraries go into `.pixi/envs/default/Library/lib/`, headers into `.pixi/envs/default/Library/include/`
-3. Pixi also installs `pkg-config` itself as a conda package
-4. `.pc` files are placed in `.pixi/envs/default/Library/lib/pkgconfig/` with correct Windows paths
-5. When you run `pixi run setup`, the `PKG_CONFIG_PATH` environment variable points to that directory
-6. Meson's `dependency('netcdf')` calls pkg-config, which finds the `.pc` file, which has correct paths
-
-Everything is self-consistent because pixi controls the entire environment.
-
-### ABI caveat
-
-Conda-forge Windows packages are typically built with MSVC. With gfortran (MinGW):
-- **Dynamic linking works** (DLL linking is cross-ABI compatible)
-- **Static linking does not** (can't link MSVC `.lib` files with MinGW's linker)
-
-For development and CI, dynamic linking via pixi is the path of least resistance. For distribution, you'd either ship DLLs alongside the executable or build a static release using MSYS2's MinGW packages.
-
----
-
-## What the Migration Looks Like
-
-### New file: `pixi.toml`
+### `pixi.toml` (final form)
 
 ```toml
 [workspace]
 name = "swb2"
 channels = ["conda-forge"]
-platforms = ["win-64", "linux-64", "osx-arm64"]
+platforms = ["win-64"]
 version = "2.3.5"
 
 [dependencies]
 meson = ">=1.6.0"
 ninja = "*"
-pkg-config = "*"
-libnetcdf = "*"       # pulls in hdf5, zlib automatically
-gfortran = "13.*"
-gcc = "13.*"
+libnetcdf = "*"
+hdf5 = "*"
+zlib = "*"
+gfortran = ">=13"
+gcc = ">=13"
+gxx = ">=13"
 
 [tasks]
-setup = { cmd = "meson setup builddir --prefix=$PIXI_PROJECT_ROOT", env = { PKG_CONFIG_PATH = "$CONDA_PREFIX/lib/pkgconfig" } }
+setup = { cmd = "meson setup builddir --wipe -Dprofile=release -Dnetcdf_root=$CONDA_PREFIX" }
+setup-dev = { cmd = "meson setup builddir --wipe -Dprofile=develop -Doptimization=0 -Dnetcdf_root=$CONDA_PREFIX" }
+setup-sa = { cmd = "meson setup builddir --wipe -Dprofile=static_analysis -Dnetcdf_root=$CONDA_PREFIX" }
 build = "meson compile -C builddir"
-test = "meson test --verbose --no-rebuild -C builddir"
+test = { cmd = "../../builddir/test/unit_tests/swbtest", cwd = "test/unit_tests" }
 clean = "rm -rf builddir"
 
 [target.win-64.tasks]
-setup = { cmd = "meson setup builddir --prefix=%PIXI_PROJECT_ROOT%", env = { PKG_CONFIG_PATH = "%CONDA_PREFIX%/Library/lib/pkgconfig" } }
+setup = { cmd = "cmd /c meson setup builddir --wipe -Dprofile=release -Dnetcdf_root=%CONDA_PREFIX%/Library" }
+setup-dev = { cmd = "cmd /c meson setup builddir --wipe -Dprofile=develop -Doptimization=0 -Dnetcdf_root=%CONDA_PREFIX%/Library" }
+setup-sa = { cmd = "cmd /c meson setup builddir --wipe -Dprofile=static_analysis -Dnetcdf_root=%CONDA_PREFIX%/Library" }
+clean = { cmd = "cmd /c \"rmdir /s /q builddir 2>nul || exit /b 0\"" }
+test = { cmd = "cmd /c ..\\..\\builddir\\test\\unit_tests\\swbtest.exe", cwd = "test/unit_tests" }
 ```
 
-Note: conda-forge on Windows puts libraries under `Library/` rather than directly in the prefix, hence the platform-specific task override.
+### Key Architecture Decisions
 
-### Simplified `meson.build`
+1. **No pkg-config** — conda-forge's `netcdf.pc` on Windows is broken (leaks
+   CMake target names like `-lHDF5::HDF5` into `Libs.private`). We use
+   `cc.find_library()` with explicit dirs in `src/meson.build` instead.
 
-```meson
-# Try pkg-config first (works inside pixi, works on Linux with system packages)
-netcdf_dep = dependency('netcdf', required: false)
-hdf5_dep = dependency('hdf5', required: false)
+2. **`fortran_std=f2018` globally** — set in `meson.build` `default_options`.
+   No more `-fall-intrinsics` or `-std=gnu`.
 
-if netcdf_dep.found() and hdf5_dep.found()
-  # pkg-config found everything — done
-  all_deps = [netcdf_dep, hdf5_dep]
-else
-  # Fallback: manual search (for users not using pixi)
-  netcdf_root = get_option('netcdf_root')
-  if netcdf_root == ''
-    error('NetCDF not found via pkg-config. Please specify -Dnetcdf_root=/path/to/netcdf')
-  endif
-  zlib = cc.find_library('zlib', dirs: [netcdf_root / 'lib'], required: false)
-  hdf5 = cc.find_library('hdf5', dirs: [netcdf_root / 'lib'], required: true)
-  hdf5_hl = cc.find_library('hdf5_hl', dirs: [netcdf_root / 'lib'], required: true)
-  netcdf = cc.find_library('netcdf', dirs: [netcdf_root / 'lib'], required: true)
-  all_deps = [zlib, hdf5, hdf5_hl, netcdf]
-endif
-```
+3. **Dynamic linking** — conda-forge provides MSVC-built DLLs. gfortran links
+   to them at runtime. Static linking remains possible via MSYS2 for release
+   distribution.
 
-This preserves backward compatibility: users without pixi can still pass `-Dnetcdf_root=...`.
+4. **`pixi.lock` committed** — guarantees reproducible environments for
+   reviewer and future developers.
+
+5. **Win-64 only for now** — cross-platform (`linux-64`, `osx-arm64`) removed
+   because the solver hits SSL errors fetching platform repodata from behind
+   USGS MITM proxy, and gfortran package naming differs across platforms.
+   Can be re-added when CI is set up outside USGS network.
 
 ---
 
-## Developer Experience Comparison
+## Problems Encountered & Solutions
 
-### Current (manual)
-
-```bash
-# 1. Download and install NetCDF 4.9.3 from Unidata (Windows installer)
-# 2. Hope HDF5 and zlib versions are compatible
-# 3. Figure out where it installed
-# 4. Configure:
-meson setup builddir -Dnetcdf_root="C:/Program Files/netCDF 4.9.3"
-meson compile -C builddir
-```
-
-### With pixi
-
-```bash
-# One-time setup (downloads ~200MB: netcdf, hdf5, zlib, compilers, pkg-config)
-pixi install
-
-# Build (works identically on Windows, Linux, macOS)
-pixi run setup
-pixi run build
-pixi run test
-```
+| Problem | Root Cause | Solution |
+|---------|-----------|----------|
+| SSL errors during `pixi install` | USGS TLS-intercepting proxy; pixi's rustls doesn't trust Windows cert store | `SSL_CERT_FILE` env var pointing to combined Mozilla + DOI cert bundle |
+| `netcdf.pc` broken on Windows | conda-forge packaging bug: leaked CMake target names in Libs.private | Bypassed pkg-config entirely; use `find_library()` with explicit dirs |
+| `%CONDA_PREFIX%` not expanding | pixi's shell doesn't expand Windows env vars without `cmd /c` | Wrapped Windows tasks in `cmd /c` |
+| `pixi run clean` fails | pixi's shell parser rejects `if` keyword | Used `rmdir /s /q builddir 2>nul \|\| exit /b 0` |
+| `pixi run test` wrong path | `cwd` changes directory before running command; relative path was wrong | Fixed path to `..\\..\\builddir\\test\\unit_tests\\swbtest.exe` |
+| osx-arm64 solver failure | SSL cert issue fetching repodata + different gfortran package names | Restricted to `win-64` platform only for now |
+| First build extremely slow (~5 min) | Endpoint security scanning unsigned pixi/gfortran binaries | Subsequent runs fast; documented in quickstart |
+| `-Wno-unused-dummy-argument` ineffective | gfortran 15.2 doesn't suppress when `-Wextra` also active | Documented as non-actionable; warnings are interface conformance |
 
 ---
 
-## What Pixi Solves
+## What Changed vs. Original Proposal
 
-| Pain Point | How Pixi Fixes It |
-|-----------|-------------------|
-| "Where is netCDF installed?" | It's in `.pixi/envs/default/Library/` (Win) or `.pixi/envs/default/` (Linux/Mac) |
-| "Which HDF5 version is compatible?" | Conda-forge's solver ensures mutual compatibility |
-| "pkg-config can't find .pc files" | Pixi sets `PKG_CONFIG_PATH` in the task environment |
-| "I need to install netCDF manually" | `pixi install` does it |
-| "It works on my machine but not CI" | CI runs `pixi install` + `pixi run build` — identical environment |
-| "Windows vs Linux paths" | Pixi abstracts this; `.pc` files have correct platform paths |
-| "Static vs dynamic linking?" | Conda-forge provides both; choose in meson via `static: true/false` |
+| Proposed | Actual |
+|----------|--------|
+| Use `dependency()` (pkg-config) for netcdf/hdf5 | Used `find_library()` — pkg-config is broken upstream |
+| `pkg-config` as a pixi dependency | Removed — not used |
+| `PKG_CONFIG_PATH` env var in tasks | Not needed — find_library takes explicit dirs |
+| Cross-platform (win/linux/mac) | Win-64 only for now |
+| `gfortran = "13.*"` | `gfortran = ">=13"` — currently resolves to 15.2 |
 
 ---
 
-## How MODFLOW6 Does It
+## Current Compiler: gfortran 15.2 (conda-forge)
 
-MODFLOW6's `pixi.toml` declares `netCDF4` (Python bindings) in its main dependencies and `libnetcdf` + `netcdf-fortran` in the `gcc-extended-build` feature. Their setup task:
+Pixi resolves `gfortran >= 13` to gfortran 15.2.0 from conda-forge. This is a
+very recent compiler with excellent F2018 support. Notable behavior:
 
-```toml
-setup = { cmd = "meson setup --prefix=$(pwd) --libdir=bin --bindir=bin", env = { PKG_CONFIG_PATH = "$CONDA_PREFIX/lib/pkgconfig" } }
-```
-
-They also have a helper script (`gcc-extended-build-update-pc-files.py`) that patches `.pc` files when needed — but this is for their extended parallel build with PETSc, not for basic netCDF usage.
-
-Note: MODFLOW6's *standard* build doesn't use netCDF (it's optional for them). Their Windows netCDF path still has some manual elements for Intel compiler builds. SWB2 would actually have a cleaner story here since netCDF is always required.
+- Full F2018 standard conformance checking works (`-std=f2018`)
+- `-Wno-unused-dummy-argument` does NOT suppress warnings when `-Wextra` is active
+  (appears to be a flag-ordering quirk in this version)
+- No `-fallow-argument-mismatch` needed — all argument mismatches have been fixed
+- No `-fall-intrinsics` needed — all non-standard intrinsics removed
 
 ---
 
-## CI Integration
+## Future Work: Compiler Matrix & CI
 
-With pixi, the GitHub Actions CI becomes trivial:
+These are post-code-review tasks, suitable for when CI is set up on
+code.usgs.gov or GitHub Actions.
+
+### Additional compilers to consider
+
+| Compiler | Value-add | Availability via conda-forge | Notes |
+|----------|-----------|------------------------------|-------|
+| **Intel ifx** | Complementary diagnostics (unreachable code, precision) | ❌ Not on conda-forge | Requires separate oneAPI install or Intel's CI containers |
+| **flang-new (LLVM 18+)** | Different warning set, LLVM-based analysis | ⚠️ Available as `flang` but F2018 support incomplete | Worth monitoring; not ready for production Fortran in mid-2026 |
+| **NAG Fortran** | Gold standard semantic analysis | ❌ Commercial license | If USGS has access, highest-value diagnostic tool for Fortran |
+| **LFortran** | Open-source, AST-level analysis | ❌ Too immature | Cannot compile SWB2 today; interesting for future |
+
+### Recommended CI approach
 
 ```yaml
+# GitHub Actions example
+strategy:
+  matrix:
+    include:
+      - os: windows-latest
+        profile: release
+      - os: windows-latest
+        profile: static_analysis
+      - os: ubuntu-latest
+        profile: release
+      # - os: ubuntu-latest  # Future: ifx via Intel containers
+      #   compiler: ifx
+
 steps:
   - uses: actions/checkout@v4
   - uses: prefix-dev/setup-pixi@v0.9.5
-    with:
-      pixi-version: v0.41.4
-  - run: pixi run setup
+  - run: pixi run setup    # or setup-sa for static_analysis
   - run: pixi run build
   - run: pixi run test
 ```
 
-No manual compiler installation, no manual netCDF installation, no platform-specific library paths. Works on `ubuntu-latest`, `windows-latest`, and `macos-latest` with the same workflow.
+### Platform expansion
+
+To re-add `linux-64` and `osx-arm64` to `pixi.toml`:
+
+1. The SSL issue won't exist in CI (no USGS MITM proxy on GitHub/GitLab runners)
+2. gfortran package naming: `gfortran` works on linux-64 and win-64; on
+   osx-arm64, conda-forge uses `gfortran_osx-arm64` (cross-compiler). May need
+   platform-specific dependency declarations:
+   ```toml
+   [target.osx-arm64.dependencies]
+   gfortran_osx-arm64 = ">=13"
+   ```
+3. The `[tasks]` (non-Windows) section already has correct Unix syntax
+
+### Other future pixi tasks
+
+| Task | Description | Priority |
+|------|-------------|----------|
+| `pixi run lint` | Run fprettify for formatting checks | After formatter adoption |
+| `pixi run docs` | Generate Doxygen documentation | After docs setup |
+| `pixi run dist` | Package exe + DLLs for distribution | For release workflow |
+| `pixi run integration-test` | Run full model test cases | After test infrastructure |
 
 ---
 
-## Distribution Considerations
+## References
 
-For distributing `swb2.exe` to end users (who won't have pixi):
-
-- **Dynamic linking approach:** Ship `netcdf.dll`, `hdf5.dll`, `hdf5_hl.dll`, `zlib.dll` alongside `swb2.exe`. These can be copied from the pixi environment during a release build step.
-- **Static linking approach:** Use MSYS2's MinGW packages (`pacman -S mingw-w64-x86_64-netcdf`) for the release build, which provides MinGW-ABI-compatible static libraries.
-- **Hybrid:** Use pixi for development/CI (fast iteration), MSYS2 for release builds (static executable).
-
----
-
-## Effort Estimate
-
-| Task | Effort |
-|------|--------|
-| Create `pixi.toml` with dependencies and tasks | 1-2 hours |
-| Simplify `meson.build` netCDF detection (pkg-config first, fallback second) | 2-3 hours |
-| Test on Windows (pixi install + build) | 2-4 hours |
-| Test on Linux/macOS | 1 hour |
-| Update developer docs | 1 hour |
-| **Total** | **~1 day** |
+- Pixi documentation: https://pixi.sh/latest/
+- MODFLOW6 pixi usage: https://github.com/MODFLOW-USGS/modflow6 (`pixi.toml`)
+- conda-forge gfortran: https://anaconda.org/conda-forge/gfortran
+- conda-forge netcdf issue (broken .pc): not yet filed upstream
 
 ---
 
-## Recommendation
+## Lessons Learned
 
-This is probably the single highest-ROI change in the entire improvement plan. It eliminates the #1 source of build friction on Windows, makes CI trivial to set up, and provides a reproducible development environment across all platforms. It should be done early (Phase 2) since it makes everything else easier — including the PROJ modernization, test-drive adoption, and CI pipeline setup.
+1. **Don't trust pkg-config on conda-forge Windows.** The `.pc` files leak
+   CMake target names into link flags. `find_library()` is simpler and works.
+
+2. **pixi's task shell parser is limited.** It doesn't understand Windows `if`
+   statements, `for` loops, or other cmd.exe constructs. Wrap complex logic in
+   `cmd /c "..."` with careful quoting, or keep it to simple single commands.
+
+3. **`pixi clean` ≠ `pixi run clean`.** `pixi clean` removes the entire pixi
+   environment (1+ GB). `pixi run clean` runs your custom clean task (removes
+   builddir). Name your task carefully in docs to avoid confusion.
+
+4. **SSL behind USGS proxy requires manual cert bundle.** pixi uses rustls
+   which doesn't read the Windows certificate store. The `SSL_CERT_FILE` env
+   var pointing to a combined Mozilla + DOI bundle is the only reliable fix.
+   Must be set as a *permanent* user environment variable, not per-session.
+
+5. **First run is slow due to endpoint security.** CrowdStrike/Defender scans
+   new unsigned binaries extensively on first encounter. Document this for
+   users so they don't think the build is broken.
+
+6. **Start with one platform.** Multi-platform pixi.toml is appealing but the
+   solver must be able to reach all platform repodata. On restricted networks,
+   stick to the platform you're actually building on.

@@ -1,8 +1,21 @@
 # Build Process Revamp: pixi + Simplified Meson
 
 **Date:** June 2026  
-**Status:** In progress — `pixi.toml` and pkg-config detection created; needs testing  
-**Goal:** Eliminate hardcoded paths, platform hacks, and manual dependency installation. One command to build on any platform.
+**Status:** ✅ SUPERSEDED — implementation complete as of July 2, 2026  
+
+> **Note:** This was the planning document. For the final implementation status,
+> see `pixi_build__resumption_notes.md`. For lessons learned and future work,
+> see `feature_consideration__adopt_pixi_for_library_management.md`. For build
+> instructions, see `developer_quickstart__pixi.md`.
+>
+> Key differences from this plan: pkg-config was abandoned (broken on
+> conda-forge Windows); `find_library()` used instead. Feature environments
+> (gcc vs intel) not implemented — single default environment with gfortran.
+> Platforms restricted to win-64 only (USGS proxy blocks cross-platform solver).
+
+---
+
+## Original Planning Notes (June 2026)
 
 ---
 
@@ -22,7 +35,7 @@ Verify: `pixi --version`
 ### Step 2: Run `pixi install` from the repo root
 
 ```
-cd E:\projects\swb_development\git\swb2
+cd <path-to-swb2-repo>
 pixi install
 ```
 

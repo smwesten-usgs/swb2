@@ -6,15 +6,28 @@
 
 ---
 
-## Current Status (June 26, 2026)
+## Current Status (July 2, 2026)
 
 | Metric | Value |
 |--------|-------|
 | gfortran build | ✅ Compiles + links (zero errors) |
-| gfortran Fortran warnings | **20** — all intentional reserve API. **Zero actionable.** |
+| gfortran Fortran warnings | **41** — all non-actionable (see breakdown below). **Zero actionable.** |
 | ifx build | ✅ Compiles + links (zero errors) |
 | ifx warnings | **0** — zero actual warnings |
 | ifx remarks | 83 — unused dummy arguments (informational only) |
+
+### Breakdown of 41 gfortran warnings (static_analysis profile, gfortran 15.2)
+
+| Category | Count | Verdict |
+|----------|------:|---------|
+| `-Wunused-function` (intentional reserve API) | 20 | Private functions retained for planned features |
+| `-Wunused-dummy-argument` (interface conformance) | 16 | Strategy pattern: procedure pointer signatures require matching arguments across all implementations |
+| `-Wmaybe-uninitialized` (false positive on allocatable) | 5 | gfortran cannot prove allocatable metadata is set from function result assignment — not a real bug |
+
+**Note:** `-Wno-unused-dummy-argument` is specified in the static_analysis profile
+flags, but gfortran 15.2 does not suppress these warnings when `-Wextra` is also
+active. This appears to be a gfortran flag-ordering quirk. The warnings remain
+non-actionable regardless.
 
 ### Completed
 
@@ -157,7 +170,27 @@ String assignment where RHS is longer than LHS.
 
 ### Remaining Diagnostics — By Design
 
-**gfortran (20 `-Wunused-function` warnings):** These are private module functions retained as intentional reserve API — part of a NetCDF abstraction layer, spatial analysis library, and planned features (zone aggregation, configurable date formats). They follow a facade design pattern: private helpers intended for future public entry points. Each has been reviewed and documented in `unused_functions_analysis.md`. These will be suppressed in normal (non-static-analysis) builds.
+**gfortran (41 warnings in static_analysis profile, gfortran 15.2):**
+
+1. **`-Wunused-function` (20 warnings):** Private module functions retained as intentional reserve API — part of a NetCDF abstraction layer, spatial analysis library, and planned features (zone aggregation, configurable date formats). They follow a facade design pattern: private helpers intended for future public entry points. Each has been reviewed and documented in `unused_functions_analysis.md`. Suppressed in normal (non-static-analysis) builds.
+
+2. **`-Wunused-dummy-argument` (16 warnings):** These arise from the strategy pattern used throughout SWB2. Procedure pointers (e.g., `model_calculate_irrigation`, `model_calculate_direct_net_infiltration`) require all implementations to match a common interface signature. Stub implementations (`_none` variants) and specific algorithm implementations that don't need every argument produce these warnings. This is structurally identical to Python's `def handler(self, event, **kwargs)` where a handler ignores some arguments.
+
+   | File | Arguments | Reason |
+   |------|-----------|--------|
+   | `model_domain.F90` | `indx` ×4 | `_none` stub implementations |
+   | `grid.F90` | `rnodatavalue`, `inodatavalue`, `pgrd`, `sfilename` | Functions also flagged as unused (reserve API) |
+   | `fog__monthly_grid.F90` | `lactive`, `nodata_fill_value` | Interface conformance |
+   | `direct_net_infiltration__gridded_data.F90` | `nodata_fill_value` | Interface conformance |
+   | `maximum_net_infiltration.F90` | `landuse_index` | Interface conformance |
+   | `actual_et__fao56__two_stage.F90` | `landuse_index` | Reserved for future use in elemental function |
+   | `mass_balance__impervious_surface.F90` | `runon` | Interface conformance |
+   | `interception__bucket.F90` | `active_cells` | Interface conformance |
+   | `data_catalog_entry.F90` | `sdescription` | Interface conformance |
+   | `et__gridded_values.F90` | `lactive` | Interface conformance |
+   | `swbstats2_support.F90` | `date_range_string` | Interface conformance |
+
+3. **`-Wmaybe-uninitialized` (5 warnings, all same variable in `swbstats2_support.F90`):** The variable `zone_values` is an allocatable array assigned from function result `unique_zone_list%get_integer()`. gfortran cannot prove that the allocatable metadata (.offset, .dim[0].lbound, .dim[0].ubound) is initialized before the assignment, but it always is. This is a known gfortran limitation with allocatable assignment from derived-type method results.
 
 **ifx (83 `#7712` remarks):** Unused dummy arguments in type-bound procedure stubs and interface implementations. These are inherent to Fortran OOP — a base-type method signature must match across all implementations even when a particular implementation doesn't use every argument. ifx correctly classifies these as remarks (informational), not warnings.
 
@@ -173,6 +206,7 @@ String assignment where RHS is longer than LHS.
 | June 25 AM | 191 → 176 | All Fortran unused variables eliminated (289 → 0) |
 | June 25 PM | 176 → **~140** | All 89 `-Wconversion` instances eliminated |
 | June 26 | **540 → 20 (gfortran), 487 → 0 (ifx)** | All actionable warnings eliminated across both compilers. 12 stale functions deleted; 20 intentional reserve API functions retained by design. Fixed 3 real bugs (uninitialized variable, typo in Kahan summation). Meson CRT linkage fixed. All INQUIRE type conformance issues resolved. **DONE.** |
+| July 2 | **41 total (gfortran 15.2)** | Full recount with pixi-managed gfortran 15.2: 20 unused-function + 16 unused-dummy-argument + 5 false-positive maybe-uninitialized. All non-actionable. |
 
 ---
 
@@ -195,3 +229,4 @@ String assignment where RHS is longer than LHS.
 | June 26, 2026 | ifx: INQUIRE `logical(c_bool)` → default `logical` (16 warnings) |
 | June 26, 2026 | ifx: Long lines >132 chars wrapped (6 warnings) |
 | June 26, 2026 | **COMPLETE**: zero actionable warnings on both compilers |
+| July 2, 2026 | Revalidated with pixi-managed gfortran 15.2 on Windows. Full recount: 41 total non-actionable warnings (20 unused-function, 16 unused-dummy-argument, 5 false-positive maybe-uninitialized). Documented unused-dummy-argument breakdown by file. Noted `-Wno-unused-dummy-argument` flag ineffective when `-Wextra` also active in gfortran 15.2. |

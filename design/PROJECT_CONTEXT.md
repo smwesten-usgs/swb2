@@ -6,7 +6,7 @@ SWB2 (Soil-Water-Balance v2) is a USGS Fortran code that estimates groundwater r
 ## Key Facts
 - **Language:** Fortran 2003+ (targets GNU extensions currently; goal is F2018)
 - **Build system:** Meson ≥1.6.0 (also has legacy CMakeLists.txt, may be outdated)
-- **Version:** v2.3.5-rc0
+- **Version:** v2.4.0-rc0
 - **Compilers tested:** gfortran 10+, Intel ifx (oneAPI)
 - **Dependencies:** NetCDF-C, HDF5, zlib (external); PROJ4 (bundled in src/proj4/)
 - **Kind system:** Uses `iso_c_binding` kinds everywhere (c_int, c_float, c_double, c_bool)

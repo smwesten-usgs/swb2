@@ -1,7 +1,7 @@
 # SWB2 Static Analysis & Code Quality Summary
 
 **Prepared for:** USGS Code Review  
-**Date:** June 26, 2026  
+**Date:** July 2, 2026 (updated)  
 **Author:** Steve Westenbroek
 
 ---
@@ -16,12 +16,20 @@ The SWB2 codebase was subjected to comprehensive static analysis using two indep
 
 | Compiler | Starting Diagnostics | Final Diagnostics | Actionable Remaining |
 |----------|--------------------:|-----------------:|--------------------:|
-| gfortran `-std=f2018 -Wall -Wextra -pedantic` | 540 | 20 | **0** |
+| gfortran `-std=f2018 -Wall -Wextra -pedantic` | 540 | 41 | **0** |
 | ifx `/warn:all /stand:f18` | 487 | 83 | **0** |
 
-**gfortran:** The 20 remaining warnings are `-Wunused-function` on intentional reserve API functions — private module procedures that form a complete NetCDF abstraction layer and spatial analysis library for planned future features. These have been individually reviewed and documented (see `design/unused_functions_analysis.md`).
+### gfortran — 41 remaining warnings (all non-actionable)
 
-**ifx:** The 83 remaining diagnostics are `remark #7712` (unused dummy argument) — informational notices inherent to Fortran OOP, where type-bound procedure signatures must match across all implementations regardless of whether a specific implementation uses every argument. ifx correctly classifies these as remarks, not warnings.
+| Category | Count | Explanation |
+|----------|------:|-------------|
+| `-Wunused-function` | 20 | Intentional reserve API: private functions retained for planned features (NetCDF abstraction, spatial analysis, zone aggregation). Documented in `design/unused_functions_analysis.md`. |
+| `-Wunused-dummy-argument` | 16 | Strategy pattern: procedure pointer interfaces require matching signatures across all implementations; stub/no-op implementations don't use every argument. Structural necessity. |
+| `-Wmaybe-uninitialized` | 5 | False positive: allocatable array assigned from derived-type method result. gfortran cannot prove allocation metadata is set, but it always is. |
+
+### ifx — 83 remaining diagnostics (all informational remarks)
+
+The 83 remaining diagnostics are `remark #7712` (unused dummy argument) — informational notices inherent to Fortran OOP, where type-bound procedure signatures must match across all implementations regardless of whether a specific implementation uses every argument. ifx correctly classifies these as remarks, not warnings.
 
 ---
 

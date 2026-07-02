@@ -1,7 +1,7 @@
 # SWB2 Code and Repository Improvement Plan
 
 **Reference:** MODFLOW6 (https://github.com/MODFLOW-ORG/modflow6) for CI/testing best practices  
-**Current SWB2 version:** v2.3.5-rc0  
+**Current SWB2 version:** v2.4.0-rc0  
 **Build system:** Meson ≥1.6.0  
 
 ---
