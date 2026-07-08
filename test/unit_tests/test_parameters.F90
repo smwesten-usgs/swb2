@@ -10,9 +10,12 @@ module test_parameters
   !! the shared TEST_PARAMS.
 
   use iso_c_binding, only: c_int, c_float, c_double, c_bool
+  use, intrinsic :: iso_fortran_env, only: error_unit
   use testdrive, only: check, error_type, new_unittest, unittest_type, test_failed
   use parameters, only: PARAMETERS_T
+  use exceptions, only: HALT_UPON_FATAL_ERROR, NUMBER_OF_FATAL_WARNINGS
   use fstring_list, only: FSTRING_LIST_T, NA_INT, NA_FLOAT
+  use constants_and_conversions, only: FALSE
   use test_fixtures, only: setup_common
   implicit none
   private
@@ -57,7 +60,8 @@ contains
       ! --- Missing key behavior ---
       new_unittest("get_missing_key_nonfatal", test_get_missing_key_nonfatal), &
       ! --- Duplicate column verification ---
-      new_unittest("duplicate_lu_code_matching", test_duplicate_lu_code_matching) &
+      new_unittest("duplicate_lu_code_matching", test_duplicate_lu_code_matching), &
+      new_unittest("duplicate_lu_code_mismatched", test_duplicate_lu_code_mismatched) &
     ]
   end subroutine collect_parameters
 
@@ -211,5 +215,34 @@ contains
     call check(error, size(irr_rate) == 9, &
                "irrigation table should have 9 entries")
   end subroutine test_duplicate_lu_code_matching
+
+  !> @brief Loading a second file with mismatched LU_Code should trigger a fatal warning.
+  subroutine test_duplicate_lu_code_mismatched(error)
+    type(error_type), allocatable, intent(out) :: error
+    type(PARAMETERS_T) :: test_params
+    integer(c_int) :: warnings_before
+
+    call setup_common()
+
+    write(error_unit, '(a)') &
+      "  [NOTE: Any error message is EXPECTED — testing error handling]"
+
+    ! Record current warning count and suppress halting
+    warnings_before = NUMBER_OF_FATAL_WARNINGS
+    HALT_UPON_FATAL_ERROR = FALSE
+
+    call test_params%add_file("../test_data/tables/Lookup__crop_coefficient_test.txt")
+    call test_params%add_file("../test_data/tables/irrigation_test_mismatched.txt")
+    call test_params%munge_file()
+
+    ! Restore normal behavior
+    HALT_UPON_FATAL_ERROR = .true._c_bool
+
+    write(error_unit, '(a)') "  [END of expected error]"
+
+    ! Verify that a fatal warning was issued
+    call check(error, NUMBER_OF_FATAL_WARNINGS > warnings_before, &
+               "mismatched LU_Code should trigger a fatal warning")
+  end subroutine test_duplicate_lu_code_mismatched
 
 end module test_parameters
