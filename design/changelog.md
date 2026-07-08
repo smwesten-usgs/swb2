@@ -2,6 +2,61 @@
 
 ---
 
+## 2026-07-08 — v2.4.1
+
+### Added: test-drive unit testing framework (replaces FRUIT)
+
+Complete migration from FRUIT (discontinued ~2013) to test-drive (fortran-lang, actively maintained). The vendored `testdrive.F90` is compiled directly into the test executable — no subproject, no DLL dependencies.
+
+**Test suites (10 suites, 144 tests):**
+
+| Suite | Tests | What it covers |
+|-------|-------|----------------|
+| timer | 7 | TIMER_T elapsed/split/prettyprint |
+| allocatable_string | 21 | fstring: chomp, replace, clean, operators (.strequal., .strapprox., .contains., .containssimilar.), as_integer, as_float, asCharacter, fieldCount |
+| exceptions | 6 | index_values_valid bounds checking |
+| gash | 2 | Gash interception model (PSat + 20-day published case) |
+| datetime | 28 | Date parsing, arithmetic, leap years, year boundaries, DOY, comparisons, error handling |
+| fao56 | 11 | Crop coefficients (GDD-based Kcb, equation 72, Example 35 two-stage evaporation) |
+| constants | 25 | clip, .approxequal., temperature/distance/angle conversions, is_numeric |
+| fstring_list | 19 | FSTRING_LIST_T: append, get, split, get_integer/float, sort, count_matching |
+| parameters | 9 | PARAMETERS_T: file loading, retrieval by key, duplicate column verification |
+| solar | 15 | Solar calculations: declination, Earth-Sun distance, sunset angle, daylight hours, Ra, Rns, Rso (FAO-56 Example 8 reference values) |
+
+**Infrastructure:**
+- `test_fixtures.F90` — tiered environment setup (DOY_BASED → FAO56_DATES → FAO56_GDD), analogous to pytest fixtures
+- `tester.F90` — driver with suite/test selection via CLI args, ANSI-colored output, test count summary
+- ANSI colors: yellow suite headers, green [PASSED], red [FAILED]
+- `error stop 1, quiet=.true.` for clean failure termination (no backtrace noise)
+- Old FRUIT files preserved in `test/unit_tests/old_fruit_tests/` for reference
+
+### Fixed: `as_float` and `as_integer` could not parse scientific notation
+
+`keepnumeric` stripped the 'e'/'E' character from strings like "1.5e-3", causing `as_float` to return NA_FLOAT. Fix: try raw list-directed `read` first (handles scientific notation and trailing units), fall back to `keepnumeric` only if raw parse fails.
+
+### Added: Duplicate column verification in `parameters.F90`
+
+When loading multiple lookup tables, if a column name (e.g., `LU_CODE`) appears in more than one file, the values are now verified for consistency:
+- Length mismatch → fatal warning with clear message
+- Value mismatch → fatal warning identifying the exact row and values, with special emphasis when `LU_CODE` is misaligned (warns that all other columns may be wrong)
+
+Previously, duplicate columns were silently ignored.
+
+### Changed: Version bumped to v2.4.1
+
+- Removed `-rc0` suffix (release candidate → release)
+- Updated version references in: `meson.build`, `pixi.toml`, `code.json`, design docs, `CODE_REVIEW_GUIDE.md`
+
+### Changed: `pixi run test` now cleans old log files
+
+Test task deletes `SWB_LOGFILE__*.md` before running to avoid accumulation.
+
+### Removed: Meson subproject dependency for test-drive
+
+Initially added as `subprojects/test-drive.wrap` but caused DLL resolution issues on Windows. Replaced with vendored single source file (`testdrive.F90`) compiled directly into the test executable.
+
+---
+
 ## 2026-07-02
 
 ### Added: Doxygen documentation generation via pixi

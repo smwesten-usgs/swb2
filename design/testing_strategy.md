@@ -2,7 +2,7 @@
 
 **Date:** July 2026
 **Replaces:** `test_drive_migration_guide.md` (May 2026)
-**Status:** Proposed
+**Status:** Tier 1 (Fortran unit tests) — IMPLEMENTED. Tier 2 (Python integration) — Proposed.
 
 ---
 
@@ -621,29 +621,41 @@ Unmaintained since ~2013. Manual test registration. No individual test execution
 
 ## Migration Checklist: FRUIT → test-drive
 
-For each existing test module:
+**Status: ✅ COMPLETE (2026-07-08)**
 
-- [ ] Replace `use fruit` with `use testdrive, only: check, error_type, new_unittest, unittest_type`
-- [ ] Add `private` / `public :: collect_<name>` to module
-- [ ] Create `collect_<name>(testsuite)` subroutine that builds the test array
-- [ ] Add `type(error_type), allocatable, intent(out) :: error` to each test subroutine
-- [ ] Convert `assert_equals(exp, act)` → `call check(error, act == exp, "msg")`
-- [ ] Convert `assert_equals(exp, act, delta=tol)` → `call check(error, abs(act - exp) < tol, "msg")`
-- [ ] Convert `assert_true(cond)` → `call check(error, cond, "msg")`
-- [ ] Add `if (allocated(error)) return` after each `check` call
-- [ ] Update `tester.f90` to USE the new module and add to testsuites array
-- [ ] Update `meson.build`
-- [ ] Verify test passes: `meson test -C builddir --verbose`
+For each existing test module (all done):
 
-Order of conversion (simplest first):
-1. `test_timer.F90`
-2. `test_allocatable_string.F90`
-3. `test_exceptions__index_values_valid.F90`
-4. `test_datetime.F90`
-5. `test_gash.F90`
-6. `test_FAO56_functions.F90` (most complex — has setup routine)
+- [x] Replace `use fruit` with `use testdrive, only: check, error_type, new_unittest, unittest_type`
+- [x] Add `private` / `public :: collect_<name>` to module
+- [x] Create `collect_<name>(testsuite)` subroutine that builds the test array
+- [x] Add `type(error_type), allocatable, intent(out) :: error` to each test subroutine
+- [x] Convert `assert_equals(exp, act)` → `call check(error, act == exp, "msg")`
+- [x] Convert `assert_equals(exp, act, delta=tol)` → `call check(error, abs(act - exp) < tol, "msg")`
+- [x] Convert `assert_true(cond)` → `call check(error, cond, "msg")`
+- [x] Add `if (allocated(error)) return` after each `check` call
+- [x] Update `tester.F90` to USE the new module and add to testsuites array
+- [x] Update `meson.build`
+- [x] Verify test passes: `pixi run test`
 
-After all conversions: delete `fruit.F90`, `fruit_util.F90`, `fruit_driver.F90`.
+Order of conversion (completed):
+1. ✅ `test_timer.F90`
+2. ✅ `test_allocatable_string.F90`
+3. ✅ `test_exceptions__index_values_valid.F90`
+4. ✅ `test_datetime.F90`
+5. ✅ `test_gash.F90`
+6. ✅ `test_FAO56_functions.F90`
+
+Additional test modules added (new coverage):
+7. `test_constants_and_conversions.F90`
+8. `test_fstring_list.F90`
+9. `test_parameters.F90`
+10. `test_solar_calculations.F90`
+
+**Implementation notes:**
+- test-drive vendored as single file (`testdrive.F90`) — not a subproject (avoids DLL issues on Windows)
+- `test_fixtures.F90` provides tiered environment setup analogous to pytest fixtures
+- Old FRUIT files in `test/unit_tests/old_fruit_tests/` — delete when confident
+- `logical(c_bool)` results must be wrapped with `logical()` for test-drive's `check` generic
 
 ---
 

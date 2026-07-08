@@ -33,31 +33,22 @@ Each phase produces a working, testable build. No phase leaves the code in a bro
 
 ## Phase 0: Test Infrastructure (test-drive Migration)
 
+**Status: ✅ COMPLETE (2026-07-08)**
+
 **Rationale:** Before making structural changes, establish a reliable automated test harness. The existing FRUIT tests are manually registered, lack individual-test execution, and use a discontinued framework. Converting to test-drive gives us:
 - Individual test execution (can run one test in isolation)
 - Meson-native test registration (`meson test` works out of the box)
 - Better failure diagnostics (error messages propagate cleanly)
 - A clean pattern for writing new phenology tests alongside the implementation
 
-**Scope:**
+**What was done:**
+- Vendored `testdrive.F90` directly (simpler than subproject; avoids DLL issues on Windows)
+- Created `test_fixtures.F90` with tiered environment setup (DOY → FAO56_DATES → FAO56_GDD)
+- Converted all 6 FRUIT test modules + added 4 new test modules (10 suites, 144 tests)
+- Old FRUIT files moved to `test/unit_tests/old_fruit_tests/` (can be deleted once confident)
+- Driver supports suite/test selection via CLI, ANSI-colored output, test count summary
 
-| Step | Description | Files affected |
-|------|-------------|---------------|
-| 0.1 | Add test-drive as a Meson subproject (wrap file) | `subprojects/test-drive.wrap` (new) |
-| 0.2 | Create new test driver using test-drive conventions | `test/unit_tests/test_driver.F90` (new) |
-| 0.3 | Convert `test_timer.F90` (simplest test) | `test/unit_tests/test_timer.F90` |
-| 0.4 | Convert `test_datetime.F90` | `test/unit_tests/test_datetime.F90` |
-| 0.5 | Convert `test_allocatable_string.F90` | `test/unit_tests/test_allocatable_string.F90` |
-| 0.6 | Convert `test_exceptions__index_values_valid.F90` | same |
-| 0.7 | Convert `test_gash.F90` | same |
-| 0.8 | Convert `test_FAO56_functions.F90` | same |
-| 0.9 | Update `test/unit_tests/meson.build` to use test-drive dependency and new driver | `test/unit_tests/meson.build` |
-| 0.10 | Remove FRUIT source files (`fruit.F90`, `fruit_util.F90`) | delete |
-| 0.11 | Verify all tests pass with `meson test` | — |
-
-**Key decision:** Do NOT delete the old `fruit_driver.F90` until all tests pass under test-drive. Keep both executables building in parallel during the transition (old `swbtest` + new `swbtest_td`), then swap.
-
-**Definition of done:** `meson test` runs all existing tests, each can be run individually, all pass.
+**Definition of done:** ✅ `pixi run test` runs all tests, each can be run individually, all pass.
 
 ---
 
