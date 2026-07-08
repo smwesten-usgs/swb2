@@ -7,9 +7,9 @@ module test_datetime
   !! Uses setup_common() from test_fixtures for logging initialization
   !! (needed by the error-suppression tests).
 
-  use iso_c_binding, only: c_int, c_bool
+  use iso_c_binding, only: c_int, c_float, c_double, c_bool
   use testdrive, only: check, error_type, new_unittest, unittest_type
-  use datetime, only: DATETIME_T, count_leap_days_between_dates
+  use datetime, only: DATETIME_T, count_leap_days_between_dates, isLeap
   use exceptions, only: HALT_UPON_FATAL_ERROR
   use constants_and_conversions, only: FALSE, TRUE, iTINYVAL
   use test_fixtures, only: setup_common
@@ -46,7 +46,26 @@ contains
       new_unittest("parse_illegal_date", test_parse_illegal_date), &
       new_unittest("julian_illegal_month", test_julian_illegal_month), &
       new_unittest("julian_illegal_day", test_julian_illegal_day), &
-      new_unittest("julian_illegal_month_and_day", test_julian_illegal_month_and_day) &
+      new_unittest("julian_illegal_month_and_day", test_julian_illegal_month_and_day), &
+      ! --- Leap year detection ---
+      new_unittest("leap_year_2000", test_leap_year_2000), &
+      new_unittest("leap_year_1900_not_leap", test_leap_year_1900_not_leap), &
+      new_unittest("leap_year_2024", test_leap_year_2024), &
+      new_unittest("leap_year_2023_not_leap", test_leap_year_2023_not_leap), &
+      ! --- Year boundary crossing ---
+      new_unittest("addDay_dec31_to_jan1", test_addDay_dec31_to_jan1), &
+      new_unittest("addDay_feb28_leap_year", test_addDay_feb28_leap_year), &
+      new_unittest("addDay_feb28_nonleap_year", test_addDay_feb28_nonleap_year), &
+      ! --- Day of year ---
+      new_unittest("doy_jan1", test_doy_jan1), &
+      new_unittest("doy_dec31_nonleap", test_doy_dec31_nonleap), &
+      new_unittest("doy_dec31_leap", test_doy_dec31_leap), &
+      ! --- Date comparisons ---
+      new_unittest("compare_less_than", test_compare_less_than), &
+      new_unittest("compare_greater_than", test_compare_greater_than), &
+      new_unittest("compare_equal", test_compare_equal), &
+      ! --- Date subtraction ---
+      new_unittest("subtract_dates", test_subtract_dates) &
     ]
   end subroutine collect_datetime
 
@@ -284,5 +303,184 @@ contains
     call check(error, int(dt%iJulianDay) == iTINYVAL, &
                "month=13, day=0 should yield iJulianDay == iTINYVAL")
   end subroutine test_julian_illegal_month_and_day
+
+  !---------------------------------------------------------------------------
+  ! LEAP YEAR DETECTION
+  !---------------------------------------------------------------------------
+
+  !> @brief 2000 is a leap year (divisible by 400).
+  subroutine test_leap_year_2000(error)
+    type(error_type), allocatable, intent(out) :: error
+    call check(error, logical(isLeap(2000)), &
+               "2000 should be a leap year (div by 400)")
+  end subroutine test_leap_year_2000
+
+  !> @brief 1900 is NOT a leap year (divisible by 100 but not 400).
+  subroutine test_leap_year_1900_not_leap(error)
+    type(error_type), allocatable, intent(out) :: error
+    call check(error, .not. logical(isLeap(1900)), &
+               "1900 should NOT be a leap year (div by 100 not 400)")
+  end subroutine test_leap_year_1900_not_leap
+
+  !> @brief 2024 is a leap year (divisible by 4, not by 100).
+  subroutine test_leap_year_2024(error)
+    type(error_type), allocatable, intent(out) :: error
+    call check(error, logical(isLeap(2024)), &
+               "2024 should be a leap year (div by 4)")
+  end subroutine test_leap_year_2024
+
+  !> @brief 2023 is NOT a leap year.
+  subroutine test_leap_year_2023_not_leap(error)
+    type(error_type), allocatable, intent(out) :: error
+    call check(error, .not. logical(isLeap(2023)), &
+               "2023 should NOT be a leap year")
+  end subroutine test_leap_year_2023_not_leap
+
+  !---------------------------------------------------------------------------
+  ! YEAR BOUNDARY CROSSING
+  !---------------------------------------------------------------------------
+
+  !> @brief Adding a day to Dec 31 yields Jan 1 of the next year.
+  subroutine test_addDay_dec31_to_jan1(error)
+    type(error_type), allocatable, intent(out) :: error
+    type(DATETIME_T) :: dt
+
+    call dt%calcJulianDay(iMonth=12, iDay=31, iYear=2023)
+    call dt%addDay()
+
+    call check(error, int(dt%iMonth) == 1, "Dec 31 + 1 day: expected month = 1")
+    if (allocated(error)) return
+    call check(error, int(dt%iDay) == 1, "Dec 31 + 1 day: expected day = 1")
+    if (allocated(error)) return
+    call check(error, int(dt%iYear) == 2024, "Dec 31 2023 + 1 day: expected year = 2024")
+  end subroutine test_addDay_dec31_to_jan1
+
+  !> @brief Feb 28 + 1 day in a leap year = Feb 29.
+  subroutine test_addDay_feb28_leap_year(error)
+    type(error_type), allocatable, intent(out) :: error
+    type(DATETIME_T) :: dt
+
+    call dt%calcJulianDay(iMonth=2, iDay=28, iYear=2000)
+    call dt%addDay()
+
+    call check(error, int(dt%iMonth) == 2, "Feb 28 2000 + 1 day: expected month = 2")
+    if (allocated(error)) return
+    call check(error, int(dt%iDay) == 29, "Feb 28 2000 + 1 day: expected day = 29 (leap year)")
+  end subroutine test_addDay_feb28_leap_year
+
+  !> @brief Feb 28 + 1 day in a non-leap year = March 1.
+  subroutine test_addDay_feb28_nonleap_year(error)
+    type(error_type), allocatable, intent(out) :: error
+    type(DATETIME_T) :: dt
+
+    call dt%calcJulianDay(iMonth=2, iDay=28, iYear=2023)
+    call dt%addDay()
+
+    call check(error, int(dt%iMonth) == 3, "Feb 28 2023 + 1 day: expected month = 3")
+    if (allocated(error)) return
+    call check(error, int(dt%iDay) == 1, "Feb 28 2023 + 1 day: expected day = 1 (non-leap)")
+  end subroutine test_addDay_feb28_nonleap_year
+
+  !---------------------------------------------------------------------------
+  ! DAY OF YEAR
+  !---------------------------------------------------------------------------
+
+  !> @brief Jan 1 is day-of-year 1.
+  subroutine test_doy_jan1(error)
+    type(error_type), allocatable, intent(out) :: error
+    type(DATETIME_T) :: dt
+    real(c_float) :: doy
+
+    call dt%calcJulianDay(iMonth=1, iDay=1, iYear=2023)
+    doy = dt%getDayOfYear()
+
+    call check(error, abs(doy - 1.0) < 0.5, &
+               "Jan 1 should be DOY 1")
+  end subroutine test_doy_jan1
+
+  !> @brief Dec 31 in a non-leap year is day-of-year 365.
+  subroutine test_doy_dec31_nonleap(error)
+    type(error_type), allocatable, intent(out) :: error
+    type(DATETIME_T) :: dt
+    real(c_float) :: doy
+
+    call dt%calcJulianDay(iMonth=12, iDay=31, iYear=2023)
+    doy = dt%getDayOfYear()
+
+    call check(error, abs(doy - 365.0) < 0.5, &
+               "Dec 31 non-leap should be DOY 365")
+  end subroutine test_doy_dec31_nonleap
+
+  !> @brief Dec 31 in a leap year is day-of-year 366.
+  subroutine test_doy_dec31_leap(error)
+    type(error_type), allocatable, intent(out) :: error
+    type(DATETIME_T) :: dt
+    real(c_float) :: doy
+
+    call dt%calcJulianDay(iMonth=12, iDay=31, iYear=2000)
+    doy = dt%getDayOfYear()
+
+    call check(error, abs(doy - 366.0) < 0.5, &
+               "Dec 31 leap year should be DOY 366")
+  end subroutine test_doy_dec31_leap
+
+  !---------------------------------------------------------------------------
+  ! DATE COMPARISONS
+  !---------------------------------------------------------------------------
+
+  !> @brief Earlier date is less than later date.
+  subroutine test_compare_less_than(error)
+    type(error_type), allocatable, intent(out) :: error
+    type(DATETIME_T) :: dt1, dt2
+
+    call dt1%calcJulianDay(iMonth=6, iDay=15, iYear=2020)
+    call dt2%calcJulianDay(iMonth=7, iDay=1, iYear=2020)
+
+    call check(error, dt1%dJulianDate < dt2%dJulianDate, &
+               "June 15 should be less than July 1")
+  end subroutine test_compare_less_than
+
+  !> @brief Later date is greater than earlier date.
+  subroutine test_compare_greater_than(error)
+    type(error_type), allocatable, intent(out) :: error
+    type(DATETIME_T) :: dt1, dt2
+
+    call dt1%calcJulianDay(iMonth=12, iDay=25, iYear=2020)
+    call dt2%calcJulianDay(iMonth=1, iDay=1, iYear=2020)
+
+    call check(error, dt1%dJulianDate > dt2%dJulianDate, &
+               "Dec 25 should be greater than Jan 1")
+  end subroutine test_compare_greater_than
+
+  !> @brief Same date is equal.
+  subroutine test_compare_equal(error)
+    type(error_type), allocatable, intent(out) :: error
+    type(DATETIME_T) :: dt1, dt2
+
+    call dt1%calcJulianDay(iMonth=3, iDay=14, iYear=2020)
+    call dt2%calcJulianDay(iMonth=3, iDay=14, iYear=2020)
+
+    call check(error, abs(dt1%dJulianDate - dt2%dJulianDate) < 0.5_c_double, &
+               "Same date should have equal Julian dates")
+  end subroutine test_compare_equal
+
+  !---------------------------------------------------------------------------
+  ! DATE SUBTRACTION
+  !---------------------------------------------------------------------------
+
+  !> @brief Subtracting two dates gives the correct number of days.
+  subroutine test_subtract_dates(error)
+    type(error_type), allocatable, intent(out) :: error
+    type(DATETIME_T) :: dt1, dt2
+    real(c_double) :: diff
+
+    call dt1%calcJulianDay(iMonth=1, iDay=1, iYear=2020)
+    call dt2%calcJulianDay(iMonth=1, iDay=31, iYear=2020)
+
+    diff = dt2 - dt1
+
+    call check(error, abs(diff - 30.0_c_double) < 0.5_c_double, &
+               "Jan 31 - Jan 1 should be 30 days")
+  end subroutine test_subtract_dates
 
 end module test_datetime
