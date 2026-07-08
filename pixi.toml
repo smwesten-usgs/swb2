@@ -2,7 +2,7 @@
 name = "swb2"
 channels = ["conda-forge"]
 platforms = ["win-64"]
-version = "2.4.0"
+version = "2.4.1"
 
 [dependencies]
 meson = ">=1.6.0"

@@ -1,7 +1,7 @@
 project(
   'swb2',
   ['fortran', 'c', 'cpp'],
-  version: 'v2.4.0-rc0',
+  version: 'v2.4.1',
   meson_version: '>= 1.6.0',
   default_options: ['optimization=2', 'debug=true', 'fortran_std=f2018']
 )
