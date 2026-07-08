@@ -1,29 +1,38 @@
-execute_process(
-  COMMAND ${PYTHON_CMD} make_test_suite.py
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+# Unit tests using the vendored test-drive framework
+# Requires: swb_lib and proj4_lib targets from parent CMakeLists.txt
+
+set(TEST_SRCS
+  testdrive.F90
+  test_fixtures.F90
+  test_timer.F90
+  test_allocatable_string.F90
+  test_exceptions.F90
+  test_gash.F90
+  test_datetime.F90
+  test_fao56.F90
+  tester.F90
 )
 
-file(GLOB fortran_files
-     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-     *.F90 )
-
-     # the following snippet assigns the local filename to __SRCNAME__
- # for each of the files contained in the 'SRCS' list
- #
- # i.e. rather than using __FILE__, which might expand to
- # d:/Some_dir/some_subdir/filename.F90, we can use
- # __SRCNAME__, which expands to 'filename.F90'
-
-foreach(f IN LISTS fortran_files)
+# Assign __SRCNAME__ for each source file (used by __FILE__ alternatives)
+foreach(f IN LISTS TEST_SRCS)
   get_filename_component(b ${f} NAME)
   set_source_files_properties(${f} PROPERTIES COMPILE_DEFINITIONS "__SRCNAME__=\"${b}\"")
 endforeach()
 
-add_executable(swbtest
-  ${fortran_files})
+add_executable(swbtest ${TEST_SRCS})
+target_link_libraries(swbtest swb_lib proj4_lib ${EXTERNAL_LIBRARIES})
 
-target_link_libraries(swbtest swb_lib proj4_lib)
+# Register tests with CTest
+enable_testing()
 
-# see https://stackoverflow.com/questions/43917443/fortran-module-files-not-found-by-cmake
-# target_include_directories(swbtest PUBLIC $<TARGET_PROPERTY:swb_lib,Fortran_MODULE_DIRECTORY>)
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/src/generated)
+# Run all suites
+add_test(NAME "All unit tests"
+         COMMAND swbtest
+         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Register individual suites for selective execution
+foreach(suite timer allocatable_string exceptions gash datetime fao56)
+  add_test(NAME ${suite}
+           COMMAND swbtest ${suite}
+           WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+endforeach()

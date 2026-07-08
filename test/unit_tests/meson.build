@@ -1,19 +1,30 @@
-swbtest_src = files(
-  'fruit.F90',
-  'fruit_util.F90',
-  'test_allocatable_string.F90',
-  'test_datetime.F90',
-  'test_exceptions__index_values_valid.F90',
-  'test_FAO56_functions.F90',
-  'test_gash.F90',
+# Unit tests using the test-drive framework
+# test-drive source (testdrive.F90) is vendored directly — single file, no DLL issues.
+
+test_srcs = files(
+  'testdrive.F90',
+  'test_fixtures.F90',
   'test_timer.F90',
-  'fruit_driver.F90',
+  'test_allocatable_string.F90',
+  'test_exceptions.F90',
+  'test_gash.F90',
+  'test_datetime.F90',
+  'test_fao56.F90',
+  'tester.F90',
 )
 
-executable('swbtest',
-    swbtest_src,
-    link_with: [swb_library],
-    link_language: 'fortran',
-    dependencies: swb_deps,
-    install: true,
+swbtest = executable('swbtest',
+  sources: test_srcs,
+  link_with: [swb_library],
+  link_language: 'fortran',
+  dependencies: swb_deps,
+  install: true,
 )
+
+# Register all tests as a single run
+test('All unit tests', swbtest, workdir: meson.current_source_dir())
+
+# Register individual suites for selective execution
+foreach suite : ['timer', 'allocatable_string', 'exceptions', 'gash', 'datetime', 'fao56']
+  test(suite, swbtest, args: suite, workdir: meson.current_source_dir())
+endforeach
