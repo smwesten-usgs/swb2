@@ -10,6 +10,7 @@ test_srcs = files(
   'test_gash.F90',
   'test_datetime.F90',
   'test_fao56.F90',
+  'test_constants_and_conversions.F90',
   'tester.F90',
 )
 
@@ -25,6 +26,6 @@ swbtest = executable('swbtest',
 test('All unit tests', swbtest, workdir: meson.current_source_dir())
 
 # Register individual suites for selective execution
-foreach suite : ['timer', 'allocatable_string', 'exceptions', 'gash', 'datetime', 'fao56']
+foreach suite : ['timer', 'allocatable_string', 'exceptions', 'gash', 'datetime', 'fao56', 'constants']
   test(suite, swbtest, args: suite, workdir: meson.current_source_dir())
 endforeach

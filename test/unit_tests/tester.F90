@@ -15,6 +15,7 @@ program tester
   use test_gash, only: collect_gash
   use test_datetime, only: collect_datetime
   use test_fao56, only: collect_fao56
+  use test_constants_and_conversions, only: collect_constants_and_conversions
   implicit none
 
   integer :: stat, suite_index
@@ -36,7 +37,8 @@ program tester
     new_testsuite("exceptions", collect_exceptions), &
     new_testsuite("gash", collect_gash), &
     new_testsuite("datetime", collect_datetime), &
-    new_testsuite("fao56", collect_fao56) &
+    new_testsuite("fao56", collect_fao56), &
+    new_testsuite("constants", collect_constants_and_conversions) &
   ]
 
   call get_argument(1, suite_name)
