@@ -155,6 +155,8 @@ MODFLOW6 provides an excellent reference for a mature Fortran scientific code wi
 | 5.4 | Modernize fixed-length strings to `character(len=:), allocatable` | Low |
 | 5.5 | Evaluate `iso_c_binding` vs `iso_fortran_env` kinds for non-C-interop modules | Very Low |
 | 5.6 | Add INTENT to C interface arguments in `grid.F90` | Low |
+| 5.7 | `datetime.F90`: Remove redundant standalone `operator(<)` / `operator(>)` interfaces — use type-bound generic operators only. Currently both are defined, which confuses compiler resolution and prevents using the operators directly in generic contexts (e.g., test-drive's `check`). | Low |
+| 5.8 | `fstring.F90` / `constants_and_conversions.F90`: Consolidate duplicate `keepnumeric` implementations. Both modules contain nearly identical private copies. Consider extracting to a shared utility module or eliminating one. | Very Low |
 
 ### Phase 6: Feature Wishlist (longer-term)
 
