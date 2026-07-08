@@ -127,6 +127,12 @@ contains
     integer (c_int)                :: number_of_columns
     character (len=MAX_TABLE_RECORD_LEN) :: sRecord, sItem
 
+    ! Duplicate column verification
+    type (FSTRING_LIST_T), allocatable :: duplicate_column_data(:)
+    type (FSTRING_LIST_T)          :: existing_values
+    character (len=:), allocatable :: existing_val, duplicate_val
+    integer (c_int)                :: iVerify
+
     allocate(DF)
 
     if ( present(comment_chars) ) then
@@ -176,6 +182,9 @@ contains
         allocate(skip_this_column(number_of_columns))
         skip_this_column = FALSE
 
+        if (allocated(duplicate_column_data))  deallocate(duplicate_column_data)
+        allocate(duplicate_column_data(number_of_columns))
+
         ! loop over each column header
         do iColIndex = 1, DF%slColNames%count
 
@@ -185,7 +194,8 @@ contains
 
             skip_this_column( iColIndex ) = TRUE
 
-            call warn("Column name "//sQuote(column_name)//" already in use. Data in this column will be ignored." &
+            call LOGS%write("Column name "//sQuote(column_name)//" already in use." &
+              //" Values will be verified for consistency." &
               //" [filename = "//sQuote(filename1)//"]")
 
             ! Dec 2019: let try eliminating duplicates from the dictionary altogether
@@ -234,7 +244,11 @@ contains
             ! break off next column of data for the current record
             call chomp(sRecord, sItem, this%delimiters%get(iFileIndex) )
 
-            if ( skip_this_column(iColIndex) )  cycle
+            if ( skip_this_column(iColIndex) ) then
+              ! Store data from duplicate columns for post-read verification
+              call duplicate_column_data(iColIndex)%append(trim(adjustl(sItem)))
+              cycle
+            end if
 
             column_name = DF%slColNames%get(iColIndex)
           
@@ -260,7 +274,56 @@ contains
 
         enddo
 
+        ! --- Verify duplicate columns match previously loaded values ---
+        do iColIndex = 1, number_of_columns
+          if (.not. skip_this_column(iColIndex)) cycle
+          if (duplicate_column_data(iColIndex)%count == 0) cycle
+
+          column_name = DF%slColNames%get(iColIndex)
+
+          ! Retrieve the existing values for this key
+          call PARAMS_DICT%get_values(sKey=column_name, slString=existing_values)
+
+          ! Check length match
+          if (existing_values%count /= duplicate_column_data(iColIndex)%count) then
+            call warn("Duplicate column "//sQuote(column_name)//" in file " &
+              //sQuote(filename1)//" has "  &
+              //asCharacter(duplicate_column_data(iColIndex)%count)  &
+              //" entries, but the previously loaded column has " &
+              //asCharacter(existing_values%count)//" entries." &
+              //" All lookup tables must have the same number of rows.", &
+              lFatal=TRUE)
+          end if
+
+          ! Check value-by-value match
+          do iVerify = 1, existing_values%count
+            existing_val = trim(existing_values%get(iVerify))
+            duplicate_val = trim(duplicate_column_data(iColIndex)%get(iVerify))
+            if (.not. (existing_val .strapprox. duplicate_val)) then
+              if (column_name .strapprox. "LU_CODE") then
+                call warn("LU_CODE mismatch at row " &
+                  //asCharacter(iVerify)//": previously loaded value = " &
+                  //sQuote(existing_val)//", value in " &
+                  //sQuote(filename1)//" = "//sQuote(duplicate_val) &
+                  //". LU_CODE must appear in the same order across all" &
+                  //" lookup tables. All other columns from this file" &
+                  //" may be misaligned.", &
+                  lFatal=TRUE)
+              else
+                call warn("Duplicate column "//sQuote(column_name) &
+                  //" mismatch at row "//asCharacter(iVerify) &
+                  //": previously loaded = "//sQuote(existing_val) &
+                  //", value in "//sQuote(filename1)//" = " &
+                  //sQuote(duplicate_val)//". Values must be identical.", &
+                  lFatal=TRUE)
+              end if
+            end if
+          end do
+
+        end do
+
         deallocate(skip_this_column)
+        deallocate(duplicate_column_data)
 
         call DF%close()
 

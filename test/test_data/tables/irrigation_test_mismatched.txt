@@ -1,0 +1,11 @@
+# Test irrigation table — LU_Code in WRONG ORDER (should trigger fatal error)
+LU_Code	Max_irrigation_rate	Irrigation_efficiency
+4	0.5	0.80
+1	0.5	0.85
+5	0.4	0.85
+6	0.4	0.80
+12	0.5	0.85
+21	0.3	0.90
+23	0.3	0.90
+24	0.3	0.90
+26	0.4	0.85

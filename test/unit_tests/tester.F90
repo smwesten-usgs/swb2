@@ -18,6 +18,7 @@ program tester
   use test_fao56, only: collect_fao56
   use test_constants_and_conversions, only: collect_constants_and_conversions
   use test_fstring_list, only: collect_fstring_list
+  use test_parameters, only: collect_parameters
   implicit none
 
   integer :: stat, suite_index, total_tests
@@ -42,7 +43,8 @@ program tester
     new_testsuite("datetime", collect_datetime), &
     new_testsuite("fao56", collect_fao56), &
     new_testsuite("constants", collect_constants_and_conversions), &
-    new_testsuite("fstring_list", collect_fstring_list) &
+    new_testsuite("fstring_list", collect_fstring_list), &
+    new_testsuite("parameters", collect_parameters) &
   ]
 
   call get_argument(1, suite_name)
