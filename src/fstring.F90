@@ -191,6 +191,11 @@ contains
     character (len=:), allocatable :: temp_str
     real (c_float)                 :: float_value
 
+    ! Try raw input first — handles clean integers and trailing non-numeric text
+    read(unit=text, fmt=*, iostat=op_status) value
+    if (op_status == 0) return
+
+    ! Fallback: strip non-numeric characters and retry
     temp_str = keepnumeric(text)
 
     ! if the cleaned up string appears to be a real value,
@@ -221,8 +226,12 @@ contains
     integer (c_int)                :: op_status
     character (len=:), allocatable :: temp_str
 
-    temp_str = keepnumeric(text)
+    ! Try raw input first — handles scientific notation and trailing units
+    read(unit=text, fmt=*, iostat=op_status) value
+    if (op_status == 0) return
 
+    ! Fallback: strip non-numeric characters and retry
+    temp_str = keepnumeric(text)
     read(unit=temp_str, fmt=*, iostat=op_status) value
     if (op_status /= 0)  value = NA_FLOAT
 
