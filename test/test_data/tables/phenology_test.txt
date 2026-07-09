@@ -1,0 +1,12 @@
+# Phenology test lookup table — uses same LU_Code values as Lookup__crop_coefficient_test.txt
+# Mixed DOY-based and GDD-based parameters (complementary)
+LU_Code	Description	Growing_season_start_date	Growing_season_end_date	Growing_season_start_GDD	Killing_frost_temperature
+1	Corn	04/15	10/15	<NA>	<NA>
+4	Sorghum	100	280	<NA>	<NA>
+5	Soybeans	<NA>	<NA>	200.0	28.0
+6	Sunflower	<NA>	<NA>	250.0	30.0
+12	Sweet Corn	05/01	09/30	<NA>	<NA>
+21	Barley	04/01	08/15	<NA>	<NA>
+23	Spring Wheat	04/20	09/01	<NA>	<NA>
+24	Winter Wheat	10/01	05/30	<NA>	<NA>
+26	Dbl Crop WinWht/Soybeans	<NA>	<NA>	150.0	26.0
