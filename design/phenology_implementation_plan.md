@@ -65,26 +65,38 @@ or
 PHENOLOGY_METHOD  GDD_THRESHOLD
 ```
 
-If `PHENOLOGY_METHOD` is not specified, fall back to the legacy `growing_season.F90` behavior (preserving backwards compatibility during the transition). Emit a deprecation notice in the log.
+`PHENOLOGY_METHOD` is **required**. If absent, the model emits a fatal error directing the user to add one. There is no fallback to `growing_season.F90` — that module is removed entirely.
+
+**Unified parameter names (lookup table columns):**
+
+| Column | Type | Method |
+|---|---|---|
+| `Growing_season_start_date` | mm/dd or integer DOY | DOY_BASED |
+| `Growing_season_end_date` | mm/dd or integer DOY | DOY_BASED |
+| `Growing_season_start_GDD` | float (degree-days) | GDD_THRESHOLD |
+| `Killing_frost_temperature` | float (temperature) | GDD_THRESHOLD |
+
+`Growing_season_start_date` accepts either `mm/dd` format (e.g., `03/17`, `4-01`) or integer day-of-year (e.g., `91`).
 
 **Scope:**
 
 | Step | Description | Files affected |
 |------|-------------|---------------|
 | 1.1 | Create `src/phenology.F90` with module skeleton: output type, public interface, method enum | `src/phenology.F90` (new) |
-| 1.2 | Implement `phenology_initialize_doy_based()` — reads `Growing_season_start`, `Growing_season_end` from lookup table | `src/phenology.F90` |
-| 1.3 | Implement `phenology_update_doy_based()` — sets growth_fraction (0 or 1), it_is_growing_season, growth_stage (DORMANT or MID) | `src/phenology.F90` |
-| 1.4 | Implement `phenology_initialize_gdd_threshold()` — reads GDD threshold + killing frost temp | `src/phenology.F90` |
-| 1.5 | Implement `phenology_update_gdd_threshold()` — same output contract | `src/phenology.F90` |
+| 1.2 | Implement `phenology_initialize_doy_based()` — reads `Growing_season_start_date`, `Growing_season_end_date` from lookup table | `src/phenology.F90` |
+| 1.3 | Implement `phenology_update_doy_based()` — sets growth_fraction (0 or 1), it_is_growing_season, growth_stage (DORMANT or MID). Handles winter-crop case (start DOY > end DOY). | `src/phenology.F90` |
+| 1.4 | Implement `phenology_initialize_gdd_threshold()` — reads `Growing_season_start_GDD`, `Killing_frost_temperature` | `src/phenology.F90` |
+| 1.5 | Implement `phenology_update_gdd_threshold()` — same output contract. GDD accumulates from DOY 1; growing season starts when GDD ≥ threshold; ends on killing frost. | `src/phenology.F90` |
 | 1.6 | Add `PHENOLOGY_METHOD` directive parsing in `model_domain.F90` method-selection block | `src/model_domain.F90` |
-| 1.7 | Add procedure pointer `this%update_phenology` alongside existing `this%update_growing_season` | `src/model_domain.F90` |
-| 1.8 | Wire new pointer into daily calculation (call `update_phenology` if set, else fall back to `update_growing_season`) | `src/model_domain.F90` or `src/daily_calculation.F90` |
-| 1.9 | Write unit tests for `phenology_update_doy_based` and `phenology_update_gdd_threshold` | `test/unit_tests/test_phenology.F90` (new) |
-| 1.10 | Run existing FAO-56 tests — they still pass (legacy path unchanged) | — |
+| 1.7 | Replace procedure pointer `this%update_growing_season` with `this%update_phenology` | `src/model_domain.F90` |
+| 1.8 | Wire new pointer into daily calculation (call `update_phenology`) | `src/daily_calculation.F90` |
+| 1.9 | Remove `growing_season.F90` from source and build | `src/growing_season.F90` (delete), `src/meson.build` |
+| 1.10 | Write unit tests for `phenology_update_doy_based` and `phenology_update_gdd_threshold` | `test/unit_tests/test_phenology.F90` (new) |
+| 1.11 | Run existing FAO-56 tests — they still pass (crop coeff module unchanged in this phase) | — |
 
-**Key design choice (no auto-detection):** The control file must explicitly state `PHENOLOGY_METHOD`. If absent, the model uses the legacy `growing_season.F90` path and logs: `"PHENOLOGY_METHOD not specified. Using legacy growing season module. This will be removed in a future version."`
+**Key design choice (clean break, no legacy support):** `growing_season.F90` is deleted. The control file must specify `PHENOLOGY_METHOD`. If absent, the model errors with: `"PHENOLOGY_METHOD is required. Valid options: DOY_BASED, GDD_THRESHOLD, FAO56_DATES, FAO56_GDD."` Legacy parameter names (`First_day_of_growing_season`, `Planting_date`, `GDD_plant`, etc.) are not recognized — users must update their lookup tables to use the unified names.
 
-**Definition of done:** New phenology module produces identical `it_is_growing_season` results as the old `growing_season.F90` for DOY and GDD cases. Old code still works. New tests pass.
+**Definition of done:** New phenology module produces correct `growth_fraction`, `it_is_growing_season`, and `growth_stage` for DOY and GDD cases. `growing_season.F90` is removed. New tests pass. Existing FAO-56 crop coefficient tests still pass (that module is untouched in this phase).
 
 ---
 
@@ -103,7 +115,7 @@ This replaces the implicit coupling where `CROP_COEFFICIENT FAO56` would overrid
 
 | Step | Description | Files affected |
 |------|-------------|---------------|
-| 2.1 | Implement `phenology_initialize_fao56_dates()` — reads `Planting_date`, `L_ini`, `L_dev`, `L_mid`, `L_late`, `L_fallow`; computes GROWTH_STAGE_DATE array | `src/phenology.F90` |
+| 2.1 | Implement `phenology_initialize_fao56_dates()` — reads `Growing_season_start_date`, `L_ini`, `L_dev`, `L_mid`, `L_late`; computes GROWTH_STAGE_DATE array. Growing season end is implicit (start + sum of stage lengths). | `src/phenology.F90` |
 | 2.2 | Implement `phenology_update_fao56_dates()` — determines current growth_stage from date comparison; computes growth_fraction; sets it_is_growing_season | `src/phenology.F90` |
 | 2.3 | Implement `phenology_advance_planting_year()` — the year-rollover logic currently in `crop_coefficients_FAO56_update_growth_stage_dates` | `src/phenology.F90` |
 | 2.4 | Refactor `crop_coefficients__fao56.F90`: remove `GROWTH_STAGE_DATE` ownership and stage-date calculation; receive growth_stage from phenology provider instead | `src/crop_coefficients__fao56.F90` |
@@ -139,7 +151,7 @@ PHENOLOGY_METHOD  FAO56_GDD
 
 | Step | Description | Files affected |
 |------|-------------|---------------|
-| 3.1 | Implement `phenology_initialize_fao56_gdd()` — reads `GDD_plant`, `GDD_ini`, `GDD_dev`, `GDD_mid`, `GDD_late` from lookup table | `src/phenology.F90` |
+| 3.1 | Implement `phenology_initialize_fao56_gdd()` — reads `Growing_season_start_GDD`, `GDD_ini`, `GDD_dev`, `GDD_mid`, `GDD_late`, `Killing_frost_temperature` from lookup table | `src/phenology.F90` |
 | 3.2 | Implement `phenology_update_fao56_gdd()` — determines growth_stage from GDD thresholds; computes growth_fraction; sets it_is_growing_season | `src/phenology.F90` |
 | 3.3 | Handle GDD reset: when does GDD accumulation restart? Options: (a) after killing frost; (b) on January 1; (c) when growth_fraction returns to 0. Document the choice. | `src/phenology.F90` |
 | 3.4 | Ensure `crop_coefficients_FAO56_calculate` works with GDD-derived growth_stage (it should already from Phase 2 refactor — the Kcb interpolation is stage-based regardless of how stage was determined) | `src/crop_coefficients__fao56.F90` |
@@ -147,7 +159,7 @@ PHENOLOGY_METHOD  FAO56_GDD
 | 3.6 | Write a focused integration test with a real weather timeseries and GDD-based phenology | `test/integration_tests/` |
 | 3.7 | Update documentation: which lookup table columns are needed for GDD-based operation | docs |
 
-**Key question to resolve:** What triggers the *start* of GDD accumulation each year? In the current code, `GDD_plant` is a threshold (start counting from DOY 1, planting starts when GDD ≥ GDD_plant). Is that the semantics you want, or should there be an explicit "base date" for GDD accumulation (e.g., January 1 in northern hemisphere, July 1 in southern)?
+**Key question to resolve:** What triggers the *start* of GDD accumulation each year? In the current code, `Growing_season_start_GDD` is a threshold (start counting from DOY 1, growth starts when GDD ≥ threshold). Is that the semantics you want, or should there be an explicit "base date" for GDD accumulation (e.g., January 1 in northern hemisphere, July 1 in southern)?
 
 **Definition of done:** A test case runs with `PHENOLOGY_METHOD FAO56_GDD` + `CROP_COEFFICIENT FAO56`, producing a smooth Kcb curve driven by thermal accumulation. Tests verify correct stage transitions.
 
@@ -204,14 +216,15 @@ CROP_COEFFICIENT      LAI_DERIVED
 
 ## Deprecation and Removal Timeline
 
-| Item | Deprecated | Removed |
-|------|-----------|---------|
-| `growing_season.F90` (module) | Phase 1 (falls back with warning) | After Phase 2 is stable |
-| FRUIT test framework | Phase 0 (both coexist briefly) | End of Phase 0 |
-| `fruit.F90`, `fruit_util.F90`, `fruit_driver.F90` | Phase 0 | Phase 0 step 0.10 |
-| Implicit pointer swap for growing season | Phase 2 (removed) | — |
-| Auto-detection of Kcb method from table contents | Phase 2 (replaced by explicit `PHENOLOGY_METHOD`) | — |
-| `crop_coefficients_FAO56_update_growing_season` | Phase 2 (removed) | — |
+| Item | Status |
+|------|--------|
+| `growing_season.F90` (module) | **Removed in Phase 1** — replaced by `phenology.F90` |
+| FRUIT test framework | ✅ Removed (Phase 0 complete) |
+| `fruit.F90`, `fruit_util.F90`, `fruit_driver.F90` | ✅ Moved to `old_fruit_tests/` |
+| Implicit pointer swap for growing season | Removed in Phase 2 |
+| Auto-detection of Kcb method from table contents | Removed in Phase 2 (replaced by explicit `PHENOLOGY_METHOD`) |
+| `crop_coefficients_FAO56_update_growing_season` | Removed in Phase 2 |
+| Legacy parameter names (`First_day_of_growing_season`, `Planting_date`, `GDD_plant`, etc.) | **Not supported** — unified names only |
 
 ---
 
@@ -223,7 +236,15 @@ CROP_COEFFICIENT  FAO56
 ```
 (implicitly overrides growing season mechanism, implicitly auto-detects date vs. GDD vs. monthly from table contents)
 
-### After (Phase 2+):
+### After (Phase 1+):
+```
+PHENOLOGY_METHOD      DOY_BASED
+```
+or
+```
+PHENOLOGY_METHOD      GDD_THRESHOLD
+```
+or
 ```
 PHENOLOGY_METHOD      FAO56_DATES
 CROP_COEFFICIENT      FAO56
@@ -233,11 +254,6 @@ or
 PHENOLOGY_METHOD      FAO56_GDD
 CROP_COEFFICIENT      FAO56
 ```
-or
-```
-PHENOLOGY_METHOD      DOY_BASED
-CROP_COEFFICIENT      NONE
-```
 
 Each directive does exactly one thing. No implicit coupling. No auto-detection.
 
@@ -246,8 +262,9 @@ Each directive does exactly one thing. No implicit coupling. No auto-detection.
 ERROR: CROP_COEFFICIENT FAO56 requires PHENOLOGY_METHOD to be FAO56_DATES,
        FAO56_GDD, or GRIDDED_LAI. Please add a PHENOLOGY_METHOD directive.
 
-ERROR: PHENOLOGY_METHOD FAO56_DATES requires columns 'Planting_date', 'L_ini',
-       'L_dev', 'L_mid', 'L_late' in the lookup table. Column 'L_dev' was not found.
+ERROR: PHENOLOGY_METHOD FAO56_DATES requires columns 'Growing_season_start_date',
+       'L_ini', 'L_dev', 'L_mid', 'L_late' in the lookup table.
+       Column 'L_dev' was not found.
 ```
 
 ---
@@ -256,9 +273,9 @@ ERROR: PHENOLOGY_METHOD FAO56_DATES requires columns 'Planting_date', 'L_ini',
 
 | Phase | New tests |
 |-------|-----------|
-| 0 | All existing tests converted to test-drive (same coverage, new framework) |
-| 1 | `test_phenology_doy_based`: known DOY → correct growth_fraction/stage. `test_phenology_gdd_threshold`: known GDD sequence → correct on/off transitions |
-| 2 | `test_phenology_fao56_dates`: planting_date + L_* → correct stage dates and growth_fraction. `test_kcb_interpolation_from_stage`: given growth_stage, Kcb values match FAO-56 expectations. Regression: full integration test comparing output before/after refactor |
-| 3 | `test_phenology_fao56_gdd`: GDD sequence → correct stage transitions. `test_kcb_gdd_vs_date`: for equivalent thermal time and calendar time, Kcb curves should be similar |
-| 4 | `test_continuous_interception`: growth_fraction ramp → smooth interception capacity transition. `test_mass_balance_continuous`: soil + interception + ET + recharge = precip (within tolerance) |
-| 5 | `test_lai_to_growth_fraction`: known LAI series → correct normalization. `test_lai_derived_kcb`: LAI → Kcb matches expected values |
+| 0 | ✅ All existing tests converted to test-drive (10 suites, 144 tests) |
+| 1 | `test_phenology_doy_based`: known DOY → correct growth_fraction/stage; winter crop (start > end) case. `test_phenology_gdd_threshold`: known GDD sequence → correct on/off transitions; killing frost terminates. |
+| 2 | `test_phenology_fao56_dates`: Growing_season_start_date + L_* → correct stage dates and growth_fraction. `test_kcb_interpolation_from_stage`: given growth_stage, Kcb values match FAO-56 expectations. Regression: full integration test comparing output before/after refactor. |
+| 3 | `test_phenology_fao56_gdd`: GDD sequence → correct stage transitions. `test_kcb_gdd_vs_date`: for equivalent thermal time and calendar time, Kcb curves should be similar. |
+| 4 | `test_continuous_interception`: growth_fraction ramp → smooth interception capacity transition. `test_mass_balance_continuous`: soil + interception + ET + recharge = precip (within tolerance). |
+| 5 | `test_lai_to_growth_fraction`: known LAI series → correct normalization. `test_lai_derived_kcb`: LAI → Kcb matches expected values. |

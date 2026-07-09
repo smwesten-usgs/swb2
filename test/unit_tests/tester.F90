@@ -20,6 +20,7 @@ program tester
   use test_fstring_list, only: collect_fstring_list
   use test_parameters, only: collect_parameters
   use test_solar_calculations, only: collect_solar_calculations
+  use test_phenology, only: collect_phenology
   implicit none
 
   integer :: stat, suite_index, total_tests
@@ -46,7 +47,8 @@ program tester
     new_testsuite("constants", collect_constants_and_conversions), &
     new_testsuite("fstring_list", collect_fstring_list), &
     new_testsuite("parameters", collect_parameters), &
-    new_testsuite("solar", collect_solar_calculations) &
+    new_testsuite("solar", collect_solar_calculations), &
+    new_testsuite("phenology", collect_phenology) &
   ]
 
   call get_argument(1, suite_name)

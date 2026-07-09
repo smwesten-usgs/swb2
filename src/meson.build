@@ -65,6 +65,7 @@ swb_common_src = files(
     'netcdf_c_api_interfaces.F90',
     'output.F90',
     'parameters.F90',
+    'phenology.F90',
     'precipitation__method_of_fragments.F90',
     'proj4_support.F90',
     'rooting_depth__FAO56.F90',

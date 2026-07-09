@@ -97,10 +97,10 @@ For the simple DOY-based case, growth_fraction snaps between 0.0 and 1.0 at the 
 ```
 PHENOLOGY_METHOD:
 
-  DOY_BASED            → Binary on/off from Growing_season_start / Growing_season_end
-  GDD_THRESHOLD        → Binary on (GDD ≥ threshold) / off (killing frost)
-  FAO56_DATES          → Planting_date + L_ini + L_dev + L_mid + L_late + L_fallow
-  FAO56_GDD            → GDD_plant + GDD_ini + GDD_dev + GDD_mid + GDD_late
+  DOY_BASED            → Growing_season_start_date + Growing_season_end_date (binary on/off)
+  GDD_THRESHOLD        → Growing_season_start_GDD + Killing_frost_temperature (binary on/off)
+  FAO56_DATES          → Growing_season_start_date + L_ini + L_dev + L_mid + L_late
+  FAO56_GDD            → Growing_season_start_GDD + GDD_ini + GDD_dev + GDD_mid + GDD_late + Killing_frost_temperature
   GRIDDED_LAI          → Time-varying LAI grid → normalized to growth_fraction
   GRIDDED_PHENOLOGY    → Preprocessed growth_fraction grid (0–1), read directly
 ```
@@ -145,11 +145,11 @@ This gives the user full awareness without requiring them to memorize priority r
 ### New Module Structure
 
 ```
-phenology.F90  (unified provider — NEW, replaces growing_season.F90)
-  ├── phenology_doy_based()           ← logic from current growing_season.F90
-  ├── phenology_gdd_threshold()       ← GDD/killing frost from current growing_season.F90
-  ├── phenology_fao56_dates()         ← growth stage date logic from crop_coefficients__fao56.F90
-  ├── phenology_fao56_gdd()           ← GDD stage logic from crop_coefficients__fao56.F90
+phenology.F90  (unified provider — NEW, growing_season.F90 is DELETED)
+  ├── phenology_doy_based()           ← simple binary on/off from DOY
+  ├── phenology_gdd_threshold()       ← GDD accumulation / killing frost
+  ├── phenology_fao56_dates()         ← growth stage logic (extracted from crop_coefficients__fao56.F90)
+  ├── phenology_fao56_gdd()           ← GDD stage logic (extracted from crop_coefficients__fao56.F90)
   ├── phenology_gridded_lai()         ← FUTURE: reads LAI grids via DATA_CATALOG
   └── phenology_gridded_fraction()    ← FUTURE: reads preprocessed growth_fraction grids
 
@@ -245,11 +245,36 @@ The breaks are justified because:
 
 | Current setup | Action needed |
 |---|---|
-| T-M with DOY growing season, no crop coefficients | Add `PHENOLOGY_METHOD DOY_BASED` to control file. (Or `GDD_THRESHOLD` if using GDD/killing frost columns.) |
-| FAO-56 with `Planting_date` + `L_*` columns | Add `PHENOLOGY_METHOD FAO56_DATES` to control file. |
-| FAO-56 with GDD columns (`GDD_plant`, etc.) | Add `PHENOLOGY_METHOD FAO56_GDD` to control file. |
-| FAO-56 with monthly Kcb (`Kcb_Jan`...`Kcb_Dec`) | Add `PHENOLOGY_METHOD DOY_BASED` (or omit phenology — monthly Kcb is independent of growth stages). |
+| T-M with DOY growing season, no crop coefficients | Add `PHENOLOGY_METHOD DOY_BASED`. Rename `First_day_of_growing_season` → `Growing_season_start_date`, `Last_day_of_growing_season` → `Growing_season_end_date` in lookup table. |
+| FAO-56 with `Planting_date` + `L_*` columns | Add `PHENOLOGY_METHOD FAO56_DATES`. Rename `Planting_date` → `Growing_season_start_date`. Remove `L_fallow` (end is implicit from sum of stage lengths). |
+| FAO-56 with GDD columns (`GDD_plant`, etc.) | Add `PHENOLOGY_METHOD FAO56_GDD`. Rename `GDD_plant` → `Growing_season_start_GDD`. |
 | Mixed table with both DOY columns and FAO-56 columns | Choose the method you want. Remove or ignore the extra columns — the model will tell you they're unused. |
+
+### Unified Parameter Names (replaces all legacy synonyms)
+
+The following parameter names are the **only** recognized column headers for the phenology module. Legacy synonyms (`First_day_of_growing_season`, `Planting_date`, `GDD_plant`, `GDD_first_day_of_growing_season`, etc.) are no longer supported.
+
+| Column | Type | Methods that use it |
+|---|---|---|
+| `Growing_season_start_date` | mm/dd string or integer DOY | DOY_BASED, FAO56_DATES |
+| `Growing_season_end_date` | mm/dd string or integer DOY | DOY_BASED only |
+| `Growing_season_start_GDD` | float (degree-days) | GDD_THRESHOLD, FAO56_GDD |
+| `Killing_frost_temperature` | float (temperature units matching input) | GDD_THRESHOLD, FAO56_GDD |
+| `L_ini` | integer (days) | FAO56_DATES |
+| `L_dev` | integer (days) | FAO56_DATES |
+| `L_mid` | integer (days) | FAO56_DATES |
+| `L_late` | integer (days) | FAO56_DATES |
+| `GDD_ini` | float (degree-days) | FAO56_GDD |
+| `GDD_dev` | float (degree-days) | FAO56_GDD |
+| `GDD_mid` | float (degree-days) | FAO56_GDD |
+| `GDD_late` | float (degree-days) | FAO56_GDD |
+
+**Design rationale:**
+- `Growing_season_start_date` replaces both `First_day_of_growing_season` and `Planting_date` — they are physically the same concept (when vegetation becomes active).
+- `Growing_season_end_date` replaces `Last_day_of_growing_season` — only needed for DOY_BASED where there is no stage-length information.
+- `Growing_season_start_GDD` replaces both `GDD_first_day_of_growing_season` and `GDD_plant` — the thermal sum at which growth initiates.
+- `L_fallow` is removed. The growing season end under FAO56_DATES is implicitly `Growing_season_start_date + L_ini + L_dev + L_mid + L_late`. The fallow period is simply the remainder of the year.
+- `Growing_season_start_date` accepts either mm/dd format (e.g., `03/17`, `3-15`) or integer DOY (e.g., `91`).
 
 
 
