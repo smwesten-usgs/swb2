@@ -36,7 +36,7 @@ The SWB2 codebase is **remarkably clean modern Fortran** — it avoids nearly al
 | Duplicate `USE` statement | 1 in `netcdf4_support.F90` | Trivial | ✅ Fixed |
 | Bare `integer` without kind | ~1 in `grid.F90` | Trivial | ✅ Fixed |
 | Intel suppressed diagnostics (7416, 7025, 6048) | 3 | Medium | Open |
-| Unused functions | 19 in 5 files | Low | Open — candidates for removal or `!$GCC attributes used` |
+| Unused functions | 19 in 5 files | Low | Accepted — intentional reserve API. See `design/unused_functions_analysis.md` |
 | Maybe-uninitialized (false positives) | 10 in 3 files | Trivial | N/A — gfortran false positives on allocatables |
 
 ### Current Compiler Warning Summary (July 2026, gfortran `-std=f2018 -Wall -Wextra -pedantic`)
