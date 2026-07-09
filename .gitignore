@@ -1,3 +1,6 @@
+# Generated documentation (built via pixi run docs, deployed by GitHub Actions)
+docs/
+
 # OS-specific files
 .DS_Store
 

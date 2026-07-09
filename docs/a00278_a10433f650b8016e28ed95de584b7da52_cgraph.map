@@ -1,7 +1,0 @@
-<map id="grid::grid_populatexy" name="grid::grid_populatexy">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,147,57"/>
-<area shape="rect" id="Node000002" href="$a00278.html#ad6acbbea3b49f90b8c19179622737342" title=" " alt="" coords="195,5,319,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="147,31,182,29,177,30,148,37"/>
-<area shape="rect" id="Node000003" href="$a00278.html#ac25f47e46ae1bb251b52182e51d7c625" title=" " alt="" coords="195,56,319,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="147,51,182,58,177,59,147,57"/>
-</map>

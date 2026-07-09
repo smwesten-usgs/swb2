@@ -1,7 +1,0 @@
-<map id="model_domain::model_initialize_et_monthly_grid" name="model_domain::model_initialize_et_monthly_grid">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,180,56"/>
-<area shape="rect" id="Node000002" href="$a00269.html#a8e210030f6900702d0d6408e5ce1286a" title=" " alt="" coords="228,5,362,64"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,32,215,34,210,35,180,37"/>
-<area shape="rect" id="Node000003" href="$a00273.html#afd73029531ee5ba631b7838d2f6395dd" title=" " alt="" coords="410,21,519,48"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="362,32,397,35,392,35,362,37"/>
-</map>

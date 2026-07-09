@@ -1,7 +1,0 @@
-<map id="model_initialize::read_hydrologic_soil_groups" name="model_initialize::read_hydrologic_soil_groups">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,166,65"/>
-<area shape="rect" id="Node000002" href="$a00278.html#a73982fb822e4ddc14622870cc41ba371" title=" " alt="" coords="214,5,359,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,31,201,29,196,30,167,36"/>
-<area shape="rect" id="Node000003" href="$a00273.html#a865c266d00ec8abab13dc671fd1f2d84" title=" " alt="" coords="226,56,346,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="166,51,214,60,208,60,166,57"/>
-</map>

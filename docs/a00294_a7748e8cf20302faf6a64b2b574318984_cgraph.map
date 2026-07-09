@@ -1,7 +1,0 @@
-<map id="model_initialize::initialize_lookup_tables" name="model_initialize::initialize_lookup_tables">
-<area shape="rect" id="Node000001" title="Find any parameter tables specified in the control file; process and store contents." alt="" coords="5,35,171,77"/>
-<area shape="rect" id="Node000002" href="$a00258.html#a033541136836ab3a090e3e1c31d7df33" title=" " alt="" coords="219,5,402,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,42,206,40,201,41,172,48"/>
-<area shape="rect" id="Node000003" href="$a00273.html#a865c266d00ec8abab13dc671fd1f2d84" title=" " alt="" coords="250,72,370,99"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="171,64,237,75,232,76,171,70"/>
-</map>

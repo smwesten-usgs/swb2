@@ -1,7 +1,7 @@
 [workspace]
 name = "swb2"
 channels = ["conda-forge"]
-platforms = ["win-64"]
+platforms = ["win-64", "linux-64"]
 version = "2.4.1"
 
 [dependencies]
@@ -25,7 +25,7 @@ setup-sa = { cmd = "meson setup builddir --wipe -Dprofile=static_analysis -Dnetc
 build = "meson compile -C builddir"
 test = { cmd = "rm -f SWB_LOGFILE__*.md && ../../builddir/test/unit_tests/swbtest", cwd = "test/unit_tests" }
 clean = "rm -rf builddir"
-docs = { cmd = "cmd /c \"if exist ..\\docs rmdir /s /q ..\\docs & doxygen Doxyfile\"", cwd = "doxygen" }
+docs = { cmd = "rm -rf ../docs && doxygen Doxyfile", cwd = "doxygen" }
 
 [target.win-64.tasks]
 setup = { cmd = "cmd /c meson setup builddir --wipe -Dprofile=release -Dnetcdf_root=%CONDA_PREFIX%/Library" }

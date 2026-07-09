@@ -1,7 +1,0 @@
-<map id="model_domain::model_calculate_actual_et_fao56" name="model_domain::model_calculate_actual_et_fao56">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,185,48"/>
-<area shape="rect" id="Node000002" href="$a00252.html#a279c33dd7fe6168cfa4a2f1cba054253" title=" " alt="" coords="233,5,413,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,24,219,26,214,27,185,29"/>
-<area shape="rect" id="Node000003" href="$a00252.html#ac5459aa126b07f29c771221fd17b2297" title="Adjust the depletion fraction based on current reference ET0." alt="" coords="461,5,624,48"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="413,24,448,27,443,27,413,29"/>
-</map>

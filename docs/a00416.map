@@ -1,8 +1,0 @@
-<map id="dictionary::dict_t" name="dictionary::dict_t">
-<area shape="rect" id="Node000001" title=" " alt="" coords="23,280,141,307"/>
-<area shape="rect" id="Node000002" href="$a00414.html" title=" " alt="" coords="5,129,159,156"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,171,85,280,79,279,80,173"/>
-<area shape="poly" id="edge3_Node000002_Node000002" title=" " alt="" coords="174,132,185,143,177,152,160,155,158,151,175,147,180,143,174,138"/>
-<area shape="rect" id="Node000003" href="$a00546.html" title=" " alt="" coords="19,5,145,48"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="83,61,85,129,79,129,81,66"/>
-</map>

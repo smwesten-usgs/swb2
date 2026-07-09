@@ -1,45 +1,40 @@
-# ----------------------------------------
-# GitHub Linguist overrides
-*.asc linguist-detectable=false
-*.html linguist-detectable=false
-*.R linguist-detectable=false
-*.ctl linguist-detectable=false
-*.ipynb linguist-detectable=false
-*.py linguist-detectable=false
+# Auto-detect text files and normalize to LF in the repo
+* text=auto
 
-# ----------------------------------------
-# Explicit line ending normalization for known text files
-*.f90 text eol=lf
+# Source code — LF in repo, native on checkout
 *.F90 text eol=lf
-*.f text eol=lf
-*.F text eol=lf
+*.f90 text eol=lf
 *.c text eol=lf
 *.h text eol=lf
-*.sh text eol=lf
-*.R text eol=lf
 *.py text eol=lf
 *.md text eol=lf
 *.txt text eol=lf
+*.ctl text eol=lf
 *.csv text eol=lf
-*.ini text eol=lf
-*.json text eol=lf
-*.html text eol=lf
-*.css text eol=lf
-*.js text eol=lf
-CMakeLists.txt text eol=lf
-*.cmake text eol=lf
+*.tsv text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+
+# Build/config files
 meson.build text eol=lf
 meson_options.txt text eol=lf
+CMakeLists.txt text eol=lf
+*.cmake text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.html text eol=lf
 
-# ----------------------------------------
-# Windows-specific scripts
-*.bat text eol=crlf
-*.cmd text eol=crlf
-
-# ----------------------------------------
-# Binary files (no normalization)
-*.pdf binary
+# Binary files — do not touch
 *.png binary
-*.jpg binary
-*.zip binary
+*.svg binary
+*.pdf binary
+*.nc binary
 *.exe binary
+*.xls binary
+*.xlsx binary
+*.asc binary
+*.gch binary
+*.ipynb binary

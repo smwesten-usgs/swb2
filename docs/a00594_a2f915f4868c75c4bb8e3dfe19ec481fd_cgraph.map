@@ -1,9 +1,0 @@
-<map id="model_domain::model_domain_t::initialize_arrays" name="model_domain::model_domain_t::initialize_arrays">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,15,154,73"/>
-<area shape="rect" id="Node000002" href="$a00293.html#a360a1203c12aa6bddb9616ca02d28183" title=" " alt="" coords="202,23,362,65"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,41,189,44,183,44,154,47"/>
-<area shape="rect" id="Node000003" href="$a00273.html#afd73029531ee5ba631b7838d2f6395dd" title=" " alt="" coords="416,5,525,32"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="362,31,403,28,397,28,363,36"/>
-<area shape="rect" id="Node000004" href="$a00273.html#a865c266d00ec8abab13dc671fd1f2d84" title=" " alt="" coords="410,56,530,83"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="363,52,397,59,392,59,362,57"/>
-</map>
