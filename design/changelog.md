@@ -2,6 +2,39 @@
 
 ---
 
+## 2026-07-09
+
+### Changed: Removed generated Doxygen HTML from git tracking
+
+Removed ~2,200 generated HTML/JS/PNG/CSS files from the `docs/` directory out of git tracking. These files are now in `.gitignore` and built on-demand via `pixi run docs` locally or deployed automatically via GitHub Actions.
+
+**Motivation:** The tracked `docs/` directory caused constant CRLF warnings, bloated the repository, polluted `git log`/`git blame`, and created merge conflicts on every regeneration.
+
+### Added: GitHub Actions workflow for Doxygen documentation deployment
+
+New `.github/workflows/docs.yml` automatically builds and deploys Doxygen documentation to GitHub Pages on every push to `main`. Uses `prefix-dev/setup-pixi@v0.9.6` to install doxygen/graphviz via conda-forge, then runs `pixi run docs`.
+
+GitHub Pages source switched from "Deploy from branch" to "GitHub Actions".
+
+### Added: `.gitattributes` for cross-platform line-ending management
+
+Explicit rules for all file types:
+- Source code (`.F90`, `.c`, `.py`, `.md`, etc.) → LF in repo, native on checkout
+- `.bat` files → CRLF (Windows-native)
+- Binary files (`.png`, `.nc`, `.exe`, `.asc`, etc.) → no conversion
+
+Combined with `core.autocrlf = false`, this eliminates CRLF replacement warnings while maintaining cross-platform compatibility for Mac/Linux contributors.
+
+### Changed: Added `linux-64` platform to `pixi.toml`
+
+Required for GitHub Actions CI (runs on `ubuntu-latest`). Linux-compatible `docs` task added alongside existing Windows-specific `[target.win-64.tasks]` override.
+
+### Removed: Stale local git branches
+
+Cleaned up local branches after merging `test_drive_conversion` into `main`. Only `main` remains.
+
+---
+
 ## 2026-07-08 — v2.4.1
 
 ### Added: test-drive unit testing framework (replaces FRUIT)

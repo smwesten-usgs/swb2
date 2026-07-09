@@ -23,26 +23,39 @@ The SWB2 codebase is **remarkably clean modern Fortran** — it avoids nearly al
 
 **Issues found:**
 
-| Category | Count | Severity |
-|----------|-------|----------|
-| `-std=gnu` instead of `-std=f2018` | 1 | High |
-| `-fallow-argument-mismatch` flag | 1 | High |
-| `-fall-intrinsics` flag | 1 | Medium |
-| `stop` instead of `error stop` | 9 instances in 6 files | Medium |
-| Lines >132 characters | 17 lines in 5 files | Low |
-| `SAVE` variables (hidden mutable state) | 7 instances in 5 files | Low |
-| `__FILE__`/`__LINE__` preprocessor macros | 545 uses in 37 files | Accepted deviation |
-| `#ifdef __GFORTRAN__`/`__INTEL_COMPILER__` | in `main.F90` | Low |
-| Duplicate `USE` statement | 1 in `netcdf4_support.F90` | Trivial |
-| Bare `integer` without kind | ~1 in `grid.F90` | Trivial |
-| Intel suppressed diagnostics (7416, 7025, 6048) | 3 | Medium |
+| Category | Count | Severity | Status |
+|----------|-------|----------|--------|
+| `-std=gnu` instead of `-std=f2018` | 1 | High | ✅ Fixed — `static_analysis` profile uses `-std=f2018`; code compiles clean |
+| `-fallow-argument-mismatch` flag | 1 | High | ✅ Fixed — flag removed from active profiles |
+| `-fall-intrinsics` flag | 1 | Medium | ✅ Fixed — flag removed |
+| `stop` instead of `error stop` | 9 instances in 6 files | Medium | ✅ Fixed (June 2026) |
+| Lines >132 characters | 17 lines in 5 files | Low | ✅ Fixed (June 2026) |
+| `SAVE` variables (hidden mutable state) | 7 instances in 5 files | Low | Open |
+| `__FILE__`/`__LINE__` preprocessor macros | 545 uses in 37 files | Accepted deviation | N/A |
+| `#ifdef __GFORTRAN__`/`__INTEL_COMPILER__` | in `main.F90` | Low | Open |
+| Duplicate `USE` statement | 1 in `netcdf4_support.F90` | Trivial | ✅ Fixed |
+| Bare `integer` without kind | ~1 in `grid.F90` | Trivial | ✅ Fixed |
+| Intel suppressed diagnostics (7416, 7025, 6048) | 3 | Medium | Open |
+| Unused functions | 19 in 5 files | Low | Open — candidates for removal or `!$GCC attributes used` |
+| Maybe-uninitialized (false positives) | 10 in 3 files | Trivial | N/A — gfortran false positives on allocatables |
+
+### Current Compiler Warning Summary (July 2026, gfortran `-std=f2018 -Wall -Wextra -pedantic`)
+
+**Fortran (SWB2 source): ~30 warnings**
+- 19 unused functions (grid, netcdf4_support, datetime, parameters, model_initialize)
+- 10 maybe-uninitialized (false positives on allocatable arrays — testdrive, swbstats2_support, solar_calculations)
+- 1 intentional float equality comparison in test code
+
+**C (bundled PROJ4 — third-party, not maintained): ~30 warnings**
+- Unused variables, missing braces, format overflow, misleading indentation
+- Will be eliminated when PROJ4 is replaced with modern PROJ library (Phase 6.1)
 
 ### Current Testing Infrastructure
 
-- **Unit tests:** FRUIT framework (vendored, circa 2005-2013)
-- **Test driver:** Hand-maintained `fruit_driver.F90` with manual test registration
+- **Unit tests:** ✅ test-drive framework (10 suites, 144 tests)
+- **Test driver:** ✅ `tester.F90` with CLI suite/test selection, ANSI output
 - **Integration/regression tests:** Ad-hoc, no CI automation
-- **CI:** None
+- **CI:** ✅ GitHub Actions (documentation deployment); build/test CI pending
 - **Formatting:** Not enforced
 - **Spelling:** Not checked
 
@@ -108,24 +121,24 @@ MODFLOW6 provides an excellent reference for a mature Fortran scientific code wi
 
 | # | Task | Notes |
 |---|------|-------|
-| 2.1 | Verify Meson build works from clean checkout on Windows (gfortran), Linux, macOS | The priority — must work before removing CMake |
+| 2.1 | Verify Meson build works from clean checkout on Windows (gfortran), Linux, macOS | ✅ Windows gfortran verified. Linux/macOS pending CI |
 | 2.2 | Add `fortran_std=f2018` to `meson.build` default_options | Matches MODFLOW6 approach |
 | 2.3 | Remove `-fallow-argument-mismatch` — fix underlying type mismatches | Likely in netCDF wrapper or FRUIT |
 | 2.4 | Remove `-fall-intrinsics` — verify no non-standard intrinsics are called | Search found none in active code |
 | 2.5 | Remove `-std=gnu` (superseded by meson's `fortran_std`) | |
 | 2.6 | Address Intel suppressed diagnostics (7416, 7025, 6048) | Fix `c_bool` vs default logical issues |
 | 2.7 | Add `fprettify` configuration (`.fprettify.yaml`) and format all source | MODFLOW6 uses: indent=2, line-length=82 |
-| 2.8 | Add `pixi.toml` as task runner for build/test commands | Wraps `meson setup`, `meson compile`, `meson test` |
+| 2.8 | Add `pixi.toml` as task runner for build/test commands | ✅ Done (June 2026). Wraps `meson setup`, `meson compile`, `meson test`, `docs` |
 | 2.9 | Remove CMakeLists.txt and cmake/ directory | After 2.1 is confirmed |
 
 ### Phase 3: Testing Framework Overhaul (1-2 weeks)
 
 | # | Task | Notes |
 |---|------|-------|
-| 3.1 | Replace FRUIT with `test-drive` for Fortran unit tests | `test-drive` is actively maintained by fortran-lang |
-| 3.2 | Port existing FRUIT tests to test-drive format | 6 test modules: allocatable_string, datetime, exceptions, FAO56, gash, timer |
-| 3.3 | Add test-drive as a meson dependency | Via pkg-config or meson subproject/wrap |
-| 3.4 | Restructure test `meson.build` with `foreach` pattern | Register individual test suites like MODFLOW6 |
+| 3.1 | Replace FRUIT with `test-drive` for Fortran unit tests | ✅ Done (July 2026). Vendored `testdrive.F90` compiled directly into test executable |
+| 3.2 | Port existing FRUIT tests to test-drive format | ✅ Done (July 2026). 10 suites, 144 tests covering timer, allocatable_string, exceptions, gash, datetime, fao56, constants, fstring_list, parameters, solar |
+| 3.3 | Add test-drive as a meson dependency | ✅ Done (July 2026). Vendored single-file approach (no subproject/wrap needed) |
+| 3.4 | Restructure test `meson.build` with `foreach` pattern | ✅ Done (July 2026). Individual test source files compiled together via meson |
 | 3.5 | Add pytest-based integration tests | Python scripts run SWB2 executable, validate output |
 | 3.6 | Separate test data with clear regression baselines | Structured `test/` directory with expected outputs |
 | 3.7 | Add pytest markers for test categorization | `smoke`, `regression`, `slow` |
@@ -135,6 +148,7 @@ MODFLOW6 provides an excellent reference for a mature Fortran scientific code wi
 | # | Task | Notes |
 |---|------|-------|
 | 4.1 | Create `.github/workflows/ci.yml` with tiered jobs | lint → build → smoke → full test (with `needs:` gates) |
+| 4.1a | Create `.github/workflows/docs.yml` for Doxygen → GitHub Pages | ✅ Done (July 2026). Auto-deploys on push to main via pixi + setup-pixi@v0.9.6 |
 | 4.2 | Add format-check CI step using `fprettify` | Fail PR if formatting differs |
 | 4.3 | Add `codespell` for typo checking | |
 | 4.4 | Multi-compiler matrix: gfortran 12/13/14, Intel ifx | Use `fortran-lang/setup-fortran@v1` |
@@ -165,7 +179,7 @@ MODFLOW6 provides an excellent reference for a mature Fortran scientific code wi
 | 6.1 | Replace bundled PROJ4 with modern PROJ via pixi/system library | See `design/feature_consideration__adopt_modern_PROJ_library.md` |
 | 6.2 | Add GDAL/GeoTIFF support for direct raster I/O | See `design/feature_consideration__reading_writing_geotiffs_gdal.md` |
 | 6.3 | Unit-agnostic operation (metric/imperial flexibility) | See `design/feature_consideration__unit_agnostic_operation.md` |
-| 6.4 | Adopt pixi for library/dependency management | See `design/feature_consideration__adopt_pixi_for_library_management.md` |
+| 6.4 | Adopt pixi for library/dependency management | ✅ Done (June-July 2026). See `pixi.toml`; manages gfortran, netcdf, hdf5, doxygen, graphviz |
 
 ---
 
@@ -192,14 +206,16 @@ MODFLOW6 provides an excellent reference for a mature Fortran scientific code wi
 | Fortran standard | `-std=gnu` (extensions) | `fortran_std=f2018` |
 | Build system | Meson (working) + CMake (deprecated) | Meson only |
 | Formatting | None enforced | `fprettify` with CI check |
-| Unit test framework | FRUIT (vendored, legacy) | `test-drive` (modern, maintained) |
+| Unit test framework | ✅ `test-drive` (10 suites, 144 tests) | Expand coverage |
 | Integration tests | Manual/ad-hoc | pytest with markers |
-| CI | None | GitHub Actions, multi-compiler, multi-OS |
-| Task runner | Manual meson commands / shell scripts | `pixi` tasks |
+| CI | ✅ GitHub Actions (docs deployment) | Expand: build, test, multi-compiler |
+| Task runner | ✅ `pixi` tasks (setup, build, test, docs, etc.) | Complete |
 | Spelling | None | `codespell` |
-| Test discovery | Manual registration | test-drive collection + meson `foreach` |
+| Test discovery | ✅ test-drive collection + meson build | Complete |
 | Failure artifacts | None | Uploaded to GitHub Actions |
 | Repo sync | Manual push to 3 remotes | CI auto-sync to DOI-USGS; manual push to code.usgs.gov at release |
+| Documentation | ✅ Doxygen via GitHub Actions → Pages | Complete |
+| Line endings | ✅ `.gitattributes` (LF normalized) | Complete |
 
 ---
 
@@ -250,3 +266,4 @@ MODFLOW6 provides an excellent reference for a mature Fortran scientific code wi
 |------|---------|
 | May 2026 | Initial plan created |
 | June 2026 | Added Phase 0 (release housekeeping), Phase 6 (feature wishlist). Moved cross-platform build verification to top of Phase 2. Added DOI-USGS sync workflow to Phase 4. Added CMake removal to Phase 2. Added change log. |
+| July 2026 | Marked Phase 3.1–3.4 complete (test-drive migration, 10 suites, 144 tests). Marked 2.1 partial (Windows verified), 2.8 complete (pixi.toml), 6.4 complete (pixi adoption). Added 4.1a (Doxygen → GitHub Pages CI deployment). Removed `docs/` from git tracking. Added `.gitattributes` for cross-platform line endings. |
