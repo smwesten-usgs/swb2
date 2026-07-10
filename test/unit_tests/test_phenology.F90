@@ -18,6 +18,7 @@ module test_phenology
                        GROWING_SEASON_START_GDD, KILLING_FROST_TEMP, &
                        PHENOLOGY_METHOD_INDEX, &
                        PHENOLOGY_NONE, PHENOLOGY_DOY_BASED, PHENOLOGY_GDD_THRESHOLD, &
+                       PHENOLOGY_FAO56_DATES, &
                        GROWTH_STAGE_DORMANT, GROWTH_STAGE_MID
   use parameters, only: PARAMETERS_T, PARAMS
   use fstring_list, only: NA_FLOAT
@@ -534,13 +535,14 @@ contains
   ! Method index tests — verify phenology_initialize sets the correct method
   !---------------------------------------------------------------------------
 
-  !> @brief DOY landuse gets PHENOLOGY_DOY_BASED method index.
+  !> @brief DOY landuse with FAO56 stage lengths gets PHENOLOGY_FAO56_DATES method index.
   subroutine test_init_method_index_doy(error)
     type(error_type), allocatable, intent(out) :: error
     call ensure_phenology_initialized()
-    ! LU 1 (Corn, index 1): has DOY columns
-    call check(error, PHENOLOGY_METHOD_INDEX(1) == PHENOLOGY_DOY_BASED, &
-               "Corn should have PHENOLOGY_DOY_BASED method")
+    ! LU 1 (Corn, index 1): has DOY columns AND L_ini/L_dev/L_mid/L_late
+    ! from the merged crop coefficient table → FAO56_DATES takes priority
+    call check(error, PHENOLOGY_METHOD_INDEX(1) == PHENOLOGY_FAO56_DATES, &
+               "Corn should have PHENOLOGY_FAO56_DATES method (DOY + stage lengths present)")
   end subroutine test_init_method_index_doy
 
   !> @brief GDD landuse gets PHENOLOGY_GDD_THRESHOLD method index.
@@ -576,6 +578,7 @@ contains
   subroutine test_dispatch_doy_growing(error)
     type(error_type), allocatable, intent(out) :: error
     real(c_float) :: growth_fraction
+    real(c_float) :: stage_fraction
     logical(c_bool) :: it_is_growing_season
     logical(c_bool) :: frost_killed_season
     integer(c_int) :: growth_stage
@@ -587,13 +590,15 @@ contains
     call phenology_update( &
       landuse_index=1, &
       current_doy=150, &
+      days_in_year=365, &
       current_gdd=0.0_c_float, &
       mean_air_temperature=70.0_c_float, &
       it_is_growing_season_in=FALSE, &
       frost_killed_season=frost_killed_season, &
       growth_fraction=growth_fraction, &
       it_is_growing_season=it_is_growing_season, &
-      growth_stage=growth_stage)
+      growth_stage=growth_stage, &
+      stage_fraction=stage_fraction)
 
     call check(error, it_is_growing_season .eqv. .true., &
                "Dispatch DOY: Corn DOY 150 should be growing")
@@ -603,6 +608,7 @@ contains
   subroutine test_dispatch_gdd_growing(error)
     type(error_type), allocatable, intent(out) :: error
     real(c_float) :: growth_fraction
+    real(c_float) :: stage_fraction
     logical(c_bool) :: it_is_growing_season
     logical(c_bool) :: frost_killed_season
     integer(c_int) :: growth_stage
@@ -614,13 +620,15 @@ contains
     call phenology_update( &
       landuse_index=3, &
       current_doy=150, &
+      days_in_year=365, &
       current_gdd=300.0_c_float, &
       mean_air_temperature=70.0_c_float, &
       it_is_growing_season_in=FALSE, &
       frost_killed_season=frost_killed_season, &
       growth_fraction=growth_fraction, &
       it_is_growing_season=it_is_growing_season, &
-      growth_stage=growth_stage)
+      growth_stage=growth_stage, &
+      stage_fraction=stage_fraction)
 
     call check(error, it_is_growing_season .eqv. .true., &
                "Dispatch GDD: Soybeans GDD 300 > 200 should be growing")
@@ -634,6 +642,7 @@ contains
   subroutine test_dispatch_none_dormant(error)
     type(error_type), allocatable, intent(out) :: error
     real(c_float) :: growth_fraction
+    real(c_float) :: stage_fraction
     logical(c_bool) :: it_is_growing_season
     logical(c_bool) :: frost_killed_season
     integer(c_int) :: growth_stage
@@ -645,13 +654,15 @@ contains
     call phenology_update( &
       landuse_index=1, &
       current_doy=30, &
+      days_in_year=365, &
       current_gdd=0.0_c_float, &
       mean_air_temperature=20.0_c_float, &
       it_is_growing_season_in=FALSE, &
       frost_killed_season=frost_killed_season, &
       growth_fraction=growth_fraction, &
       it_is_growing_season=it_is_growing_season, &
-      growth_stage=growth_stage)
+      growth_stage=growth_stage, &
+      stage_fraction=stage_fraction)
 
     call check(error, it_is_growing_season .eqv. .false., &
                "Dispatch DOY: Corn DOY 30 should be dormant")

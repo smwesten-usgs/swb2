@@ -121,6 +121,9 @@ module model_domain
     integer (c_int), allocatable      :: number_of_days_since_planting(:)
     logical (c_bool), allocatable     :: it_is_growing_season(:)
     logical (c_bool), allocatable     :: frost_killed_season(:)
+    integer (c_int), allocatable      :: growth_stage(:)
+    real (c_float), allocatable       :: stage_fraction(:)
+    real (c_float), allocatable       :: growth_fraction(:)
 
     real (c_float), allocatable       :: gross_precip(:)
     real (c_float), allocatable       :: monthly_gross_precip(:)
@@ -433,7 +436,7 @@ contains
     ! [ LOCALS ]
     integer (c_int)  :: iCount
     integer (c_int)  :: iIndex
-    integer (c_int)  :: iStat(73)
+    integer (c_int)  :: iStat(76)
 
     iCount = count( this%active )
     iStat = 0
@@ -493,24 +496,27 @@ contains
     allocate( this%row_num_1D( iCount ), stat=iStat(53) )
     allocate( this%it_is_growing_season( iCount ), stat=iStat(54) )
     allocate( this%frost_killed_season( iCount ), stat=iStat(55) )
-    allocate( this%curve_num_adj( iCount ), stat=iStat(56) )
-    allocate( this%rejected_net_infiltration( iCount ), stat=iStat(57) )
-    allocate( this%evap_reduction_coef_kr( iCount ), stat=iStat(58) )
-    allocate( this%surf_evap_coef_ke( iCount ), stat=iStat(59) )
-    allocate( this%plant_stress_coef_ks( iCount ), stat=iStat(60) )
-    allocate( this%total_available_water_taw( iCount ), stat=iStat(61) )
-    allocate( this%readily_available_water_raw( iCount ), stat=iStat(62) )
-    allocate( this%bare_soil_evap( iCount ), stat=iStat(63) )
-    allocate( this%fraction_exposed_and_wetted_soil( iCount ), stat=iStat(64) )
-    allocate( this%delta_soil_storage( iCount ), stat=iStat(65) )
-    allocate( this%soil_moisture_deficit( iCount ), stat=iStat(66) )
-    allocate( this%net_rainfall( iCount ), stat=iStat(67) )
-    allocate( this%net_snowfall( iCount ), stat=iStat(68) )
-    allocate( this%evaporable_water_storage( iCount ), stat=iStat(69) )
-    allocate( this%evaporable_water_deficit( iCount ), stat=iStat(70) )
-    allocate( this%irrigation_mask( iCount ), stat=iStat(71) )
-    allocate( this%tmax_minus_tmin( iCount ), stat=iStat(72) )
-    allocate( this%climatic_deficit( iCount ), stat=iStat(73) )
+    allocate( this%growth_stage( iCount ), stat=iStat(56) )
+    allocate( this%stage_fraction( iCount ), stat=iStat(57) )
+    allocate( this%growth_fraction( iCount ), stat=iStat(58) )
+    allocate( this%curve_num_adj( iCount ), stat=iStat(59) )
+    allocate( this%rejected_net_infiltration( iCount ), stat=iStat(60) )
+    allocate( this%evap_reduction_coef_kr( iCount ), stat=iStat(61) )
+    allocate( this%surf_evap_coef_ke( iCount ), stat=iStat(62) )
+    allocate( this%plant_stress_coef_ks( iCount ), stat=iStat(63 ) )
+    allocate( this%total_available_water_taw( iCount ), stat=iStat(64) )
+    allocate( this%readily_available_water_raw( iCount ), stat=iStat(65) )
+    allocate( this%bare_soil_evap( iCount ), stat=iStat(66) )
+    allocate( this%fraction_exposed_and_wetted_soil( iCount ), stat=iStat(67) )
+    allocate( this%delta_soil_storage( iCount ), stat=iStat(68) )
+    allocate( this%soil_moisture_deficit( iCount ), stat=iStat(69) )
+    allocate( this%net_rainfall( iCount ), stat=iStat(70) )
+    allocate( this%net_snowfall( iCount ), stat=iStat(71) )
+    allocate( this%evaporable_water_storage( iCount ), stat=iStat(72) )
+    allocate( this%evaporable_water_deficit( iCount ), stat=iStat(73) )
+    allocate( this%irrigation_mask( iCount ), stat=iStat(74) )
+    allocate( this%tmax_minus_tmin( iCount ), stat=iStat(75) )
+    allocate( this%climatic_deficit( iCount ), stat=iStat(76) )
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR"                    &
@@ -590,6 +596,9 @@ contains
     this%evaporable_water_deficit            = 0.0_c_float
     this%it_is_growing_season                = FALSE
     this%frost_killed_season                 = FALSE
+    this%growth_stage                        = 0
+    this%stage_fraction                      = 0.0_c_float
+    this%growth_fraction                     = 0.0_c_float
     this%irrigation_mask                     = 1.0_c_float
     this%tmax_minus_tmin                     = 0.0_c_float
     this%climatic_deficit                    = 0.0_c_float
@@ -2598,8 +2607,6 @@ contains
     ! [ LOCALS ]
     integer (c_int)  :: indx
     integer (c_int)  :: number_of_cells
-    real (c_float)   :: growth_fraction
-    integer (c_int)  :: growth_stage
 
     number_of_cells = ubound( this%landuse_index, 1 )
 
@@ -2613,13 +2620,15 @@ contains
       call phenology_update(                                              &
         landuse_index          = this%landuse_index(indx),                &
         current_doy            = SIM_DT%iDOY,                            &
+        days_in_year           = SIM_DT%iDaysInYear,                     &
         current_gdd            = this%gdd(indx),                         &
         mean_air_temperature   = this%tmean(indx),                       &
         it_is_growing_season_in = this%it_is_growing_season(indx),       &
         frost_killed_season    = this%frost_killed_season(indx),         &
-        growth_fraction        = growth_fraction,                         &
+        growth_fraction        = this%growth_fraction(indx),             &
         it_is_growing_season   = this%it_is_growing_season(indx),        &
-        growth_stage           = growth_stage )
+        growth_stage           = this%growth_stage(indx),                &
+        stage_fraction         = this%stage_fraction(indx) )
 
     end do
 

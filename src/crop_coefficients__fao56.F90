@@ -28,6 +28,7 @@ module crop_coefficients__fao56
   public :: crop_coefficients_FAO56_update_growth_stage_dates
   public :: crop_coefficients_FAO56_update_growing_season
   public :: crop_coefficients_FAO56_calculate_Kcb_Max
+  public :: crop_coefficients_FAO56_interpolate_Kcb
   public :: update_crop_coefficient_date_as_threshold, update_crop_coefficient_GDD_as_threshold
   public :: GROWTH_STAGE_DATE, PLANTING_DATE, GROWTH_STAGE_LENGTH_IN_DAYS
   public :: KCB_MIN, KCB_INI, KCB_MID, KCB_END
@@ -694,5 +695,70 @@ end function update_crop_coefficient_GDD_as_threshold
     endif
 
   end subroutine crop_coefficients_FAO56_update_growing_season
+
+!--------------------------------------------------------------------------------------------------
+
+  !> @brief Interpolate Kcb from growth stage and stage fraction.
+  !!
+  !! Pure Kcb interpolation: given the current growth_stage and the fractional
+  !! position within that stage (from the phenology module), return the
+  !! basal crop coefficient. For monthly Kcb land uses, uses the current month.
+  !!
+  !! @param[in]  landuse_index   Index into per-landuse Kcb arrays
+  !! @param[in]  growth_stage    Current growth stage (DORMANT, INI, DEV, MID, LATE)
+  !! @param[in]  stage_fraction  Position within current stage (0.0–1.0)
+  !! @param[in]  current_month   Current month (1-12), used for monthly Kcb method
+  !! @return     Kcb             Interpolated basal crop coefficient
+  !---------------------------------------------------------------------------
+  pure function crop_coefficients_FAO56_interpolate_Kcb( landuse_index,  &
+                                                         growth_stage,   &
+                                                         stage_fraction, &
+                                                         current_month ) &
+                                                         result( Kcb )
+
+    use phenology, only : GROWTH_STAGE_INI, &
+                          GROWTH_STAGE_DEV, GROWTH_STAGE_MID, GROWTH_STAGE_LATE
+
+    integer (c_int), intent(in) :: landuse_index
+    integer (c_int), intent(in) :: growth_stage
+    real (c_float), intent(in)  :: stage_fraction
+    integer (c_int), intent(in) :: current_month
+    real (c_float)              :: Kcb
+
+    if ( KCB_METHOD( landuse_index ) == KCB_METHOD_MONTHLY_VALUES ) then
+
+      Kcb = KCB_l( current_month, landuse_index )
+
+    else
+
+      select case ( growth_stage )
+
+        case ( GROWTH_STAGE_INI )
+          Kcb = KCB_l( KCB_INI, landuse_index )
+
+        case ( GROWTH_STAGE_DEV )
+          ! Linear ramp from Kcb_ini to Kcb_mid over the development stage
+          Kcb = KCB_l( KCB_INI, landuse_index )                            &
+              + stage_fraction * ( KCB_l( KCB_MID, landuse_index )         &
+                                 - KCB_l( KCB_INI, landuse_index ) )
+
+        case ( GROWTH_STAGE_MID )
+          Kcb = KCB_l( KCB_MID, landuse_index )
+
+        case ( GROWTH_STAGE_LATE )
+          ! Linear decline from Kcb_mid to Kcb_end over the late stage
+          Kcb = KCB_l( KCB_MID, landuse_index )                            &
+              + stage_fraction * ( KCB_l( KCB_END, landuse_index )         &
+                                 - KCB_l( KCB_MID, landuse_index ) )
+
+        case default
+          ! DORMANT or unknown
+          Kcb = KCB_l( KCB_MIN, landuse_index )
+
+      end select
+
+    end if
+
+  end function crop_coefficients_FAO56_interpolate_Kcb
 
 end module crop_coefficients__fao56

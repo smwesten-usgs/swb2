@@ -29,17 +29,23 @@ module phenology
   public :: phenology_update
   public :: phenology_update_doy_based
   public :: phenology_update_gdd_threshold
+  public :: phenology_update_fao56_dates
+  public :: phenology_update_fao56_gdd
 
   ! --- Public constants (growth stages) ---
-  public :: GROWTH_STAGE_DORMANT, GROWTH_STAGE_MID
+  public :: GROWTH_STAGE_DORMANT, GROWTH_STAGE_INI, GROWTH_STAGE_DEV
+  public :: GROWTH_STAGE_MID, GROWTH_STAGE_LATE
 
   ! --- Public constants (method indices) ---
   public :: PHENOLOGY_NONE, PHENOLOGY_DOY_BASED, PHENOLOGY_GDD_THRESHOLD
+  public :: PHENOLOGY_FAO56_DATES, PHENOLOGY_FAO56_GDD
 
   ! --- Public module data (per-landuse arrays, populated by phenology_initialize) ---
   public :: GROWING_SEASON_START_DOY, GROWING_SEASON_END_DOY
   public :: GROWING_SEASON_START_GDD, KILLING_FROST_TEMP
   public :: PHENOLOGY_METHOD_INDEX
+  public :: L_INI_DAYS, L_DEV_DAYS, L_MID_DAYS, L_LATE_DAYS
+  public :: GDD_INI, GDD_DEV, GDD_MID, GDD_LATE
 
   ! --- Growth stage constants ---
   integer(c_int), parameter :: GROWTH_STAGE_DORMANT = 0
@@ -61,6 +67,18 @@ module phenology
   real(c_float), allocatable  :: GROWING_SEASON_START_GDD(:)
   real(c_float), allocatable  :: KILLING_FROST_TEMP(:)
   integer(c_int), allocatable :: PHENOLOGY_METHOD_INDEX(:)
+
+  ! --- FAO56 date-based stage lengths (days) ---
+  integer(c_int), allocatable :: L_INI_DAYS(:)
+  integer(c_int), allocatable :: L_DEV_DAYS(:)
+  integer(c_int), allocatable :: L_MID_DAYS(:)
+  integer(c_int), allocatable :: L_LATE_DAYS(:)
+
+  ! --- FAO56 GDD-based stage lengths (degree-days) ---
+  real(c_float), allocatable  :: GDD_INI(:)
+  real(c_float), allocatable  :: GDD_DEV(:)
+  real(c_float), allocatable  :: GDD_MID(:)
+  real(c_float), allocatable  :: GDD_LATE(:)
 
   ! --- Private constants ---
   character(len=2), parameter  :: DATE_DELIMS = "/-"
@@ -186,14 +204,120 @@ contains
     call assert( status == 0, "phenology_initialize: allocation failed", &
                  __FILE__, __LINE__ )
 
+    ! --- FAO56 date-based stage lengths (L_ini, L_dev, L_mid, L_late) ---
+    call PARAMS%get_parameters( sKey="L_ini", fValues=temp_float_values, lFatal=FALSE )
+    allocate( L_INI_DAYS( number_of_landuses ), stat=status )
+    call assert( status == 0, "phenology_initialize: allocation failed", __FILE__, __LINE__ )
+    if ( allocated( temp_float_values ) &
+         .and. size( temp_float_values ) == number_of_landuses ) then
+      L_INI_DAYS = int( temp_float_values, c_int )
+      deallocate( temp_float_values )
+    else
+      L_INI_DAYS = NODATA_INT
+    end if
+
+    call PARAMS%get_parameters( sKey="L_dev", fValues=temp_float_values, lFatal=FALSE )
+    allocate( L_DEV_DAYS( number_of_landuses ), stat=status )
+    call assert( status == 0, "phenology_initialize: allocation failed", __FILE__, __LINE__ )
+    if ( allocated( temp_float_values ) &
+         .and. size( temp_float_values ) == number_of_landuses ) then
+      L_DEV_DAYS = int( temp_float_values, c_int )
+      deallocate( temp_float_values )
+    else
+      L_DEV_DAYS = NODATA_INT
+    end if
+
+    call PARAMS%get_parameters( sKey="L_mid", fValues=temp_float_values, lFatal=FALSE )
+    allocate( L_MID_DAYS( number_of_landuses ), stat=status )
+    call assert( status == 0, "phenology_initialize: allocation failed", __FILE__, __LINE__ )
+    if ( allocated( temp_float_values ) &
+         .and. size( temp_float_values ) == number_of_landuses ) then
+      L_MID_DAYS = int( temp_float_values, c_int )
+      deallocate( temp_float_values )
+    else
+      L_MID_DAYS = NODATA_INT
+    end if
+
+    call PARAMS%get_parameters( sKey="L_late", fValues=temp_float_values, lFatal=FALSE )
+    allocate( L_LATE_DAYS( number_of_landuses ), stat=status )
+    call assert( status == 0, "phenology_initialize: allocation failed", __FILE__, __LINE__ )
+    if ( allocated( temp_float_values ) &
+         .and. size( temp_float_values ) == number_of_landuses ) then
+      L_LATE_DAYS = int( temp_float_values, c_int )
+      deallocate( temp_float_values )
+    else
+      L_LATE_DAYS = NODATA_INT
+    end if
+
+    ! --- FAO56 GDD-based stage lengths (GDD_ini, GDD_dev, GDD_mid, GDD_late) ---
+    call PARAMS%get_parameters( sKey="GDD_ini", fValues=temp_float_values, lFatal=FALSE )
+    if ( allocated( temp_float_values ) &
+         .and. size( temp_float_values ) == number_of_landuses ) then
+      call move_alloc( temp_float_values, GDD_INI )
+    else
+      allocate( GDD_INI( number_of_landuses ), stat=status )
+      call assert( status == 0, "phenology_initialize: allocation failed", __FILE__, __LINE__ )
+      GDD_INI = NA_FLOAT
+    end if
+
+    call PARAMS%get_parameters( sKey="GDD_dev", fValues=temp_float_values, lFatal=FALSE )
+    if ( allocated( temp_float_values ) &
+         .and. size( temp_float_values ) == number_of_landuses ) then
+      call move_alloc( temp_float_values, GDD_DEV )
+    else
+      allocate( GDD_DEV( number_of_landuses ), stat=status )
+      call assert( status == 0, "phenology_initialize: allocation failed", __FILE__, __LINE__ )
+      GDD_DEV = NA_FLOAT
+    end if
+
+    call PARAMS%get_parameters( sKey="GDD_mid", fValues=temp_float_values, lFatal=FALSE )
+    if ( allocated( temp_float_values ) &
+         .and. size( temp_float_values ) == number_of_landuses ) then
+      call move_alloc( temp_float_values, GDD_MID )
+    else
+      allocate( GDD_MID( number_of_landuses ), stat=status )
+      call assert( status == 0, "phenology_initialize: allocation failed", __FILE__, __LINE__ )
+      GDD_MID = NA_FLOAT
+    end if
+
+    call PARAMS%get_parameters( sKey="GDD_late", fValues=temp_float_values, lFatal=FALSE )
+    if ( allocated( temp_float_values ) &
+         .and. size( temp_float_values ) == number_of_landuses ) then
+      call move_alloc( temp_float_values, GDD_LATE )
+    else
+      allocate( GDD_LATE( number_of_landuses ), stat=status )
+      call assert( status == 0, "phenology_initialize: allocation failed", __FILE__, __LINE__ )
+      GDD_LATE = NA_FLOAT
+    end if
+
+    ! --- Assign method per landuse based on which columns have data ---
+    ! Priority: FAO56_DATES > FAO56_GDD > DOY_BASED > GDD_THRESHOLD > NONE
     do indx = 1, number_of_landuses
-      if ( GROWING_SEASON_START_DOY(indx) /= NODATA_INT ) then
+
+      if ( GROWING_SEASON_START_DOY(indx) /= NODATA_INT   &
+           .and. L_INI_DAYS(indx) /= NODATA_INT           &
+           .and. L_DEV_DAYS(indx) /= NODATA_INT           &
+           .and. L_MID_DAYS(indx) /= NODATA_INT           &
+           .and. L_LATE_DAYS(indx) /= NODATA_INT ) then
+        PHENOLOGY_METHOD_INDEX(indx) = PHENOLOGY_FAO56_DATES
+
+      else if ( GROWING_SEASON_START_GDD(indx) > NA_FLOAT &
+                .and. GDD_INI(indx) > NA_FLOAT            &
+                .and. GDD_DEV(indx) > NA_FLOAT            &
+                .and. GDD_MID(indx) > NA_FLOAT            &
+                .and. GDD_LATE(indx) > NA_FLOAT ) then
+        PHENOLOGY_METHOD_INDEX(indx) = PHENOLOGY_FAO56_GDD
+
+      else if ( GROWING_SEASON_START_DOY(indx) /= NODATA_INT ) then
         PHENOLOGY_METHOD_INDEX(indx) = PHENOLOGY_DOY_BASED
+
       else if ( GROWING_SEASON_START_GDD(indx) > NA_FLOAT ) then
         PHENOLOGY_METHOD_INDEX(indx) = PHENOLOGY_GDD_THRESHOLD
+
       else
         PHENOLOGY_METHOD_INDEX(indx) = PHENOLOGY_NONE
       end if
+
     end do
 
   end subroutine phenology_initialize
@@ -207,6 +331,7 @@ contains
   !!
   !! @param[in]    landuse_index            Index into per-landuse arrays (1-based)
   !! @param[in]    current_doy              Current day of year (1-366)
+  !! @param[in]    days_in_year             Days in current year (365 or 366)
   !! @param[in]    current_gdd              Accumulated GDD for current year
   !! @param[in]    mean_air_temperature     Current mean daily air temperature
   !! @param[in]    it_is_growing_season_in  Growing season state from previous day
@@ -214,26 +339,31 @@ contains
   !! @param[out]   growth_fraction          0.0 (dormant) to 1.0 (full growth)
   !! @param[out]   it_is_growing_season     Updated growing season state
   !! @param[out]   growth_stage             Current growth stage enum value
+  !! @param[out]   stage_fraction           0.0–1.0 position within current stage
   !---------------------------------------------------------------------------
   subroutine phenology_update( landuse_index,            &
                                current_doy,              &
+                               days_in_year,             &
                                current_gdd,              &
                                mean_air_temperature,     &
                                it_is_growing_season_in,  &
                                frost_killed_season,      &
                                growth_fraction,          &
                                it_is_growing_season,     &
-                               growth_stage )
+                               growth_stage,             &
+                               stage_fraction )
 
-    integer(c_int), intent(in)   :: landuse_index
-    integer(c_int), intent(in)   :: current_doy
-    real(c_float), intent(in)    :: current_gdd
-    real(c_float), intent(in)    :: mean_air_temperature
-    logical(c_bool), intent(in)  :: it_is_growing_season_in
+    integer(c_int), intent(in)     :: landuse_index
+    integer(c_int), intent(in)     :: current_doy
+    integer(c_int), intent(in)     :: days_in_year
+    real(c_float), intent(in)      :: current_gdd
+    real(c_float), intent(in)      :: mean_air_temperature
+    logical(c_bool), intent(in)    :: it_is_growing_season_in
     logical(c_bool), intent(inout) :: frost_killed_season
-    real(c_float), intent(out)   :: growth_fraction
-    logical(c_bool), intent(out) :: it_is_growing_season
-    integer(c_int), intent(out)  :: growth_stage
+    real(c_float), intent(out)     :: growth_fraction
+    logical(c_bool), intent(out)   :: it_is_growing_season
+    integer(c_int), intent(out)    :: growth_stage
+    real(c_float), intent(out)     :: stage_fraction
 
     select case ( PHENOLOGY_METHOD_INDEX(landuse_index) )
 
@@ -245,6 +375,7 @@ contains
           growth_fraction=growth_fraction,            &
           it_is_growing_season=it_is_growing_season,  &
           growth_stage=growth_stage )
+        stage_fraction = growth_fraction  ! binary: 0 or 1
 
       case ( PHENOLOGY_GDD_THRESHOLD )
         call phenology_update_gdd_threshold(          &
@@ -257,12 +388,44 @@ contains
           growth_fraction=growth_fraction,            &
           it_is_growing_season=it_is_growing_season,  &
           growth_stage=growth_stage )
+        stage_fraction = growth_fraction  ! binary: 0 or 1
+
+      case ( PHENOLOGY_FAO56_DATES )
+        call phenology_update_fao56_dates(            &
+          current_doy=current_doy,                    &
+          growing_season_start_doy=GROWING_SEASON_START_DOY(landuse_index), &
+          l_ini=L_INI_DAYS(landuse_index),            &
+          l_dev=L_DEV_DAYS(landuse_index),            &
+          l_mid=L_MID_DAYS(landuse_index),            &
+          l_late=L_LATE_DAYS(landuse_index),          &
+          days_in_year=days_in_year,                  &
+          growth_stage=growth_stage,                  &
+          stage_fraction=stage_fraction,              &
+          growth_fraction=growth_fraction,            &
+          it_is_growing_season=it_is_growing_season )
+
+      case ( PHENOLOGY_FAO56_GDD )
+        call phenology_update_fao56_gdd(              &
+          current_gdd=current_gdd,                    &
+          mean_air_temperature=mean_air_temperature,  &
+          growing_season_start_gdd=GROWING_SEASON_START_GDD(landuse_index), &
+          killing_frost_temperature=KILLING_FROST_TEMP(landuse_index),      &
+          gdd_ini=GDD_INI(landuse_index),             &
+          gdd_dev=GDD_DEV(landuse_index),             &
+          gdd_mid=GDD_MID(landuse_index),             &
+          gdd_late=GDD_LATE(landuse_index),           &
+          frost_killed_season=frost_killed_season,    &
+          growth_stage=growth_stage,                  &
+          stage_fraction=stage_fraction,              &
+          growth_fraction=growth_fraction,            &
+          it_is_growing_season=it_is_growing_season )
 
       case default
         ! PHENOLOGY_NONE: no growing season defined — always dormant
         growth_fraction      = 0.0_c_float
         it_is_growing_season = FALSE
         growth_stage         = GROWTH_STAGE_DORMANT
+        stage_fraction       = 0.0_c_float
 
     end select
 
@@ -409,5 +572,282 @@ contains
     end if
 
   end subroutine phenology_update_gdd_threshold
+
+  !---------------------------------------------------------------------------
+  !> @brief Determine phenology state for FAO56_DATES method.
+  !!
+  !! Continuous growth progression driven by calendar days since planting.
+  !! Growth stages are determined by cumulative stage lengths (L_ini, L_dev,
+  !! L_mid, L_late) counted from the planting date. Handles year-wrapping
+  !! for winter crops (planting DOY > harvest DOY wraps into next year).
+  !!
+  !! @param[in]  current_doy               Current day of year (1-366)
+  !! @param[in]  growing_season_start_doy  Planting date as DOY
+  !! @param[in]  l_ini                     Length of initial stage (days)
+  !! @param[in]  l_dev                     Length of development stage (days)
+  !! @param[in]  l_mid                     Length of mid-season stage (days)
+  !! @param[in]  l_late                    Length of late-season stage (days)
+  !! @param[in]  days_in_year              Number of days in current year (365 or 366)
+  !! @param[out] growth_stage              DORMANT, INI, DEV, MID, or LATE
+  !! @param[out] stage_fraction            0.0–1.0 position within current stage
+  !! @param[out] growth_fraction           0.0–1.0 overall growth progression
+  !! @param[out] it_is_growing_season      TRUE when growth_stage > DORMANT
+  !---------------------------------------------------------------------------
+  pure subroutine phenology_update_fao56_dates( current_doy,              &
+                                                growing_season_start_doy, &
+                                                l_ini,                    &
+                                                l_dev,                    &
+                                                l_mid,                    &
+                                                l_late,                   &
+                                                days_in_year,             &
+                                                growth_stage,             &
+                                                stage_fraction,           &
+                                                growth_fraction,          &
+                                                it_is_growing_season )
+
+    integer(c_int), intent(in)   :: current_doy
+    integer(c_int), intent(in)   :: growing_season_start_doy
+    integer(c_int), intent(in)   :: l_ini
+    integer(c_int), intent(in)   :: l_dev
+    integer(c_int), intent(in)   :: l_mid
+    integer(c_int), intent(in)   :: l_late
+    integer(c_int), intent(in)   :: days_in_year
+    integer(c_int), intent(out)  :: growth_stage
+    real(c_float), intent(out)   :: stage_fraction
+    real(c_float), intent(out)   :: growth_fraction
+    logical(c_bool), intent(out) :: it_is_growing_season
+
+    ! [ LOCALS ]
+    integer(c_int) :: days_since_planting
+    integer(c_int) :: total_season_length
+    integer(c_int) :: end_ini, end_dev, end_mid, end_late
+
+    ! Cumulative stage boundaries (days since planting)
+    end_ini  = l_ini
+    end_dev  = l_ini + l_dev
+    end_mid  = l_ini + l_dev + l_mid
+    end_late = l_ini + l_dev + l_mid + l_late
+    total_season_length = end_late
+
+    ! Calculate days since planting, handling year wrap
+    days_since_planting = current_doy - growing_season_start_doy
+    if ( days_since_planting < 0 ) then
+      days_since_planting = days_since_planting + days_in_year
+    end if
+
+    ! Determine growth stage and stage_fraction from days since planting
+    if ( days_since_planting >= total_season_length ) then
+
+      ! Past end of growing season — dormant
+      growth_stage         = GROWTH_STAGE_DORMANT
+      stage_fraction       = 0.0_c_float
+      growth_fraction      = 0.0_c_float
+      it_is_growing_season = FALSE
+
+    else if ( days_since_planting < end_ini ) then
+
+      ! Initial stage
+      growth_stage   = GROWTH_STAGE_INI
+      if ( l_ini > 0 ) then
+        stage_fraction = real( days_since_planting, c_float ) / real( l_ini, c_float )
+      else
+        stage_fraction = 1.0_c_float
+      end if
+      growth_fraction      = stage_fraction * 0.1_c_float
+      it_is_growing_season = TRUE
+
+    else if ( days_since_planting < end_dev ) then
+
+      ! Development stage — Kcb ramps from ini to mid
+      growth_stage   = GROWTH_STAGE_DEV
+      if ( l_dev > 0 ) then
+        stage_fraction = real( days_since_planting - end_ini, c_float ) &
+                       / real( l_dev, c_float )
+      else
+        stage_fraction = 1.0_c_float
+      end if
+      growth_fraction      = 0.1_c_float + stage_fraction * 0.9_c_float
+      it_is_growing_season = TRUE
+
+    else if ( days_since_planting < end_mid ) then
+
+      ! Mid-season stage — full maturity
+      growth_stage   = GROWTH_STAGE_MID
+      if ( l_mid > 0 ) then
+        stage_fraction = real( days_since_planting - end_dev, c_float ) &
+                       / real( l_mid, c_float )
+      else
+        stage_fraction = 1.0_c_float
+      end if
+      growth_fraction      = 1.0_c_float
+      it_is_growing_season = TRUE
+
+    else
+
+      ! Late season stage — senescence
+      growth_stage   = GROWTH_STAGE_LATE
+      if ( l_late > 0 ) then
+        stage_fraction = real( days_since_planting - end_mid, c_float ) &
+                       / real( l_late, c_float )
+      else
+        stage_fraction = 1.0_c_float
+      end if
+      growth_fraction      = 1.0_c_float - stage_fraction * 0.8_c_float
+      it_is_growing_season = TRUE
+
+    end if
+
+  end subroutine phenology_update_fao56_dates
+
+  !---------------------------------------------------------------------------
+  !> @brief Determine phenology state for FAO56_GDD method.
+  !!
+  !! Continuous growth progression driven by growing degree day accumulation.
+  !! Growing season starts when GDD reaches the planting threshold. Growth
+  !! stages are determined by cumulative GDD thresholds (GDD_ini, GDD_dev,
+  !! GDD_mid, GDD_late) counted from the planting GDD. Season ends on
+  !! killing frost (hard latch for remainder of year).
+  !!
+  !! @param[in]     current_gdd               Accumulated GDD for current year
+  !! @param[in]     mean_air_temperature      Current mean daily air temperature
+  !! @param[in]     growing_season_start_gdd  GDD threshold to begin growth
+  !! @param[in]     killing_frost_temperature Frost threshold to end season
+  !! @param[in]     gdd_ini                   GDD accumulation for initial stage
+  !! @param[in]     gdd_dev                   GDD accumulation for development stage
+  !! @param[in]     gdd_mid                   GDD accumulation for mid-season stage
+  !! @param[in]     gdd_late                  GDD accumulation for late-season stage
+  !! @param[inout]  frost_killed_season       Hard latch: TRUE after killing frost
+  !! @param[out]    growth_stage              DORMANT, INI, DEV, MID, or LATE
+  !! @param[out]    stage_fraction            0.0–1.0 position within current stage
+  !! @param[out]    growth_fraction           0.0–1.0 overall growth progression
+  !! @param[out]    it_is_growing_season      TRUE when growth_stage > DORMANT
+  !---------------------------------------------------------------------------
+  pure subroutine phenology_update_fao56_gdd( current_gdd,               &
+                                              mean_air_temperature,       &
+                                              growing_season_start_gdd,   &
+                                              killing_frost_temperature,  &
+                                              gdd_ini,                    &
+                                              gdd_dev,                    &
+                                              gdd_mid,                    &
+                                              gdd_late,                   &
+                                              frost_killed_season,        &
+                                              growth_stage,               &
+                                              stage_fraction,             &
+                                              growth_fraction,            &
+                                              it_is_growing_season )
+
+    real(c_float), intent(in)      :: current_gdd
+    real(c_float), intent(in)      :: mean_air_temperature
+    real(c_float), intent(in)      :: growing_season_start_gdd
+    real(c_float), intent(in)      :: killing_frost_temperature
+    real(c_float), intent(in)      :: gdd_ini
+    real(c_float), intent(in)      :: gdd_dev
+    real(c_float), intent(in)      :: gdd_mid
+    real(c_float), intent(in)      :: gdd_late
+    logical(c_bool), intent(inout) :: frost_killed_season
+    integer(c_int), intent(out)    :: growth_stage
+    real(c_float), intent(out)     :: stage_fraction
+    real(c_float), intent(out)     :: growth_fraction
+    logical(c_bool), intent(out)   :: it_is_growing_season
+
+    ! [ LOCALS ]
+    real(c_float) :: gdd_since_planting
+    real(c_float) :: end_ini, end_dev, end_mid, end_late
+
+    ! Cumulative GDD boundaries (since planting GDD threshold)
+    end_ini  = gdd_ini
+    end_dev  = gdd_ini + gdd_dev
+    end_mid  = gdd_ini + gdd_dev + gdd_mid
+    end_late = gdd_ini + gdd_dev + gdd_mid + gdd_late
+
+    ! Check for frost hard latch
+    if ( frost_killed_season ) then
+      growth_stage         = GROWTH_STAGE_DORMANT
+      stage_fraction       = 0.0_c_float
+      growth_fraction      = 0.0_c_float
+      it_is_growing_season = FALSE
+      return
+    end if
+
+    ! Check for killing frost (only meaningful once season has started)
+    if ( current_gdd >= growing_season_start_gdd &
+         .and. mean_air_temperature <= killing_frost_temperature ) then
+      frost_killed_season  = TRUE
+      growth_stage         = GROWTH_STAGE_DORMANT
+      stage_fraction       = 0.0_c_float
+      growth_fraction      = 0.0_c_float
+      it_is_growing_season = FALSE
+      return
+    end if
+
+    ! GDD since planting threshold was crossed
+    gdd_since_planting = current_gdd - growing_season_start_gdd
+
+    ! Not yet planted
+    if ( gdd_since_planting < 0.0_c_float ) then
+      growth_stage         = GROWTH_STAGE_DORMANT
+      stage_fraction       = 0.0_c_float
+      growth_fraction      = 0.0_c_float
+      it_is_growing_season = FALSE
+      return
+    end if
+
+    ! Past end of growing season (all GDD stages completed)
+    if ( gdd_since_planting >= end_late ) then
+      growth_stage         = GROWTH_STAGE_DORMANT
+      stage_fraction       = 0.0_c_float
+      growth_fraction      = 0.0_c_float
+      it_is_growing_season = FALSE
+      return
+    end if
+
+    ! Determine stage from GDD position
+    if ( gdd_since_planting < end_ini ) then
+
+      growth_stage = GROWTH_STAGE_INI
+      if ( gdd_ini > 0.0_c_float ) then
+        stage_fraction = gdd_since_planting / gdd_ini
+      else
+        stage_fraction = 1.0_c_float
+      end if
+      growth_fraction      = stage_fraction * 0.1_c_float
+      it_is_growing_season = TRUE
+
+    else if ( gdd_since_planting < end_dev ) then
+
+      growth_stage = GROWTH_STAGE_DEV
+      if ( gdd_dev > 0.0_c_float ) then
+        stage_fraction = ( gdd_since_planting - end_ini ) / gdd_dev
+      else
+        stage_fraction = 1.0_c_float
+      end if
+      growth_fraction      = 0.1_c_float + stage_fraction * 0.9_c_float
+      it_is_growing_season = TRUE
+
+    else if ( gdd_since_planting < end_mid ) then
+
+      growth_stage = GROWTH_STAGE_MID
+      if ( gdd_mid > 0.0_c_float ) then
+        stage_fraction = ( gdd_since_planting - end_dev ) / gdd_mid
+      else
+        stage_fraction = 1.0_c_float
+      end if
+      growth_fraction      = 1.0_c_float
+      it_is_growing_season = TRUE
+
+    else
+
+      growth_stage = GROWTH_STAGE_LATE
+      if ( gdd_late > 0.0_c_float ) then
+        stage_fraction = ( gdd_since_planting - end_mid ) / gdd_late
+      else
+        stage_fraction = 1.0_c_float
+      end if
+      growth_fraction      = 1.0_c_float - stage_fraction * 0.8_c_float
+      it_is_growing_season = TRUE
+
+    end if
+
+  end subroutine phenology_update_fao56_gdd
 
 end module phenology
