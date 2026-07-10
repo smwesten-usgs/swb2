@@ -1275,8 +1275,6 @@ contains
 
         this%init_crop_coefficient => model_initialize_crop_coefficient_FAO56
         this%update_crop_coefficient => model_update_crop_coefficient_FAO56
-        this%init_growing_season => model_initialize_growing_season_crop_coefficient_FAO56
-        this%update_growing_season => model_update_growing_season_crop_coefficient_FAO56
         call LOGS%WRITE( "==> FAO-56 crop coefficient calculation method selected.", iLogLevel = LOG_ALL, &
            lEcho = FALSE )
 
@@ -3469,27 +3467,28 @@ contains
 
   subroutine model_update_crop_coefficient_FAO56(this)
 
-    use crop_coefficients__FAO56, only : crop_coefficients_FAO56_calculate,                 &
-                                         crop_coefficients_FAO56_update_growth_stage_dates, &
-                                         GROWTH_STAGE_DATE, PLANTING_DATE
+    use crop_coefficients__FAO56, only : crop_coefficients_FAO56_interpolate_Kcb
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
     integer (c_int) :: indx
+    integer (c_int) :: number_of_cells
 
-    call crop_coefficients_FAO56_update_growth_stage_dates( )
+    number_of_cells = ubound( this%landuse_index, 1 )
 
-    do indx=1,ubound(this%number_of_days_since_planting,1)
+    ! Kcb interpolation using phenology-provided growth_stage and stage_fraction.
+    ! The phenology module has already updated growth_stage(:) and stage_fraction(:)
+    ! in model_update_phenology (called earlier in the daily calculation sequence).
+    do indx = 1, number_of_cells
 
-      this%number_of_days_since_planting(indx) = int(SIM_DT%curr                   &
-              - GROWTH_STAGE_DATE( PLANTING_DATE, this%landuse_index(indx) ), c_int)
-    enddo
+      this%crop_coefficient_kcb(indx) = crop_coefficients_FAO56_interpolate_Kcb( &
+        landuse_index = this%landuse_index(indx),                                &
+        growth_stage  = this%growth_stage(indx),                                 &
+        stage_fraction = this%stage_fraction(indx),                              &
+        current_month = int(SIM_DT%curr%iMonth, c_int) )
 
-
-    call crop_coefficients_FAO56_calculate( Kcb=this%crop_coefficient_kcb,             &
-                                            GDD=this%gdd,                              &
-                                            landuse_index=this%landuse_index )
+    end do
 
   end subroutine model_update_crop_coefficient_FAO56
 

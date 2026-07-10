@@ -36,9 +36,9 @@ contains
     ! calls elemental
     call cells%calc_GDD()
 
-    ! calls elemental
-    call cells%update_crop_coefficient()
+    ! phenology must update before crop coefficient (provides growth_stage, stage_fraction)
     call cells%update_growing_season()
+    call cells%update_crop_coefficient()
     call cells%update_rooting_depth()
     call cells%calc_reference_et()
 

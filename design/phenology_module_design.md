@@ -632,3 +632,31 @@ Using crop-specific values significantly affects when GDD thresholds are reached
 **Related question:** Is the Baskerville-Emin method important? It uses a sine-curve approximation for the diurnal temperature cycle to improve GDD estimation when daily min/max straddle the base temperature. It's more accurate than the simple (Tmax+Tmin)/2 - Tbase approach, but adds complexity. Worth evaluating whether users actually benefit from it vs. the simpler method, especially given that climate input data (Daymet, gridMET) already have their own temperature averaging assumptions baked in.
 
 **Priority:** Address alongside FAO56 phenology (Phase 3 — GDD-based crop coefficient curves).
+
+
+---
+
+## Wishlist: Detect and Error on Legacy Column Names
+
+**Date:** 2026-07-10
+**Status:** Wishlist
+**Affects:** `phenology.F90` (phenology_initialize)
+
+**Problem:** When users have tables with legacy column names (`Planting_date`, `First_day_of_growing_season`, `GDD_plant`, `GDD_first_day_of_growing_season`), the new phenology module silently doesn't find them. The result: all land uses get `PHENOLOGY_NONE` and `growth_stage = DORMANT` always. With FAO56 crop coefficients active, this means Kcb = Kcb_min permanently — a subtle and confusing failure.
+
+**Desired behavior:** At the end of `phenology_initialize`, scan PARAMS for known legacy column names. If found, emit a fatal error with a clear migration message:
+
+```
+ERROR: Legacy column name 'Planting_date' detected in lookup table.
+       The phenology module requires unified column names.
+       Please rename: 'Planting_date' → 'Growing_season_start_date'
+
+       Full mapping:
+         Planting_date                    → Growing_season_start_date
+         First_day_of_growing_season      → Growing_season_start_date
+         Last_day_of_growing_season       → Growing_season_end_date
+         GDD_plant                        → Growing_season_start_GDD
+         GDD_first_day_of_growing_season  → Growing_season_start_GDD
+```
+
+**Implementation:** Simple — after the main parameter reads, call `PARAMS%get_parameters` with `lFatal=FALSE` for each legacy name. If any returns data, emit the fatal error with the rename instructions.
