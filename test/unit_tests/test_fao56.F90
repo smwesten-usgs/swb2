@@ -14,10 +14,12 @@ module test_fao56
   use iso_c_binding, only: c_int, c_float, c_double
   use testdrive, only: check, error_type, new_unittest, unittest_type, test_failed
   use constants_and_conversions, only: clip
-  use crop_coefficients__FAO56, only: GROWTH_STAGE_DATE, PLANTING_DATE, &
-       KCB_METHOD, KCB_METHOD_GDD, &
-       update_crop_coefficient_GDD_as_threshold, &
-       crop_coefficients_FAO56_calculate_Kcb_Max
+  use crop_coefficients__FAO56, only: &
+       crop_coefficients_FAO56_interpolate_Kcb, &
+       crop_coefficients_FAO56_calculate_Kcb_Max, &
+       KCB_METHOD, KCB_METHOD_GDD
+  use phenology, only: GROWTH_STAGE_DORMANT, GROWTH_STAGE_INI, GROWTH_STAGE_DEV, &
+                        GROWTH_STAGE_MID, GROWTH_STAGE_LATE
   use growing_degree_day, only: growing_degree_day_calculate
   use simulation_datetime, only: SIM_DT
   use fstring, only: as_character
@@ -38,15 +40,14 @@ contains
     call setup_environment_fao56_gdd()
 
     testsuite = [ &
-      ! --- Crop coefficient parsing ---
-      new_unittest("planting_doy_from_table", test_planting_doy_from_table), &
+      ! --- Crop coefficient method detection ---
       new_unittest("kcb_method_gdd_detected", test_kcb_method_gdd_detected), &
-      ! --- GDD-based Kcb curve ---
-      new_unittest("Kcb_before_planting", test_Kcb_before_planting), &
-      new_unittest("Kcb_at_planting_zero_gdd", test_Kcb_at_planting_zero_gdd), &
-      new_unittest("Kcb_GDD_1000", test_Kcb_GDD_1000), &
-      new_unittest("Kcb_GDD_2000", test_Kcb_GDD_2000), &
-      new_unittest("Kcb_GDD_1800", test_Kcb_GDD_1800), &
+      ! --- Kcb interpolation (new interface) ---
+      new_unittest("Kcb_dormant_is_min", test_Kcb_dormant_is_min), &
+      new_unittest("Kcb_ini_stage", test_Kcb_ini_stage), &
+      new_unittest("Kcb_dev_midpoint", test_Kcb_dev_midpoint), &
+      new_unittest("Kcb_mid_stage", test_Kcb_mid_stage), &
+      new_unittest("Kcb_late_midpoint", test_Kcb_late_midpoint), &
       ! --- GDD accumulation (Wilson & Barnett, 1983) ---
       new_unittest("gdd_simple_cases", test_gdd_simple_cases), &
       ! --- Equation 72: Kcb_max ---
@@ -58,18 +59,8 @@ contains
   end subroutine collect_fao56
 
   !---------------------------------------------------------------------------
-  ! CROP COEFFICIENT PARSING
+  ! CROP COEFFICIENT METHOD DETECTION
   !---------------------------------------------------------------------------
-
-  !> @brief Planting DOY for land use index 6 should be 110 (April 20).
-  subroutine test_planting_doy_from_table(error)
-    type(error_type), allocatable, intent(out) :: error
-    real(c_float) :: planting_doy
-
-    planting_doy = GROWTH_STAGE_DATE(PLANTING_DATE, 6)%getDayOfYear()
-    call check(error, abs(planting_doy - 110.0) < 0.5, &
-               "Planting DOY for index 6 should be 110")
-  end subroutine test_planting_doy_from_table
 
   !> @brief Corn (index 5) should be detected as GDD-based Kcb method.
   subroutine test_kcb_method_gdd_detected(error)
@@ -80,60 +71,78 @@ contains
   end subroutine test_kcb_method_gdd_detected
 
   !---------------------------------------------------------------------------
-  ! GDD-BASED Kcb CURVE
+  ! Kcb INTERPOLATION — tests the new pure interpolation function
+  ! Using index 5 (Corn): Kcb_ini=0.20, Kcb_mid=0.96, Kcb_end=0.60, Kcb_min=0.19
   !---------------------------------------------------------------------------
 
-  !> @brief Before planting date, Kcb should be Kcb_min (0.14 for barley).
-  subroutine test_Kcb_before_planting(error)
+  !> @brief DORMANT stage → Kcb = Kcb_min
+  subroutine test_Kcb_dormant_is_min(error)
     type(error_type), allocatable, intent(out) :: error
     real(c_float) :: Kcb
 
-    call SIM_DT%curr%parseDate("03/30/2002")
-    Kcb = update_crop_coefficient_GDD_as_threshold(6, 0.)
-    call check(error, abs(Kcb - 0.14) < 1.0e-4, &
-               "Before planting, Kcb should be Kcb_min (0.14)")
-  end subroutine test_Kcb_before_planting
+    Kcb = crop_coefficients_FAO56_interpolate_Kcb( &
+      landuse_index=5, growth_stage=GROWTH_STAGE_DORMANT, &
+      stage_fraction=0.0_c_float, current_month=1)
 
-  !> @brief After planting date with GDD=0, Kcb should be Kcb_ini (0.15).
-  subroutine test_Kcb_at_planting_zero_gdd(error)
+    call check(error, abs(Kcb - 0.19) < 1.0e-4, &
+               "DORMANT: Kcb should be Kcb_min (0.19)")
+  end subroutine test_Kcb_dormant_is_min
+
+  !> @brief INI stage → Kcb = Kcb_ini
+  subroutine test_Kcb_ini_stage(error)
     type(error_type), allocatable, intent(out) :: error
     real(c_float) :: Kcb
 
-    call SIM_DT%curr%parseDate("04/20/2002")
-    Kcb = update_crop_coefficient_GDD_as_threshold(6, 0.)
-    call check(error, abs(Kcb - 0.15) < 1.0e-4, &
-               "At planting with GDD=0, Kcb should be Kcb_ini (0.15)")
-  end subroutine test_Kcb_at_planting_zero_gdd
+    Kcb = crop_coefficients_FAO56_interpolate_Kcb( &
+      landuse_index=5, growth_stage=GROWTH_STAGE_INI, &
+      stage_fraction=0.5_c_float, current_month=6)
 
-  !> @brief At GDD=1000, Kcb for corn (index 5) should be 0.96.
-  subroutine test_Kcb_GDD_1000(error)
+    call check(error, abs(Kcb - 0.20) < 1.0e-4, &
+               "INI stage: Kcb should be Kcb_ini (0.20)")
+  end subroutine test_Kcb_ini_stage
+
+  !> @brief DEV stage at 50% → Kcb = Kcb_ini + 0.5*(Kcb_mid - Kcb_ini) = 0.58
+  subroutine test_Kcb_dev_midpoint(error)
+    type(error_type), allocatable, intent(out) :: error
+    real(c_float) :: Kcb, expected
+
+    expected = 0.20 + 0.5 * (0.96 - 0.20)  ! = 0.58
+
+    Kcb = crop_coefficients_FAO56_interpolate_Kcb( &
+      landuse_index=5, growth_stage=GROWTH_STAGE_DEV, &
+      stage_fraction=0.5_c_float, current_month=6)
+
+    call check(error, abs(Kcb - expected) < 1.0e-3, &
+               "DEV at 50%: Kcb should be ~0.58")
+  end subroutine test_Kcb_dev_midpoint
+
+  !> @brief MID stage → Kcb = Kcb_mid
+  subroutine test_Kcb_mid_stage(error)
     type(error_type), allocatable, intent(out) :: error
     real(c_float) :: Kcb
 
-    Kcb = update_crop_coefficient_GDD_as_threshold(5, 1000.)
+    Kcb = crop_coefficients_FAO56_interpolate_Kcb( &
+      landuse_index=5, growth_stage=GROWTH_STAGE_MID, &
+      stage_fraction=0.5_c_float, current_month=7)
+
     call check(error, abs(Kcb - 0.96) < 1.0e-4, &
-               "At GDD=1000, Kcb should be 0.96")
-  end subroutine test_Kcb_GDD_1000
+               "MID stage: Kcb should be Kcb_mid (0.96)")
+  end subroutine test_Kcb_mid_stage
 
-  !> @brief At GDD=2000, Kcb for corn (index 5) should be 0.60.
-  subroutine test_Kcb_GDD_2000(error)
+  !> @brief LATE stage at 50% → Kcb = Kcb_mid + 0.5*(Kcb_end - Kcb_mid) = 0.78
+  subroutine test_Kcb_late_midpoint(error)
     type(error_type), allocatable, intent(out) :: error
-    real(c_float) :: Kcb
+    real(c_float) :: Kcb, expected
 
-    Kcb = update_crop_coefficient_GDD_as_threshold(5, 2000.)
-    call check(error, abs(Kcb - 0.6) < 1.0e-4, &
-               "At GDD=2000, Kcb should be 0.60")
-  end subroutine test_Kcb_GDD_2000
+    expected = 0.96 + 0.5 * (0.60 - 0.96)  ! = 0.78
 
-  !> @brief At GDD=1800, Kcb for corn (index 5) should be 0.78.
-  subroutine test_Kcb_GDD_1800(error)
-    type(error_type), allocatable, intent(out) :: error
-    real(c_float) :: Kcb
+    Kcb = crop_coefficients_FAO56_interpolate_Kcb( &
+      landuse_index=5, growth_stage=GROWTH_STAGE_LATE, &
+      stage_fraction=0.5_c_float, current_month=8)
 
-    Kcb = update_crop_coefficient_GDD_as_threshold(5, 1800.)
-    call check(error, abs(Kcb - 0.78) < 1.0e-4, &
-               "At GDD=1800, Kcb should be 0.78")
-  end subroutine test_Kcb_GDD_1800
+    call check(error, abs(Kcb - expected) < 1.0e-3, &
+               "LATE at 50%: Kcb should be ~0.78")
+  end subroutine test_Kcb_late_midpoint
 
   !---------------------------------------------------------------------------
   ! GDD ACCUMULATION (Wilson & Barnett, 1983)

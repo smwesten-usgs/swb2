@@ -24,13 +24,9 @@ module crop_coefficients__fao56
 
   private
 
-  public :: crop_coefficients_FAO56_initialize, crop_coefficients_FAO56_calculate
-  public :: crop_coefficients_FAO56_update_growth_stage_dates
-  public :: crop_coefficients_FAO56_update_growing_season
+  public :: crop_coefficients_FAO56_initialize
   public :: crop_coefficients_FAO56_calculate_Kcb_Max
   public :: crop_coefficients_FAO56_interpolate_Kcb
-  public :: update_crop_coefficient_date_as_threshold, update_crop_coefficient_GDD_as_threshold
-  public :: GROWTH_STAGE_DATE, PLANTING_DATE, GROWTH_STAGE_LENGTH_IN_DAYS
   public :: KCB_MIN, KCB_INI, KCB_MID, KCB_END
   public :: KCB_l, JAN, DEC, KCB_METHOD, KCB_METHOD_GDD, KCB_METHOD_FAO56
   public :: KCB_METHOD_MONTHLY_VALUES
@@ -385,316 +381,39 @@ contains
 
   end subroutine crop_coefficients_FAO56_initialize
 
-!------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
- !> Update the current basal crop coefficient (Kcb) for
- !! a SINGLE irrigation table entry
- !!
- !! @param[inout] pIRRIGATION pointer to a single line of information in the irrigation file.
- !! @param[in] iThreshold either the current day of year or the number of growing degree days.
- !! @retval rKcb Basal crop coefficient given the irrigation table entries and the
- !!         current threshold values.
-
- impure elemental function update_crop_coefficient_date_as_threshold( iLanduseIndex )           &
-                                                                          result(Kcb)
-
-  integer (c_int), intent(in)   :: iLanduseIndex
-  real (c_float)                :: Kcb
-
-  ! [ LOCALS ]
-  real (c_double) :: fFrac
-
-  if ( KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
-
-    Kcb = KCB_l( SIM_DT%curr%iMonth, iLanduseIndex )
-
-  else
-
-    ! define shorthand variable names for remainder of function
-    associate ( Date_ini => GROWTH_STAGE_DATE( ENDDATE_INI, iLanduseIndex ),           &
-                Date_dev => GROWTH_STAGE_DATE( ENDDATE_DEV, iLanduseIndex ),           &
-                Date_mid => GROWTH_STAGE_DATE( ENDDATE_MID, iLanduseIndex ),           &
-                Date_late => GROWTH_STAGE_DATE( ENDDATE_LATE, iLanduseIndex ),         &
-                Date_fallow => GROWTH_STAGE_DATE( ENDDATE_FALLOW, iLanduseIndex ),     &
-                Kcb_ini => KCB_l(KCB_INI, iLanduseIndex),                              &
-                Kcb_mid => KCB_l(KCB_MID, iLanduseIndex),                              &
-                Kcb_min => KCB_l(KCB_MIN, iLanduseIndex),                              &
-                PlantingDate => GROWTH_STAGE_DATE( PLANTING_DATE, iLanduseIndex),      &
-                Kcb_end => KCB_l(KCB_END, iLanduseIndex),                              &
-                current_date => SIM_DT%curr )
-
-      ! now calculate Kcb for the given landuse
-
-      if( current_date >= Date_late ) then
-
-        Kcb = Kcb_min
-
-      elseif ( current_date >= Date_mid ) then
-
-        fFrac = ( current_date - Date_mid ) / ( Date_late - Date_mid )
-
-        Kcb =  real(Kcb_mid * (1.0_c_double - fFrac) + Kcb_end * fFrac, c_float)
-
-      elseif ( current_date >= Date_dev ) then
-
-        Kcb = Kcb_mid
-
-      elseif ( current_date >= Date_ini ) then
-
-        fFrac = ( current_date - Date_ini ) / ( Date_dev - Date_ini )
-
-        Kcb = real(Kcb_ini * (1.0_c_double - fFrac) + Kcb_mid * fFrac, c_float)
-
-      elseif ( current_date >= PlantingDate ) then
-
-        Kcb = Kcb_ini
-
-      else
-
-        Kcb = Kcb_min
-
-      endif
-
-    end associate
-
-  end if
-
-end function update_crop_coefficient_date_as_threshold
-
-!------------------------------------------------------------------------------
-
-pure elemental function crop_coefficients_FAO56_calculate_Kcb_Max(wind_speed_meters_per_sec,   &
+  !> @brief Calculate the maximum basal crop coefficient (Kcb_max).
+  !!
+  !! Equation 72, FAO-56, p 199. Adjusts for wind speed, humidity, and plant height.
+  pure elemental function crop_coefficients_FAO56_calculate_Kcb_Max(wind_speed_meters_per_sec,   &
                                           relative_humidity_min_pct,   &
-                                          Kcb,                         & 
+                                          Kcb,                         &
                                           plant_height_meters)                       result(kcb_max)
 
-  real (c_float), intent(in) :: wind_speed_meters_per_sec
-  real (c_float), intent(in) :: relative_humidity_min_pct
-  real (c_float), intent(in) :: Kcb
-  real (c_float), intent(in) :: plant_height_meters
-
-  real (c_float)  :: kcb_max
-  real (c_double) :: U2
-  real (c_double) :: RHmin
-  real (c_double) :: plant_height
-
-  ! Limits are as suggested on page 123 of FAO-56 with respect to
-  ! modifying mid-season KCB_mid values 
-  RHmin = clip( relative_humidity_min_pct, minval=20., maxval=80. )
-  U2 = clip(wind_speed_meters_per_sec, minval=1., maxval=6.)
-  plant_height = clip(plant_height_meters, minval=1., maxval=10.)
-
-  ! equation 72, FAO-56, p 199
-  kcb_max = real(max(  1.2_c_double + ( (0.04_c_double * (U2 - 2._c_double)               &
-                                  - 0.004_c_double * (RHmin - 45._c_double) ) )      &
-                                  * (plant_height_meters/3._c_double)**0.3_c_double, &
-                  Kcb + 0.05_c_double ), c_float)
-
-end function crop_coefficients_FAO56_calculate_Kcb_Max
-
-!------------------------------------------------------------------------------
-
- !> Update the current basal crop coefficient (Kcb), with GDD as the threhold
- !!
- !! @param[in] fGDD current growing degree day value associated with the cell.
- !! @retval fKcb Basal crop coefficient given the irrigation table entries and the
- !!         current threshold values.
-
- impure elemental function update_crop_coefficient_GDD_as_threshold( iLanduseIndex, fGDD )   &
-                                                                         result(fKcb)
-
-  integer (c_int), intent(in)   :: iLanduseIndex
-  real (c_float), intent(in)    :: fGDD
-  real (c_float)                :: fKcb
-
-  ! [ LOCALS ]
-  real (c_double) :: fFrac
-
-  ! define shorthand variable names for remainder of function
-  associate ( GDD_ini_l => GROWTH_STAGE_GDD( GDD_INI, iLanduseIndex ),          &
-              GDD_dev_l => GROWTH_STAGE_GDD( GDD_DEV, iLanduseIndex ),          &
-              GDD_mid_l => GROWTH_STAGE_GDD( GDD_MID, iLanduseIndex ),          &
-              GDD_late_l => GROWTH_STAGE_GDD( GDD_LATE, iLanduseIndex ),        &
-              Kcb_ini => KCB_l(KCB_INI, iLanduseIndex),                         &
-              Kcb_mid => KCB_l(KCB_MID, iLanduseIndex),                         &
-              Kcb_min => KCB_l(KCB_MIN, iLanduseIndex),                         &
-              PlantingDOY => GROWTH_STAGE_DATE( PLANTING_DATE,                  &
-                                                iLanduseIndex)%getDayOfYear(),  &
-              GDD_plant_l => GROWTH_STAGE_GDD( GDD_PLANT, iLanduseIndex),       &
-              Kcb_end => KCB_l(KCB_END, iLanduseIndex),                         &
-              current_doy => SIM_DT%curr%getDayOfYear() )
-
-    ! now calculate Kcb for the given landuse
-    if( fGDD > GDD_late_l ) then
-
-      fKcb = Kcb_min
-
-    elseif ( fGDD > GDD_mid_l ) then
-
-      fFrac = ( fGDD - GDD_mid_l ) / ( GDD_late_l - GDD_mid_l )
-
-      fKcb =  real(Kcb_mid * (1.0_c_double - fFrac) + Kcb_end * fFrac, c_float)
-
-    elseif ( fGDD > GDD_dev_l ) then
-
-      fKcb = Kcb_mid
-
-    elseif ( fGDD > GDD_ini_l ) then
-
-      fFrac = ( fGDD - GDD_ini_l ) / ( GDD_dev_l - GDD_ini_l )
-
-      fKcb = real(Kcb_ini * (1_c_double - fFrac) + Kcb_mid * fFrac, c_float)
-
-    elseif ( (PlantingDOY > 0) .and. (current_DOY >= PlantingDOY) ) then
-
-      ! if there is a valid value for the Planting Date, use it
-      fKcb = Kcb_ini
-
-    elseif ( (GDD_plant_l >= 0.) .and. (fGDD >= GDD_plant_l) ) then
-
-        fKcb = Kcb_ini
-
-    else
-
-      fKcb = Kcb_min
-
-    endif
-
-  end associate
-
-end function update_crop_coefficient_GDD_as_threshold
-
-!------------------------------------------------------------------------------
-
-  subroutine crop_coefficients_FAO56_update_growth_stage_dates( )
-
-    ! [ LOCALS ]
-    integer (c_int) :: iIndex
-
-    do iIndex=lbound(GROWTH_STAGE_DATE,2), ubound(GROWTH_STAGE_DATE,2)
-
-  !     print *, SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate()
-
-      ! if we have not yet reached the enddate associated with the fallow period, skip
-      if ( SIM_DT%curr < GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) ) cycle
-
-      if ( KCB_METHOD( iIndex ) /= KCB_METHOD_FAO56 ) cycle
-
-      ! current date is beyond the enddate associated with fallow period;
-      ! update Kcb curve and dates
-
-!      print *, "a) ",SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate()
-
-      ! it's possible that the planting date might be later in the current calendar year
-      !call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%setYear( SIM_DT%curr%iYear )
-
-!      print *, "b) ",SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate()
-
-      ! if we are already past the planting doy, planting date must be
-      ! next calendar year
-      if ( SIM_DT%iDOY > GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%getDayOfYear() )  then
-
-        GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) =                                                &
-            crop_coefficients_calculate_planting_date(sPlantingDate = SL_PLANTING_DATE%get(iIndex), &
-                                                      iYear=SIM_DT%curr%iYear + 1)
-
-      else
-
-        ! allow for planting date to be later in the current year
-        GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) =                                                &
-            crop_coefficients_calculate_planting_date(sPlantingDate = SL_PLANTING_DATE%get(iIndex), &
-                                                      iYear=SIM_DT%curr%iYear )
-        
-      endif 
-
-      ! now calculate dates associated with the rest of the Kcb curve
-      GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) &
-                                                + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_INI, iIndex ) )
-      GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )&
-                                                + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_DEV, iIndex ) )
-      GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )&
-                                                + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_MID, iIndex ) )
-      GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )&
-                                                + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_LATE, iIndex ) )
-      GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )&
-                                                + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_FALLOW, iIndex ) )
-
-      call LOGS%write("## Updated Crop Kcb Curve Summary ##", iLinesAfter=1, lEcho=FALSE )
-      call LOGS%write("Landuse Code | Planting Date | End of 'ini' | End of 'dev' " &
-        //"| End of 'mid' | End of 'late' | End of 'fallow' ", lEcho=FALSE )
-      call Logs%write("-------------|---------------|--------------|--------------" &
-        //"|--------------|---------------|-----------------", lEcho=FALSE )
-
-      ! call LOGS%write( asCharacter( LANDUSE_CODE( iIndex ))//" | "                &
-      !    //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )//" | " &
-      !    //trim( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%prettydate() )//" | "   &
-      !    //trim( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%prettydate() )//" | "   &
-      !    //trim( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%prettydate() )//" | "   &
-      !    //trim( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate() )//" | "  &
-      !    //trim( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%prettydate() ),      &
-      !    lEcho=FALSE, iLogLevel=LOG_ALL )
-
-
-        call LOGS%write( "| "//asCharacter( LANDUSE_CODE( iIndex ))//" | "                                    &
-           //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )                                  &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%getDayOfYear() )//") | "     &
-           //trim( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%prettydate() )//" | "                             &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%getDayOfYear() )//") | "       &
-           //trim( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%prettydate() )//" | "                             &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%getDayOfYear() )//") | "       &
-           //trim( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%prettydate() )//" | "                             &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%getDayOfYear() )//") | "       &
-           //trim( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate() )//" | "                            &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%getDayOfYear() )//") | "      &
-           //trim( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%prettydate() )                                 &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%getDayOfYear() )//") | ",   &
-           lEcho=FALSE, iLogLevel=LOG_ALL)
-
-    enddo
-
-
-  end subroutine crop_coefficients_FAO56_update_growth_stage_dates
-
-!--------------------------------------------------------------------------------------------------
-
-  impure elemental subroutine crop_coefficients_FAO56_calculate( Kcb, landuse_index, GDD )
-
-    real (c_float), intent(inout)          :: Kcb
-    integer (c_int), intent(in)            :: landuse_index
-    real (c_float), intent(in), optional   :: GDD
-
-
-    if ( KCB_METHOD( landuse_index )  == KCB_METHOD_FAO56  &
-      .or. KCB_METHOD( landuse_index ) == KCB_METHOD_MONTHLY_VALUES ) then
-
-      Kcb = update_crop_coefficient_date_as_threshold( landuse_index )
-
-    else
-
-      Kcb = update_crop_coefficient_GDD_as_threshold( landuse_index, GDD )
-
-    endif
-
-  end subroutine crop_coefficients_FAO56_calculate
-
-!--------------------------------------------------------------------------------------------------
-
-  impure elemental subroutine crop_coefficients_FAO56_update_growing_season(   &
-                                           landuse_index,                      &
-                                           Kcb,                                &
-                                           it_is_growing_season)
-
-    real (c_float), intent(in)             :: Kcb
-    integer (c_int), intent(in)            :: landuse_index
-    logical (c_bool), intent(out)          :: it_is_growing_season
-
-    if ( Kcb > KCB_l( KCB_MIN, landuse_index) ) then
-      it_is_growing_season = TRUE
-    else
-      it_is_growing_season = FALSE
-    endif
-
-  end subroutine crop_coefficients_FAO56_update_growing_season
+    real (c_float), intent(in) :: wind_speed_meters_per_sec
+    real (c_float), intent(in) :: relative_humidity_min_pct
+    real (c_float), intent(in) :: Kcb
+    real (c_float), intent(in) :: plant_height_meters
+
+    real (c_float)  :: kcb_max
+    real (c_double) :: U2
+    real (c_double) :: RHmin
+    real (c_double) :: plant_height
+
+    ! Limits are as suggested on page 123 of FAO-56 with respect to
+    ! modifying mid-season KCB_mid values
+    RHmin = clip( relative_humidity_min_pct, minval=20., maxval=80. )
+    U2 = clip(wind_speed_meters_per_sec, minval=1., maxval=6.)
+    plant_height = clip(plant_height_meters, minval=1., maxval=10.)
+
+    ! equation 72, FAO-56, p 199
+    kcb_max = real(max(  1.2_c_double + ( (0.04_c_double * (U2 - 2._c_double)               &
+                                    - 0.004_c_double * (RHmin - 45._c_double) ) )      &
+                                    * (plant_height_meters/3._c_double)**0.3_c_double, &
+                    Kcb + 0.05_c_double ), c_float)
+
+  end function crop_coefficients_FAO56_calculate_Kcb_Max
 
 !--------------------------------------------------------------------------------------------------
 

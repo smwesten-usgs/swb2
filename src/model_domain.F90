@@ -2561,29 +2561,6 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_growing_season_crop_coefficient_FAO56( this )
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-  end subroutine model_initialize_growing_season_crop_coefficient_FAO56
-
-  !--------------------------------------------------------------------------------------------------
-
-  subroutine model_update_growing_season_crop_coefficient_FAO56( this )
-
-    use crop_coefficients__fao56
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    call crop_coefficients_FAO56_update_growing_season(                           &
-                                 landuse_index=this%landuse_index,                &
-                                 Kcb=this%crop_coefficient_kcb,                   &
-                                 it_is_growing_season=this%it_is_growing_season )
-
-  end subroutine model_update_growing_season_crop_coefficient_FAO56
-
-!--------------------------------------------------------------------------------------------------
-
   subroutine model_initialize_phenology( this )
 
     use phenology, only : phenology_initialize
