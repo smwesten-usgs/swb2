@@ -264,13 +264,14 @@ contains
         call LOGS%write(" ** WARNING fatal error: **", iTab=6, iLinesBefore=1)
         call LOGS%write( trim(sMessage), iTab=16 )
 
-        if (NUMBER_OF_FATAL_WARNINGS <= ubound( WARNING_TEXT,1 ) )     &
+        if (NUMBER_OF_FATAL_WARNINGS <= ubound( WARNING_TEXT,1 ) ) then
           WARNING_TEXT( NUMBER_OF_FATAL_WARNINGS ) = trim(sMessage)
           if (present(sHints)) then
             HINT_TEXT( NUMBER_OF_FATAL_WARNINGS ) = trim(sHints)
           else
             HINT_TEXT( NUMBER_OF_FATAL_WARNINGS ) = ""
-          endif  
+          endif
+        endif
       else
         call LOGS%write(" ** WARNING **", iTab=10, iLinesBefore=1)
         call LOGS%write( trim(sMessage), iTab=16 )

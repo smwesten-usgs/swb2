@@ -12,6 +12,8 @@ module test_phenology
   use constants_and_conversions, only: TRUE, FALSE
   use phenology, only: phenology_update_doy_based, &
                        phenology_update_gdd_threshold, &
+                       phenology_update_fao56_dates, &
+                       phenology_update_fao56_gdd, &
                        phenology_update, &
                        phenology_initialize, &
                        GROWING_SEASON_START_DOY, GROWING_SEASON_END_DOY, &
@@ -19,7 +21,8 @@ module test_phenology
                        PHENOLOGY_METHOD_INDEX, &
                        PHENOLOGY_NONE, PHENOLOGY_DOY_BASED, PHENOLOGY_GDD_THRESHOLD, &
                        PHENOLOGY_FAO56_DATES, &
-                       GROWTH_STAGE_DORMANT, GROWTH_STAGE_MID
+                       GROWTH_STAGE_DORMANT, GROWTH_STAGE_INI, GROWTH_STAGE_DEV, &
+                       GROWTH_STAGE_MID, GROWTH_STAGE_LATE
   use parameters, only: PARAMETERS_T, PARAMS
   use fstring_list, only: NA_FLOAT
   use test_fixtures, only: setup_common
@@ -63,7 +66,17 @@ contains
       new_unittest("init_method_index_none_landuse", test_init_method_index_none), &
       new_unittest("dispatch_doy_landuse_is_growing", test_dispatch_doy_growing), &
       new_unittest("dispatch_gdd_landuse_above_threshold", test_dispatch_gdd_growing), &
-      new_unittest("dispatch_none_landuse_always_dormant", test_dispatch_none_dormant) &
+      new_unittest("dispatch_none_landuse_always_dormant", test_dispatch_none_dormant), &
+      new_unittest("fao56_dates_ini_stage", test_fao56_dates_ini_stage), &
+      new_unittest("fao56_dates_dev_stage_midpoint", test_fao56_dates_dev_stage_midpoint), &
+      new_unittest("fao56_dates_mid_stage", test_fao56_dates_mid_stage), &
+      new_unittest("fao56_dates_late_stage", test_fao56_dates_late_stage), &
+      new_unittest("fao56_dates_dormant_after_season", test_fao56_dates_dormant_after), &
+      new_unittest("fao56_dates_winter_crop_wrap", test_fao56_dates_winter_crop), &
+      new_unittest("fao56_gdd_ini_stage", test_fao56_gdd_ini_stage), &
+      new_unittest("fao56_gdd_mid_stage", test_fao56_gdd_mid_stage), &
+      new_unittest("fao56_gdd_frost_kills_and_latches", test_fao56_gdd_frost_latch), &
+      new_unittest("fao56_gdd_dormant_after_all_stages", test_fao56_gdd_dormant_after) &
     ]
   end subroutine collect_phenology
 
@@ -667,5 +680,326 @@ contains
     call check(error, it_is_growing_season .eqv. .false., &
                "Dispatch DOY: Corn DOY 30 should be dormant")
   end subroutine test_dispatch_none_dormant
+
+  !---------------------------------------------------------------------------
+  ! FAO56_DATES tests
+  !
+  ! Setup: planting DOY=100, L_ini=20, L_dev=30, L_mid=40, L_late=25
+  ! Total season = 115 days (DOY 100 to 214)
+  ! Stage boundaries (days since planting):
+  !   INI:  0–19   (DOY 100–119)
+  !   DEV:  20–49  (DOY 120–149)
+  !   MID:  50–89  (DOY 150–189)
+  !   LATE: 90–114 (DOY 190–214)
+  !   DORMANT: >= 115 (DOY >= 215)
+  !---------------------------------------------------------------------------
+
+  !> @brief Day 5 since planting → INI stage, stage_fraction ~0.25
+  subroutine test_fao56_dates_ini_stage(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+
+    call phenology_update_fao56_dates( &
+      current_doy=105, &
+      growing_season_start_doy=100, &
+      l_ini=20, l_dev=30, l_mid=40, l_late=25, &
+      days_in_year=365, &
+      growth_stage=growth_stage, &
+      stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, &
+      it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_INI, &
+               "DOY 105, planting 100: should be INI stage")
+    if (allocated(error)) return
+    call check(error, abs(stage_fraction - 0.25) < 0.01, &
+               "5 days into 20-day INI: stage_fraction should be ~0.25")
+    if (allocated(error)) return
+    call check(error, it_is_growing_season .eqv. .true., &
+               "INI stage should be growing season")
+  end subroutine test_fao56_dates_ini_stage
+
+  !> @brief Day 35 since planting → DEV stage midpoint, stage_fraction ~0.5
+  subroutine test_fao56_dates_dev_stage_midpoint(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+
+    call phenology_update_fao56_dates( &
+      current_doy=135, &
+      growing_season_start_doy=100, &
+      l_ini=20, l_dev=30, l_mid=40, l_late=25, &
+      days_in_year=365, &
+      growth_stage=growth_stage, &
+      stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, &
+      it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_DEV, &
+               "DOY 135, planting 100: should be DEV stage (35 days in)")
+    if (allocated(error)) return
+    call check(error, abs(stage_fraction - 0.5) < 0.02, &
+               "15 days into 30-day DEV: stage_fraction should be ~0.5")
+  end subroutine test_fao56_dates_dev_stage_midpoint
+
+  !> @brief Day 60 since planting → MID stage
+  subroutine test_fao56_dates_mid_stage(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+
+    call phenology_update_fao56_dates( &
+      current_doy=160, &
+      growing_season_start_doy=100, &
+      l_ini=20, l_dev=30, l_mid=40, l_late=25, &
+      days_in_year=365, &
+      growth_stage=growth_stage, &
+      stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, &
+      it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_MID, &
+               "DOY 160, planting 100: should be MID stage (60 days in)")
+    if (allocated(error)) return
+    call check(error, abs(growth_fraction - 1.0) < 0.01, &
+               "MID stage: growth_fraction should be 1.0")
+  end subroutine test_fao56_dates_mid_stage
+
+  !> @brief Day 100 since planting → LATE stage, stage_fraction ~0.4
+  subroutine test_fao56_dates_late_stage(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+
+    call phenology_update_fao56_dates( &
+      current_doy=200, &
+      growing_season_start_doy=100, &
+      l_ini=20, l_dev=30, l_mid=40, l_late=25, &
+      days_in_year=365, &
+      growth_stage=growth_stage, &
+      stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, &
+      it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_LATE, &
+               "DOY 200, planting 100: should be LATE stage (100 days in)")
+    if (allocated(error)) return
+    call check(error, abs(stage_fraction - 0.4) < 0.02, &
+               "10 days into 25-day LATE: stage_fraction should be ~0.4")
+  end subroutine test_fao56_dates_late_stage
+
+  !> @brief Day 120 since planting → DORMANT (past end of season)
+  subroutine test_fao56_dates_dormant_after(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+
+    call phenology_update_fao56_dates( &
+      current_doy=220, &
+      growing_season_start_doy=100, &
+      l_ini=20, l_dev=30, l_mid=40, l_late=25, &
+      days_in_year=365, &
+      growth_stage=growth_stage, &
+      stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, &
+      it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_DORMANT, &
+               "DOY 220, 120 days past planting 100: should be DORMANT")
+    if (allocated(error)) return
+    call check(error, it_is_growing_season .eqv. .false., &
+               "Past end of season: it_is_growing_season should be FALSE")
+  end subroutine test_fao56_dates_dormant_after
+
+  !> @brief Winter crop: planting DOY 300, total 120 days, wraps into next year.
+  !!        DOY 30 = 95 days since planting → should be in MID stage.
+  subroutine test_fao56_dates_winter_crop(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+
+    ! Planting DOY 300, L_ini=20, L_dev=30, L_mid=40, L_late=30
+    ! DOY 30 in next year = 30 + (365-300) = 95 days since planting
+    ! INI: 0-19, DEV: 20-49, MID: 50-89, LATE: 90-119
+    ! 95 days → LATE stage, stage_fraction = (95-90)/30 = 0.167
+    call phenology_update_fao56_dates( &
+      current_doy=30, &
+      growing_season_start_doy=300, &
+      l_ini=20, l_dev=30, l_mid=40, l_late=30, &
+      days_in_year=365, &
+      growth_stage=growth_stage, &
+      stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, &
+      it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_LATE, &
+               "Winter crop: DOY 30, planted 300, 95 days in: should be LATE")
+    if (allocated(error)) return
+    call check(error, it_is_growing_season .eqv. .true., &
+               "Winter crop in LATE stage should be growing")
+  end subroutine test_fao56_dates_winter_crop
+
+  !---------------------------------------------------------------------------
+  ! FAO56_GDD tests
+  !
+  ! Setup: growing_season_start_gdd=200, gdd_ini=100, gdd_dev=200,
+  !        gdd_mid=400, gdd_late=150, killing_frost=28°F
+  ! Cumulative GDD boundaries (since planting threshold):
+  !   INI:  0–99
+  !   DEV:  100–299
+  !   MID:  300–699
+  !   LATE: 700–849
+  !   DORMANT: >= 850
+  !---------------------------------------------------------------------------
+
+  !> @brief GDD 250 (50 since planting threshold of 200) → INI stage
+  subroutine test_fao56_gdd_ini_stage(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+    logical(c_bool) :: frost_killed_season
+
+    frost_killed_season = FALSE
+
+    call phenology_update_fao56_gdd( &
+      current_gdd=250.0_c_float, &
+      mean_air_temperature=70.0_c_float, &
+      growing_season_start_gdd=200.0_c_float, &
+      killing_frost_temperature=28.0_c_float, &
+      gdd_ini=100.0_c_float, gdd_dev=200.0_c_float, &
+      gdd_mid=400.0_c_float, gdd_late=150.0_c_float, &
+      frost_killed_season=frost_killed_season, &
+      growth_stage=growth_stage, &
+      stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, &
+      it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_INI, &
+               "GDD 250, threshold 200: 50 GDD in → should be INI")
+    if (allocated(error)) return
+    call check(error, abs(stage_fraction - 0.5) < 0.01, &
+               "50 of 100 GDD_ini: stage_fraction should be ~0.5")
+  end subroutine test_fao56_gdd_ini_stage
+
+  !> @brief GDD 600 (400 since planting threshold) → MID stage
+  subroutine test_fao56_gdd_mid_stage(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+    logical(c_bool) :: frost_killed_season
+
+    frost_killed_season = FALSE
+
+    call phenology_update_fao56_gdd( &
+      current_gdd=600.0_c_float, &
+      mean_air_temperature=80.0_c_float, &
+      growing_season_start_gdd=200.0_c_float, &
+      killing_frost_temperature=28.0_c_float, &
+      gdd_ini=100.0_c_float, gdd_dev=200.0_c_float, &
+      gdd_mid=400.0_c_float, gdd_late=150.0_c_float, &
+      frost_killed_season=frost_killed_season, &
+      growth_stage=growth_stage, &
+      stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, &
+      it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_MID, &
+               "GDD 600, threshold 200: 400 GDD in → should be MID")
+    if (allocated(error)) return
+    call check(error, abs(growth_fraction - 1.0) < 0.01, &
+               "MID stage: growth_fraction should be 1.0")
+  end subroutine test_fao56_gdd_mid_stage
+
+  !> @brief Frost kills during growing → latches dormant, stays dormant on warm day
+  subroutine test_fao56_gdd_frost_latch(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+    logical(c_bool) :: frost_killed_season
+
+    frost_killed_season = FALSE
+
+    ! First call: frost kills (GDD=600 → would be MID, but temp=25 <= 28)
+    call phenology_update_fao56_gdd( &
+      current_gdd=600.0_c_float, &
+      mean_air_temperature=25.0_c_float, &
+      growing_season_start_gdd=200.0_c_float, &
+      killing_frost_temperature=28.0_c_float, &
+      gdd_ini=100.0_c_float, gdd_dev=200.0_c_float, &
+      gdd_mid=400.0_c_float, gdd_late=150.0_c_float, &
+      frost_killed_season=frost_killed_season, &
+      growth_stage=growth_stage, &
+      stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, &
+      it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_DORMANT, &
+               "Frost kills: should be DORMANT")
+    if (allocated(error)) return
+    call check(error, frost_killed_season .eqv. .true., &
+               "frost_killed_season should be TRUE")
+    if (allocated(error)) return
+
+    ! Second call: warm day after frost → should STAY dormant (latch)
+    call phenology_update_fao56_gdd( &
+      current_gdd=650.0_c_float, &
+      mean_air_temperature=70.0_c_float, &
+      growing_season_start_gdd=200.0_c_float, &
+      killing_frost_temperature=28.0_c_float, &
+      gdd_ini=100.0_c_float, gdd_dev=200.0_c_float, &
+      gdd_mid=400.0_c_float, gdd_late=150.0_c_float, &
+      frost_killed_season=frost_killed_season, &
+      growth_stage=growth_stage, &
+      stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, &
+      it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_DORMANT, &
+               "After frost latch: warm day should still be DORMANT")
+    if (allocated(error)) return
+    call check(error, it_is_growing_season .eqv. .false., &
+               "After frost latch: it_is_growing_season should be FALSE")
+  end subroutine test_fao56_gdd_frost_latch
+
+  !> @brief GDD past all stages → DORMANT naturally (no frost needed)
+  subroutine test_fao56_gdd_dormant_after(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+    logical(c_bool) :: frost_killed_season
+
+    frost_killed_season = FALSE
+
+    ! GDD 1100: 900 since threshold → past end_late (850)
+    call phenology_update_fao56_gdd( &
+      current_gdd=1100.0_c_float, &
+      mean_air_temperature=70.0_c_float, &
+      growing_season_start_gdd=200.0_c_float, &
+      killing_frost_temperature=28.0_c_float, &
+      gdd_ini=100.0_c_float, gdd_dev=200.0_c_float, &
+      gdd_mid=400.0_c_float, gdd_late=150.0_c_float, &
+      frost_killed_season=frost_killed_season, &
+      growth_stage=growth_stage, &
+      stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, &
+      it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_DORMANT, &
+               "GDD 1100, 900 past threshold: all stages done → DORMANT")
+    if (allocated(error)) return
+    call check(error, it_is_growing_season .eqv. .false., &
+               "Past all stages: it_is_growing_season should be FALSE")
+  end subroutine test_fao56_gdd_dormant_after
 
 end module test_phenology
