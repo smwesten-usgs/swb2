@@ -1,0 +1,70 @@
+# Phenology parameters for Central Sands integration test
+# Supplements Landuse_lookup_CDL.txt with unified phenology columns.
+# MUST have exactly the same LU_Code set as the CDL table.
+#
+# Strategy:
+#   - Row crops (corn, soybeans, etc.): GDD_THRESHOLD (GDD start + killing frost)
+#   - Perennials/forests: DOY_BASED (fixed calendar dates)
+#   - Winter wheat: DOY_BASED with start > end (winter crop wrap)
+#   - Open water / developed / barren: all <NA> (PHENOLOGY_NONE → always dormant)
+#
+LU_Code	Description	Growing_season_start_date	Growing_season_end_date	Growing_season_start_GDD	Killing_frost_temperature
+1	Corn	<NA>	<NA>	200.0	28.0
+4	Sorghum	<NA>	<NA>	250.0	28.0
+5	Soybeans	<NA>	<NA>	200.0	28.0
+6	Sunflowers	<NA>	<NA>	250.0	28.0
+12	Sweet Corn	<NA>	<NA>	200.0	28.0
+21	Barley	04/01	08/15	<NA>	<NA>
+23	Spring Wheat	04/20	09/01	<NA>	<NA>
+24	Winter Wheat	10/01	05/30	<NA>	<NA>
+26	Dbl Crop WinWht/Soybeans	<NA>	<NA>	150.0	28.0
+27	Rye	04/01	09/15	<NA>	<NA>
+28	Oats	04/15	08/30	<NA>	<NA>
+29	Millet	<NA>	<NA>	300.0	28.0
+30	Speltz	04/15	09/01	<NA>	<NA>
+32	Flaxseed	05/01	09/15	<NA>	<NA>
+36	Alfalfa	04/01	10/31	<NA>	<NA>
+37	Other Hay/Non Alfalfa	04/15	10/15	<NA>	<NA>
+38	Camelina	04/15	09/01	<NA>	<NA>
+41	Sugarbeets	<NA>	<NA>	200.0	28.0
+42	Dry Beans	<NA>	<NA>	250.0	28.0
+43	Potatoes	<NA>	<NA>	200.0	28.0
+47	Misc Vegs and Fruits	05/01	10/01	<NA>	<NA>
+49	Onions	04/15	09/30	<NA>	<NA>
+50	Cucumbers	<NA>	<NA>	300.0	28.0
+53	Peas	04/01	08/15	<NA>	<NA>
+57	Herbs	05/01	09/30	<NA>	<NA>
+58	Clover/Wildflowers	04/01	10/31	<NA>	<NA>
+59	Sod/Grass Seed	04/01	10/31	<NA>	<NA>
+61	Fallow/Idle Cropland	<NA>	<NA>	<NA>	<NA>
+70	Christmas Trees	04/01	11/15	<NA>	<NA>
+92	Aquaculture	<NA>	<NA>	<NA>	<NA>
+111	Open Water	<NA>	<NA>	<NA>	<NA>
+121	Developed/Open Space	04/15	10/15	<NA>	<NA>
+122	Developed/Low Intensity	04/15	10/15	<NA>	<NA>
+123	Developed/Medium Intensity	<NA>	<NA>	<NA>	<NA>
+124	Developed/High Intensity	<NA>	<NA>	<NA>	<NA>
+131	Barren	<NA>	<NA>	<NA>	<NA>
+141	Deciduous Forest	04/15	10/15	<NA>	<NA>
+142	Evergreen Forest	03/15	11/30	<NA>	<NA>
+143	Mixed Forest	04/01	11/01	<NA>	<NA>
+151	Dwarf Scrub	04/15	10/15	<NA>	<NA>
+152	Shrubland	04/15	10/15	<NA>	<NA>
+171	Grassland/Herbaceous (arid)	04/15	10/15	<NA>	<NA>
+176	Grass/Pasture	04/15	10/15	<NA>	<NA>
+181	Pasture/Hay (fair)	04/01	10/31	<NA>	<NA>
+182	Cultivated Crops (SR+CR poor)	<NA>	<NA>	200.0	28.0
+190	Woody Wetlands	04/01	10/31	<NA>	<NA>
+195	Herbaceous Wetlands	04/01	10/31	<NA>	<NA>
+205	Triticale	04/01	08/30	<NA>	<NA>
+206	Carrots	05/01	09/30	<NA>	<NA>
+207	Asparagus	04/15	09/30	<NA>	<NA>
+221	Strawberries	04/15	10/15	<NA>	<NA>
+225	Dbl Crop WinWht/Corn	<NA>	<NA>	150.0	28.0
+226	Dbl Crop Oats/Corn	<NA>	<NA>	200.0	28.0
+241	Dbl Crop Corn/Soybeans	<NA>	<NA>	200.0	28.0
+242	Blueberries	04/15	10/15	<NA>	<NA>
+243	Cabbage	05/01	10/01	<NA>	<NA>
+250	Cranberries	04/15	10/15	<NA>	<NA>
+251	Waste_disposal_fallow	<NA>	<NA>	<NA>	<NA>
+252	Waste_disposal_grass	04/15	10/15	<NA>	<NA>

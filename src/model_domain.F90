@@ -120,6 +120,7 @@ module model_domain
     real (c_float), allocatable       :: current_plant_height(:)
     integer (c_int), allocatable      :: number_of_days_since_planting(:)
     logical (c_bool), allocatable     :: it_is_growing_season(:)
+    logical (c_bool), allocatable     :: frost_killed_season(:)
 
     real (c_float), allocatable       :: gross_precip(:)
     real (c_float), allocatable       :: monthly_gross_precip(:)
@@ -238,8 +239,8 @@ module model_domain
     procedure :: row_column_to_index_fn
     generic   :: row_column_to_index => row_column_to_index_fn
 
-    procedure :: model_initialize_growing_season
-    generic   :: initialize_growing_season => model_initialize_growing_season
+    procedure :: model_initialize_phenology
+    generic   :: initialize_growing_season => model_initialize_phenology
 
   end type MODEL_DOMAIN_T
 
@@ -336,7 +337,7 @@ contains
      this%init_direct_soil_moisture    => model_initialize_direct_soil_moisture_none
      this%update_landuse_codes         => model_update_landuse_codes_static
      this%init_GDD                     => model_initialize_GDD
-     this%init_growing_season          => model_initialize_growing_season
+     this%init_growing_season          => model_initialize_phenology
      this%init_AWC                     => model_initialize_available_water_content_gridded
      this%init_crop_coefficient        => model_initialize_crop_coefficient_none
      this%calc_interception            => model_calculate_interception_bucket
@@ -363,7 +364,7 @@ contains
      this%calc_fog                => model_calculate_fog_none
      this%calc_irrigation         => model_calculate_irrigation_none
      this%calc_GDD                => model_calculate_GDD
-     this%update_growing_season   => model_update_growing_season
+     this%update_growing_season   => model_update_phenology
      this%calc_direct_net_infiltration => model_calculate_direct_net_infiltration_none
      this%calc_direct_soil_moisture    => model_calculate_direct_soil_moisture_none
 
@@ -432,7 +433,7 @@ contains
     ! [ LOCALS ]
     integer (c_int)  :: iCount
     integer (c_int)  :: iIndex
-    integer (c_int)  :: iStat(72)
+    integer (c_int)  :: iStat(73)
 
     iCount = count( this%active )
     iStat = 0
@@ -491,24 +492,25 @@ contains
     allocate( this%col_num_1D( iCount ), stat=iStat(52) )
     allocate( this%row_num_1D( iCount ), stat=iStat(53) )
     allocate( this%it_is_growing_season( iCount ), stat=iStat(54) )
-    allocate( this%curve_num_adj( iCount ), stat=iStat(55) )
-    allocate( this%rejected_net_infiltration( iCount ), stat=iStat(56) )
-    allocate( this%evap_reduction_coef_kr( iCount ), stat=iStat(57) )
-    allocate( this%surf_evap_coef_ke( iCount ), stat=iStat(58) )
-    allocate( this%plant_stress_coef_ks( iCount ), stat=iStat(59) )
-    allocate( this%total_available_water_taw( iCount ), stat=iStat(60) )
-    allocate( this%readily_available_water_raw( iCount ), stat=iStat(61) )
-    allocate( this%bare_soil_evap( iCount ), stat=iStat(62) )
-    allocate( this%fraction_exposed_and_wetted_soil( iCount ), stat=iStat(63) )
-    allocate( this%delta_soil_storage( iCount ), stat=iStat(64) )
-    allocate( this%soil_moisture_deficit( iCount ), stat=iStat(65) )
-    allocate( this%net_rainfall( iCount ), stat=iStat(66) )
-    allocate( this%net_snowfall( iCount ), stat=iStat(67) )
-    allocate( this%evaporable_water_storage( iCount ), stat=iStat(68) )
-    allocate( this%evaporable_water_deficit( iCount ), stat=iStat(69) )
-    allocate( this%irrigation_mask( iCount ), stat=iStat(70) )
-    allocate( this%tmax_minus_tmin( iCount ), stat=iStat(71) )
-    allocate( this%climatic_deficit( iCount ), stat=iStat(72) )
+    allocate( this%frost_killed_season( iCount ), stat=iStat(55) )
+    allocate( this%curve_num_adj( iCount ), stat=iStat(56) )
+    allocate( this%rejected_net_infiltration( iCount ), stat=iStat(57) )
+    allocate( this%evap_reduction_coef_kr( iCount ), stat=iStat(58) )
+    allocate( this%surf_evap_coef_ke( iCount ), stat=iStat(59) )
+    allocate( this%plant_stress_coef_ks( iCount ), stat=iStat(60) )
+    allocate( this%total_available_water_taw( iCount ), stat=iStat(61) )
+    allocate( this%readily_available_water_raw( iCount ), stat=iStat(62) )
+    allocate( this%bare_soil_evap( iCount ), stat=iStat(63) )
+    allocate( this%fraction_exposed_and_wetted_soil( iCount ), stat=iStat(64) )
+    allocate( this%delta_soil_storage( iCount ), stat=iStat(65) )
+    allocate( this%soil_moisture_deficit( iCount ), stat=iStat(66) )
+    allocate( this%net_rainfall( iCount ), stat=iStat(67) )
+    allocate( this%net_snowfall( iCount ), stat=iStat(68) )
+    allocate( this%evaporable_water_storage( iCount ), stat=iStat(69) )
+    allocate( this%evaporable_water_deficit( iCount ), stat=iStat(70) )
+    allocate( this%irrigation_mask( iCount ), stat=iStat(71) )
+    allocate( this%tmax_minus_tmin( iCount ), stat=iStat(72) )
+    allocate( this%climatic_deficit( iCount ), stat=iStat(73) )
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR"                    &
@@ -587,6 +589,7 @@ contains
     this%evaporable_water_storage            = 0.0_c_float
     this%evaporable_water_deficit            = 0.0_c_float
     this%it_is_growing_season                = FALSE
+    this%frost_killed_season                 = FALSE
     this%irrigation_mask                     = 1.0_c_float
     this%tmax_minus_tmin                     = 0.0_c_float
     this%climatic_deficit                    = 0.0_c_float
@@ -2574,30 +2577,53 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_growing_season( this )
+  subroutine model_initialize_phenology( this )
 
-    use growing_season
+    use phenology, only : phenology_initialize
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call growing_season_initialize( )
+    call phenology_initialize()
 
-  end subroutine model_initialize_growing_season
+  end subroutine model_initialize_phenology
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_update_growing_season( this )
+  subroutine model_update_phenology( this )
 
-    use growing_season
+    use phenology, only : phenology_update
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call growing_season_update( landuse_index=this%landuse_index,                                &
-                                              GDD=this%gdd,                                      &
-                                              mean_air_temp=this%tmean,                          &
-                                              it_is_growing_season=this%it_is_growing_season )
+    ! [ LOCALS ]
+    integer (c_int)  :: indx
+    integer (c_int)  :: number_of_cells
+    real (c_float)   :: growth_fraction
+    integer (c_int)  :: growth_stage
 
-  end subroutine model_update_growing_season
+    number_of_cells = ubound( this%landuse_index, 1 )
+
+    ! Reset frost latch at the start of each calendar year
+    if ( SIM_DT%iDOY == 1 ) then
+      this%frost_killed_season = FALSE
+    end if
+
+    do indx = 1, number_of_cells
+
+      call phenology_update(                                              &
+        landuse_index          = this%landuse_index(indx),                &
+        current_doy            = SIM_DT%iDOY,                            &
+        current_gdd            = this%gdd(indx),                         &
+        mean_air_temperature   = this%tmean(indx),                       &
+        it_is_growing_season_in = this%it_is_growing_season(indx),       &
+        frost_killed_season    = this%frost_killed_season(indx),         &
+        growth_fraction        = growth_fraction,                         &
+        it_is_growing_season   = this%it_is_growing_season(indx),        &
+        growth_stage           = growth_stage )
+
+    end do
+
+  end subroutine model_update_phenology
 
 !--------------------------------------------------------------------------------------------------
 

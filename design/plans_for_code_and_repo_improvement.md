@@ -267,3 +267,39 @@ MODFLOW6 provides an excellent reference for a mature Fortran scientific code wi
 | May 2026 | Initial plan created |
 | June 2026 | Added Phase 0 (release housekeeping), Phase 6 (feature wishlist). Moved cross-platform build verification to top of Phase 2. Added DOI-USGS sync workflow to Phase 4. Added CMake removal to Phase 2. Added change log. |
 | July 2026 | Marked Phase 3.1–3.4 complete (test-drive migration, 10 suites, 144 tests). Marked 2.1 partial (Windows verified), 2.8 complete (pixi.toml), 6.4 complete (pixi adoption). Added 4.1a (Doxygen → GitHub Pages CI deployment). Removed `docs/` from git tracking. Added `.gitattributes` for cross-platform line endings. |
+
+
+---
+
+## Issue: Incomplete Weather Data Files (Leap Year Edge Case)
+
+**Discovered:** 2026-07-10
+**Severity:** Minor (workaround: adjust END_DATE), but poor user experience
+**File:** `src/data_catalog_entry.F90`, `getvalues_dynamic_netcdf_sub`, line ~1575
+
+**Problem:** When a NetCDF climate file doesn't cover the full simulation period (e.g., Daymet 2012 file has 365 records but 2012 is a leap year with 366 days), SWB halts with a fatal error rather than padding the missing day(s).
+
+**Root cause (investigated):** The existing padding logic in `getvalues_dynamic_netcdf_sub` has two paths that handle missing data:
+
+1. **`test_for_need_to_pad_values` (~line 1400):** Returns TRUE only when the *file doesn't exist* at year-end. Assumes a missing file = missing data. Does NOT help when the file exists but is short by a day.
+
+2. **`netcdf_update_time_starting_index` returns FALSE (~line 1615):** Sets `lPadValues = TRUE` for missing timesteps *within* a file's date range. But this path is only reached if `netcdf_date_within_range` passes first.
+
+The gap: when the file **exists and opens successfully** but the requested date is **past the file's last date**, the code hits the outer `netcdf_date_within_range` check (line ~1550), finds the date is out of range, sees no `#` in the filename (not a sequential series), and calls `assert(FALSE, ...)` — a hard stop.
+
+**The fix would be:** At the else-branch around line ~1565 (where the fatal error is), instead of dying, set `lPadValues = TRUE` and emit a warning:
+```fortran
+! Instead of assert(FALSE, ...):
+this%lPadValues = TRUE
+call LOGS%write("WARNING: Current simulation date is beyond the end of NetCDF file "  &
+  //dquote(this%sSourceFilename)//". Padding with previous/zero values.", &
+  iLogLevel=LOG_ALL, lEcho=TRUE)
+```
+
+This would make the behavior consistent: missing days at file boundaries get the same padding treatment as missing files at year boundaries.
+
+**Why it works fine with multi-year series (e.g., `prcp_%y.nc`):** When the filename template contains `%y`, SWB closes the 2012 file at year-end and attempts to open a 2013 file. If that file doesn't exist, `test_for_need_to_pad_values` catches it. The problem is specific to single-file runs or the last file in a series where the file exists but is short.
+
+**Workaround:** Set `END_DATE` to match the last date in the NetCDF file (e.g., `12/30/2012` for Daymet leap years).
+
+**Future work:** Implement the fix above, add a test case exercising this edge case.

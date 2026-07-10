@@ -303,7 +303,10 @@ contains
     type(error_type), allocatable, intent(out) :: error
     real(c_float) :: growth_fraction
     logical(c_bool) :: it_is_growing_season
+    logical(c_bool) :: frost_killed_season
     integer(c_int) :: growth_stage
+
+    frost_killed_season = FALSE
 
     call phenology_update_gdd_threshold( &
       current_gdd=150.0_c_float, &
@@ -311,6 +314,7 @@ contains
       growing_season_start_gdd=200.0_c_float, &
       killing_frost_temperature=28.0_c_float, &
       it_is_growing_season_in=FALSE, &
+      frost_killed_season=frost_killed_season, &
       growth_fraction=growth_fraction, &
       it_is_growing_season=it_is_growing_season, &
       growth_stage=growth_stage)
@@ -324,7 +328,10 @@ contains
     type(error_type), allocatable, intent(out) :: error
     real(c_float) :: growth_fraction
     logical(c_bool) :: it_is_growing_season
+    logical(c_bool) :: frost_killed_season
     integer(c_int) :: growth_stage
+
+    frost_killed_season = FALSE
 
     call phenology_update_gdd_threshold( &
       current_gdd=200.0_c_float, &
@@ -332,6 +339,7 @@ contains
       growing_season_start_gdd=200.0_c_float, &
       killing_frost_temperature=28.0_c_float, &
       it_is_growing_season_in=FALSE, &
+      frost_killed_season=frost_killed_season, &
       growth_fraction=growth_fraction, &
       it_is_growing_season=it_is_growing_season, &
       growth_stage=growth_stage)
@@ -345,7 +353,10 @@ contains
     type(error_type), allocatable, intent(out) :: error
     real(c_float) :: growth_fraction
     logical(c_bool) :: it_is_growing_season
+    logical(c_bool) :: frost_killed_season
     integer(c_int) :: growth_stage
+
+    frost_killed_season = FALSE
 
     call phenology_update_gdd_threshold( &
       current_gdd=500.0_c_float, &
@@ -353,6 +364,7 @@ contains
       growing_season_start_gdd=200.0_c_float, &
       killing_frost_temperature=28.0_c_float, &
       it_is_growing_season_in=TRUE, &
+      frost_killed_season=frost_killed_season, &
       growth_fraction=growth_fraction, &
       it_is_growing_season=it_is_growing_season, &
       growth_stage=growth_stage)
@@ -366,7 +378,10 @@ contains
     type(error_type), allocatable, intent(out) :: error
     real(c_float) :: growth_fraction
     logical(c_bool) :: it_is_growing_season
+    logical(c_bool) :: frost_killed_season
     integer(c_int) :: growth_stage
+
+    frost_killed_season = FALSE
 
     call phenology_update_gdd_threshold( &
       current_gdd=500.0_c_float, &
@@ -374,12 +389,15 @@ contains
       growing_season_start_gdd=200.0_c_float, &
       killing_frost_temperature=28.0_c_float, &
       it_is_growing_season_in=TRUE, &
+      frost_killed_season=frost_killed_season, &
       growth_fraction=growth_fraction, &
       it_is_growing_season=it_is_growing_season, &
       growth_stage=growth_stage)
 
     call check(error, it_is_growing_season .eqv. .false., &
                "Temperature 25 <= frost threshold 28: season should end")
+    call check(error, frost_killed_season .eqv. .true., &
+               "frost_killed_season should be set TRUE after killing frost")
   end subroutine test_gdd_killing_frost_ends_season
 
   !> @brief Temperature above frost threshold while growing: season continues.
@@ -387,7 +405,10 @@ contains
     type(error_type), allocatable, intent(out) :: error
     real(c_float) :: growth_fraction
     logical(c_bool) :: it_is_growing_season
+    logical(c_bool) :: frost_killed_season
     integer(c_int) :: growth_stage
+
+    frost_killed_season = FALSE
 
     call phenology_update_gdd_threshold( &
       current_gdd=500.0_c_float, &
@@ -395,6 +416,7 @@ contains
       growing_season_start_gdd=200.0_c_float, &
       killing_frost_temperature=28.0_c_float, &
       it_is_growing_season_in=TRUE, &
+      frost_killed_season=frost_killed_season, &
       growth_fraction=growth_fraction, &
       it_is_growing_season=it_is_growing_season, &
       growth_stage=growth_stage)
@@ -504,7 +526,7 @@ contains
     if (allocated(error)) return
 
     ! LU 1 (Corn, index 1): no GDD columns → NA_FLOAT
-    call check(error, GROWING_SEASON_START_GDD(1) == NA_FLOAT, &
+    call check(error, .not. (GROWING_SEASON_START_GDD(1) > NA_FLOAT), &
                "GDD start should be NA_FLOAT for DOY-only landuse")
   end subroutine test_init_nodata_for_missing
 
@@ -555,9 +577,11 @@ contains
     type(error_type), allocatable, intent(out) :: error
     real(c_float) :: growth_fraction
     logical(c_bool) :: it_is_growing_season
+    logical(c_bool) :: frost_killed_season
     integer(c_int) :: growth_stage
 
     call ensure_phenology_initialized()
+    frost_killed_season = FALSE
 
     ! LU 1 (Corn, index 1): DOY 150, season is 105-288
     call phenology_update( &
@@ -566,6 +590,7 @@ contains
       current_gdd=0.0_c_float, &
       mean_air_temperature=70.0_c_float, &
       it_is_growing_season_in=FALSE, &
+      frost_killed_season=frost_killed_season, &
       growth_fraction=growth_fraction, &
       it_is_growing_season=it_is_growing_season, &
       growth_stage=growth_stage)
@@ -579,9 +604,11 @@ contains
     type(error_type), allocatable, intent(out) :: error
     real(c_float) :: growth_fraction
     logical(c_bool) :: it_is_growing_season
+    logical(c_bool) :: frost_killed_season
     integer(c_int) :: growth_stage
 
     call ensure_phenology_initialized()
+    frost_killed_season = FALSE
 
     ! LU 5 (Soybeans, index 3): GDD=300 > threshold 200, warm temp
     call phenology_update( &
@@ -590,6 +617,7 @@ contains
       current_gdd=300.0_c_float, &
       mean_air_temperature=70.0_c_float, &
       it_is_growing_season_in=FALSE, &
+      frost_killed_season=frost_killed_season, &
       growth_fraction=growth_fraction, &
       it_is_growing_season=it_is_growing_season, &
       growth_stage=growth_stage)
@@ -607,9 +635,11 @@ contains
     type(error_type), allocatable, intent(out) :: error
     real(c_float) :: growth_fraction
     logical(c_bool) :: it_is_growing_season
+    logical(c_bool) :: frost_killed_season
     integer(c_int) :: growth_stage
 
     call ensure_phenology_initialized()
+    frost_killed_season = FALSE
 
     ! LU 1 (Corn, index 1): DOY 30, outside season 105-288
     call phenology_update( &
@@ -618,6 +648,7 @@ contains
       current_gdd=0.0_c_float, &
       mean_air_temperature=20.0_c_float, &
       it_is_growing_season_in=FALSE, &
+      frost_killed_season=frost_killed_season, &
       growth_fraction=growth_fraction, &
       it_is_growing_season=it_is_growing_season, &
       growth_stage=growth_stage)

@@ -576,3 +576,59 @@ The key architectural insight: **LAI becomes the universal intermediate variable
 - Er-Raki, S., Chehbouni, A., Guemouria, N., Duchemin, B., Ezzahar, J., and Hadria, R., 2007, Combining FAO-56 model and ground-based remote sensing to estimate water consumptions of wheat crops in a semi-arid region: Agricultural Water Management, v. 87, no. 1, p. 41–54.
 - Raes, D., Steduto, P., Hsiao, T.C., and Fereres, E., 2009, AquaCrop—The FAO crop model to simulate yield response to water: Agronomy Journal, v. 101, no. 3, p. 426–437.
 - Thorp, K.R., 2022, pyfao56: FAO-56 evapotranspiration in Python: SoftwareX 19, 101208.
+
+
+---
+
+## Design Decision: Leap Year Handling for mm/dd → DOY Conversion
+
+**Date:** 2026-07-10
+**Status:** Deferred (implement when next touching phenology_initialize)
+**Affects:** `phenology.F90`, `datetime.F90` (`mmdd2doy`)
+
+**Problem:** `mmdd2doy` converts "04/15" to DOY using a hardcoded non-leap year (1999). In leap years, DOY 105 lands on April 14, not April 15. This is a 1-day error after February in leap years.
+
+**Design principle:** Respect the user's intent based on input format:
+- `"04/15"` (mm/dd) → user means "April 15th" in any year. Convert to correct DOY for the current simulation year.
+- `105` (integer) → user means "day 105" regardless of year. Use as-is. This is the PEST++-friendly path.
+
+**Implementation plan:**
+1. In `phenology_initialize`, store both `month` + `day` (for mm/dd inputs) and a flag indicating the input was a raw integer DOY
+2. Add `phenology_update_doy_for_year(current_year)` — called once at the start of each simulation year
+3. For mm/dd entries: recompute `GROWING_SEASON_START_DOY` using actual year (trivial: `julian_day(year, month, day) - julian_day(year, 1, 1) + 1`)
+4. For integer DOY entries: leave unchanged
+
+**Impact:** 1 day shift in leap years for mm/dd-specified dates. Matches user intent. No impact on integer-DOY users or PEST++ workflows.
+
+**Current behavior (preserved until fix):** All inputs converted to DOY using non-leap 1999 reference. Off by 1 day after Feb 28 in leap years. Integration test expects this behavior.
+
+
+---
+
+## Enhancement: Per-Crop GDD Base and Maximum Temperatures
+
+**Date:** 2026-07-10
+**Status:** Planned (priority when FAO56 phenology phases begin)
+**Affects:** `growing_degree_day.F90`, `growing_degree_day_baskerville_emin.F90`, lookup tables
+
+**Current state:** Both GDD calculation routines use hardcoded defaults:
+- `GDD_base_temperature = 50°F`
+- `GDD_max_temperature = 86°F`
+
+It's unclear whether per-landuse override was ever wired up (investigate).
+
+**Motivation:** FAO-56 (2025 edition, Tables 6.10–6.12) defines base and max temperatures on a per-crop basis. For example:
+- Corn: GDD_base=50°F, GDD_max=89.6°F
+- Spring wheat: GDD_base=32°F, GDD_max=77°F
+- Soybeans: GDD_base=50°F, GDD_max=86°F
+
+Using crop-specific values significantly affects when GDD thresholds are reached, which directly impacts the phenology module's growing season start date.
+
+**Implementation sketch:**
+1. Add `GDD_base_temperature` and `GDD_max_temperature` columns to lookup tables (optional, with fallback to current defaults)
+2. Modify `growing_degree_day_calculate` and the Baskerville-Emin variant to accept per-cell base/max
+3. Wire through `model_calculate_GDD` → pass `this%landuse_index` to look up per-landuse values
+
+**Related question:** Is the Baskerville-Emin method important? It uses a sine-curve approximation for the diurnal temperature cycle to improve GDD estimation when daily min/max straddle the base temperature. It's more accurate than the simple (Tmax+Tmin)/2 - Tbase approach, but adds complexity. Worth evaluating whether users actually benefit from it vs. the simpler method, especially given that climate input data (Daymet, gridMET) already have their own temperature averaging assumptions baked in.
+
+**Priority:** Address alongside FAO56 phenology (Phase 3 — GDD-based crop coefficient curves).

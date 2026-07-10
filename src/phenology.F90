@@ -189,7 +189,7 @@ contains
     do indx = 1, number_of_landuses
       if ( GROWING_SEASON_START_DOY(indx) /= NODATA_INT ) then
         PHENOLOGY_METHOD_INDEX(indx) = PHENOLOGY_DOY_BASED
-      else if ( GROWING_SEASON_START_GDD(indx) /= NA_FLOAT ) then
+      else if ( GROWING_SEASON_START_GDD(indx) > NA_FLOAT ) then
         PHENOLOGY_METHOD_INDEX(indx) = PHENOLOGY_GDD_THRESHOLD
       else
         PHENOLOGY_METHOD_INDEX(indx) = PHENOLOGY_NONE
@@ -210,6 +210,7 @@ contains
   !! @param[in]    current_gdd              Accumulated GDD for current year
   !! @param[in]    mean_air_temperature     Current mean daily air temperature
   !! @param[in]    it_is_growing_season_in  Growing season state from previous day
+  !! @param[inout] frost_killed_season      TRUE if frost already ended season this year
   !! @param[out]   growth_fraction          0.0 (dormant) to 1.0 (full growth)
   !! @param[out]   it_is_growing_season     Updated growing season state
   !! @param[out]   growth_stage             Current growth stage enum value
@@ -219,6 +220,7 @@ contains
                                current_gdd,              &
                                mean_air_temperature,     &
                                it_is_growing_season_in,  &
+                               frost_killed_season,      &
                                growth_fraction,          &
                                it_is_growing_season,     &
                                growth_stage )
@@ -228,6 +230,7 @@ contains
     real(c_float), intent(in)    :: current_gdd
     real(c_float), intent(in)    :: mean_air_temperature
     logical(c_bool), intent(in)  :: it_is_growing_season_in
+    logical(c_bool), intent(inout) :: frost_killed_season
     real(c_float), intent(out)   :: growth_fraction
     logical(c_bool), intent(out) :: it_is_growing_season
     integer(c_int), intent(out)  :: growth_stage
@@ -250,6 +253,7 @@ contains
           growing_season_start_gdd=GROWING_SEASON_START_GDD(landuse_index), &
           killing_frost_temperature=KILLING_FROST_TEMP(landuse_index),      &
           it_is_growing_season_in=it_is_growing_season_in,                  &
+          frost_killed_season=frost_killed_season,    &
           growth_fraction=growth_fraction,            &
           it_is_growing_season=it_is_growing_season,  &
           growth_stage=growth_stage )
@@ -325,27 +329,29 @@ contains
   !> @brief Determine phenology state for GDD_THRESHOLD method.
   !!
   !! Binary on/off driven by thermal accumulation. Growing season starts when
-  !! accumulated GDD reaches the threshold. Season ends when mean air temperature
-  !! drops to or below the killing frost temperature.
+  !! accumulated GDD reaches the threshold AND temperature is above the killing
+  !! frost threshold. Season ends when mean air temperature drops to or below
+  !! the killing frost temperature.
   !!
-  !! This subroutine is stateful in that it requires the current growing-season
-  !! state as input: if already growing, it checks for killing frost; if dormant,
-  !! it checks whether the GDD threshold has been reached.
+  !! Once a killing frost terminates the growing season, it cannot restart
+  !! until the next calendar year (hard latch via frost_killed_season flag).
   !!
-  !! @param[in]  current_gdd               Accumulated GDD for current year (degree-days)
-  !! @param[in]  mean_air_temperature      Current mean daily air temperature
-  !! @param[in]  growing_season_start_gdd  GDD threshold for growing season start
-  !! @param[in]  killing_frost_temperature Temperature at or below which season ends
-  !! @param[in]  it_is_growing_season_in   Growing season state from previous timestep
-  !! @param[out] growth_fraction           0.0 (dormant) or 1.0 (growing)
-  !! @param[out] it_is_growing_season      Updated growing season state
-  !! @param[out] growth_stage              GROWTH_STAGE_DORMANT or GROWTH_STAGE_MID
+  !! @param[in]     current_gdd               Accumulated GDD for current year (degree-days)
+  !! @param[in]     mean_air_temperature      Current mean daily air temperature
+  !! @param[in]     growing_season_start_gdd  GDD threshold for growing season start
+  !! @param[in]     killing_frost_temperature Temperature at or below which season ends
+  !! @param[in]     it_is_growing_season_in   Growing season state from previous timestep
+  !! @param[inout]  frost_killed_season       TRUE if frost already ended the season this year
+  !! @param[out]    growth_fraction           0.0 (dormant) or 1.0 (growing)
+  !! @param[out]    it_is_growing_season      Updated growing season state
+  !! @param[out]    growth_stage              GROWTH_STAGE_DORMANT or GROWTH_STAGE_MID
   !---------------------------------------------------------------------------
   pure subroutine phenology_update_gdd_threshold( current_gdd,               &
                                                   mean_air_temperature,       &
                                                   growing_season_start_gdd,   &
                                                   killing_frost_temperature,  &
                                                   it_is_growing_season_in,    &
+                                                  frost_killed_season,        &
                                                   growth_fraction,            &
                                                   it_is_growing_season,       &
                                                   growth_stage )
@@ -355,6 +361,7 @@ contains
     real(c_float), intent(in)    :: growing_season_start_gdd
     real(c_float), intent(in)    :: killing_frost_temperature
     logical(c_bool), intent(in)  :: it_is_growing_season_in
+    logical(c_bool), intent(inout) :: frost_killed_season
     real(c_float), intent(out)   :: growth_fraction
     logical(c_bool), intent(out) :: it_is_growing_season
     integer(c_int), intent(out)  :: growth_stage
@@ -362,19 +369,28 @@ contains
     ! [ LOCALS ]
     logical :: is_growing
 
-    if ( it_is_growing_season_in ) then
+    if ( frost_killed_season ) then
+
+      ! Hard latch: once frost has killed the season this year, stay dormant
+      ! until GDD resets (next calendar year)
+      is_growing = .false.
+
+    else if ( it_is_growing_season_in ) then
 
       ! Already growing — check for killing frost
       if ( mean_air_temperature <= killing_frost_temperature ) then
         is_growing = .false.
+        frost_killed_season = TRUE
       else
         is_growing = .true.
       end if
 
     else
 
-      ! Dormant — check whether GDD threshold has been reached
-      if ( current_gdd >= growing_season_start_gdd ) then
+      ! Dormant, no prior frost kill this year — check whether GDD threshold
+      ! has been reached AND temperature is above frost threshold
+      if ( current_gdd >= growing_season_start_gdd &
+           .and. mean_air_temperature > killing_frost_temperature ) then
         is_growing = .true.
       else
         is_growing = .false.

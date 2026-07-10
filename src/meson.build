@@ -45,7 +45,6 @@ swb_common_src = files(
     'grid.F90',
     'growing_degree_day.F90',
     'growing_degree_day_baskerville_emin.F90',
-    'growing_season.F90',
     'interception__bucket.F90',
     'interception__gash.F90',
     'irrigation.F90',
