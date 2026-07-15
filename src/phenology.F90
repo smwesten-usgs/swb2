@@ -18,7 +18,9 @@ module phenology
   use constants_and_conversions, only : TRUE, FALSE
   use exceptions, only : assert, warn
   use datetime, only : mmdd2doy
-  use parameters, only : PARAMS
+  use logfiles, only : LOGS, LOG_ALL
+  use parameters, only : PARAMETERS_T
+  use fstring, only : asCharacter
   use fstring_list, only : FSTRING_LIST_T, NA_FLOAT
   implicit none
 
@@ -91,14 +93,20 @@ contains
   !!
   !! Reads Growing_season_start_date, Growing_season_end_date,
   !! Growing_season_start_GDD, and Killing_frost_temperature from the
-  !! PARAMS lookup table. Populates module-level per-landuse arrays.
+  !! Reads Growing_season_start_date, Growing_season_end_date,
+  !! Growing_season_start_GDD, and Killing_frost_temperature from the
+  !! provided PARAMETERS_T instance. Populates module-level per-landuse arrays.
   !!
   !! Growing_season_start_date and Growing_season_end_date accept either
   !! mm/dd format (e.g., "03/17", "4-01") or integer DOY (e.g., "91").
   !!
   !! Columns that are absent or contain "<NA>" are filled with NODATA values.
+  !!
+  !! @param[inout] params  PARAMETERS_T instance containing lookup table data.
   !---------------------------------------------------------------------------
-  subroutine phenology_initialize()
+  subroutine phenology_initialize(params)
+
+    type(PARAMETERS_T), intent(inout) :: params
 
     ! [ LOCALS ]
     integer(c_int)                     :: number_of_landuses
@@ -110,11 +118,11 @@ contains
     character(len=32)                  :: str_buffer
 
     !> Determine number of landuse codes
-    call PARAMS%get_parameters( sKey="LU_Code", iValues=landuse_codes )
+    call params%get_parameters( sKey="LU_Code", iValues=landuse_codes )
     number_of_landuses = size( landuse_codes )
 
     ! --- Growing_season_start_date (mm/dd or DOY) ---
-    call PARAMS%get_parameters( sKey="Growing_season_start_date", &
+    call params%get_parameters( sKey="Growing_season_start_date", &
                                 slValues=sl_start_date_strings,   &
                                 lFatal=FALSE )
 
@@ -142,7 +150,7 @@ contains
     end if
 
     ! --- Growing_season_end_date (mm/dd or DOY) ---
-    call PARAMS%get_parameters( sKey="Growing_season_end_date", &
+    call params%get_parameters( sKey="Growing_season_end_date", &
                                 slValues=sl_end_date_strings,   &
                                 lFatal=FALSE )
 
@@ -170,7 +178,7 @@ contains
     end if
 
     ! --- Growing_season_start_GDD (float) ---
-    call PARAMS%get_parameters( sKey="Growing_season_start_GDD", &
+    call params%get_parameters( sKey="Growing_season_start_GDD", &
                                 fValues=temp_float_values,       &
                                 lFatal=FALSE )
 
@@ -185,7 +193,7 @@ contains
     end if
 
     ! --- Killing_frost_temperature (float) ---
-    call PARAMS%get_parameters( sKey="Killing_frost_temperature", &
+    call params%get_parameters( sKey="Killing_frost_temperature", &
                                 fValues=temp_float_values,        &
                                 lFatal=FALSE )
 
@@ -205,7 +213,7 @@ contains
                  __FILE__, __LINE__ )
 
     ! --- FAO56 date-based stage lengths (L_ini, L_dev, L_mid, L_late) ---
-    call PARAMS%get_parameters( sKey="L_ini", fValues=temp_float_values, lFatal=FALSE )
+    call params%get_parameters( sKey="L_ini", fValues=temp_float_values, lFatal=FALSE )
     allocate( L_INI_DAYS( number_of_landuses ), stat=status )
     call assert( status == 0, "phenology_initialize: allocation failed", __FILE__, __LINE__ )
     if ( allocated( temp_float_values ) &
@@ -216,7 +224,7 @@ contains
       L_INI_DAYS = NODATA_INT
     end if
 
-    call PARAMS%get_parameters( sKey="L_dev", fValues=temp_float_values, lFatal=FALSE )
+    call params%get_parameters( sKey="L_dev", fValues=temp_float_values, lFatal=FALSE )
     allocate( L_DEV_DAYS( number_of_landuses ), stat=status )
     call assert( status == 0, "phenology_initialize: allocation failed", __FILE__, __LINE__ )
     if ( allocated( temp_float_values ) &
@@ -227,7 +235,7 @@ contains
       L_DEV_DAYS = NODATA_INT
     end if
 
-    call PARAMS%get_parameters( sKey="L_mid", fValues=temp_float_values, lFatal=FALSE )
+    call params%get_parameters( sKey="L_mid", fValues=temp_float_values, lFatal=FALSE )
     allocate( L_MID_DAYS( number_of_landuses ), stat=status )
     call assert( status == 0, "phenology_initialize: allocation failed", __FILE__, __LINE__ )
     if ( allocated( temp_float_values ) &
@@ -238,7 +246,7 @@ contains
       L_MID_DAYS = NODATA_INT
     end if
 
-    call PARAMS%get_parameters( sKey="L_late", fValues=temp_float_values, lFatal=FALSE )
+    call params%get_parameters( sKey="L_late", fValues=temp_float_values, lFatal=FALSE )
     allocate( L_LATE_DAYS( number_of_landuses ), stat=status )
     call assert( status == 0, "phenology_initialize: allocation failed", __FILE__, __LINE__ )
     if ( allocated( temp_float_values ) &
@@ -250,7 +258,7 @@ contains
     end if
 
     ! --- FAO56 GDD-based stage lengths (GDD_ini, GDD_dev, GDD_mid, GDD_late) ---
-    call PARAMS%get_parameters( sKey="GDD_ini", fValues=temp_float_values, lFatal=FALSE )
+    call params%get_parameters( sKey="GDD_ini", fValues=temp_float_values, lFatal=FALSE )
     if ( allocated( temp_float_values ) &
          .and. size( temp_float_values ) == number_of_landuses ) then
       call move_alloc( temp_float_values, GDD_INI )
@@ -260,7 +268,7 @@ contains
       GDD_INI = NA_FLOAT
     end if
 
-    call PARAMS%get_parameters( sKey="GDD_dev", fValues=temp_float_values, lFatal=FALSE )
+    call params%get_parameters( sKey="GDD_dev", fValues=temp_float_values, lFatal=FALSE )
     if ( allocated( temp_float_values ) &
          .and. size( temp_float_values ) == number_of_landuses ) then
       call move_alloc( temp_float_values, GDD_DEV )
@@ -270,7 +278,7 @@ contains
       GDD_DEV = NA_FLOAT
     end if
 
-    call PARAMS%get_parameters( sKey="GDD_mid", fValues=temp_float_values, lFatal=FALSE )
+    call params%get_parameters( sKey="GDD_mid", fValues=temp_float_values, lFatal=FALSE )
     if ( allocated( temp_float_values ) &
          .and. size( temp_float_values ) == number_of_landuses ) then
       call move_alloc( temp_float_values, GDD_MID )
@@ -280,7 +288,7 @@ contains
       GDD_MID = NA_FLOAT
     end if
 
-    call PARAMS%get_parameters( sKey="GDD_late", fValues=temp_float_values, lFatal=FALSE )
+    call params%get_parameters( sKey="GDD_late", fValues=temp_float_values, lFatal=FALSE )
     if ( allocated( temp_float_values ) &
          .and. size( temp_float_values ) == number_of_landuses ) then
       call move_alloc( temp_float_values, GDD_LATE )
@@ -320,7 +328,133 @@ contains
 
     end do
 
+    ! --- Write summary table to logfile ---
+    call LOGS%write( "", iLinesBefore=1 )
+    call LOGS%write( "## Phenology Method Summary ##", iLogLevel=LOG_ALL, lEcho=FALSE )
+    call LOGS%write( "LU_Code | Method          | Start        | End/Parameters", &
+                     iLogLevel=LOG_ALL, lEcho=FALSE )
+    call LOGS%write( "--------|-----------------|--------------|-----------------------------", &
+                     iLogLevel=LOG_ALL, lEcho=FALSE )
+
+    do indx = 1, number_of_landuses
+
+      select case ( PHENOLOGY_METHOD_INDEX(indx) )
+
+        case ( PHENOLOGY_FAO56_DATES )
+          call LOGS%write( "  "//asCharacter(landuse_codes(indx))        &
+            //"   | FAO56_DATES     | DOY "                              &
+            //asCharacter(GROWING_SEASON_START_DOY(indx))                &
+            //"     | L: "//asCharacter(L_INI_DAYS(indx))//"/"           &
+            //asCharacter(L_DEV_DAYS(indx))//"/"                         &
+            //asCharacter(L_MID_DAYS(indx))//"/"                         &
+            //asCharacter(L_LATE_DAYS(indx))//" days",                   &
+            iLogLevel=LOG_ALL, lEcho=FALSE )
+
+        case ( PHENOLOGY_FAO56_GDD )
+          call LOGS%write( "  "//asCharacter(landuse_codes(indx))        &
+            //"   | FAO56_GDD       | GDD "                              &
+            //asCharacter(int(GROWING_SEASON_START_GDD(indx)))           &
+            //"     | GDD: "//asCharacter(int(GDD_INI(indx)))//"/"       &
+            //asCharacter(int(GDD_DEV(indx)))//"/"                       &
+            //asCharacter(int(GDD_MID(indx)))//"/"                       &
+            //asCharacter(int(GDD_LATE(indx)))//" | frost: "             &
+            //asCharacter(int(KILLING_FROST_TEMP(indx)))//"F",           &
+            iLogLevel=LOG_ALL, lEcho=FALSE )
+
+        case ( PHENOLOGY_DOY_BASED )
+          call LOGS%write( "  "//asCharacter(landuse_codes(indx))        &
+            //"   | DOY_BASED       | DOY "                              &
+            //asCharacter(GROWING_SEASON_START_DOY(indx))                &
+            //"     | DOY "                                              &
+            //asCharacter(GROWING_SEASON_END_DOY(indx)),                 &
+            iLogLevel=LOG_ALL, lEcho=FALSE )
+
+        case ( PHENOLOGY_GDD_THRESHOLD )
+          call LOGS%write( "  "//asCharacter(landuse_codes(indx))        &
+            //"   | GDD_THRESHOLD   | GDD "                              &
+            //asCharacter(int(GROWING_SEASON_START_GDD(indx)))           &
+            //"     | frost: "                                           &
+            //asCharacter(int(KILLING_FROST_TEMP(indx)))//"F",           &
+            iLogLevel=LOG_ALL, lEcho=FALSE )
+
+        case default
+          call LOGS%write( "  "//asCharacter(landuse_codes(indx))        &
+            //"   | NONE            | --           | --",                 &
+            iLogLevel=LOG_ALL, lEcho=FALSE )
+
+      end select
+
+    end do
+
+    call LOGS%write( "", iLinesAfter=1 )
+
+    ! --- Detect legacy column names and emit fatal error with migration guide ---
+    call detect_legacy_column_names(params)
+
   end subroutine phenology_initialize
+
+  !---------------------------------------------------------------------------
+  !> @brief Detect legacy column names and emit fatal errors with migration guide.
+  !!
+  !! Probes params for known legacy column names that the old growing_season.F90
+  !! and crop_coefficients__fao56.F90 modules used. If found, emits a fatal
+  !! warning telling the user exactly what to rename.
+  !!
+  !! @param[inout] params  PARAMETERS_T instance to probe for legacy names.
+  !---------------------------------------------------------------------------
+  subroutine detect_legacy_column_names(params)
+
+    type(PARAMETERS_T), intent(inout) :: params
+
+    ! [ LOCALS ]
+    type(FSTRING_LIST_T) :: sl_test
+    integer(c_int) :: num_found
+
+    ! --- Legacy names and their replacements ---
+    ! Each check: probe PARAMS for the old name. If data comes back,
+    ! the user has the old name in their table.
+
+    ! Planting_date → Growing_season_start_date
+    call params%get_parameters( sKey="Planting_date", slValues=sl_test, lFatal=FALSE )
+    if ( sl_test%count > 0 .and. sl_test%count_matching("<NA>") < sl_test%count ) then
+      call warn( "Legacy column name 'Planting_date' detected in lookup table."         &
+        //"~ Please rename to 'Growing_season_start_date'.",                             &
+        lFatal=TRUE )
+    end if
+
+    ! First_day_of_growing_season → Growing_season_start_date
+    call params%get_parameters( sKey="First_day_of_growing_season", slValues=sl_test, lFatal=FALSE )
+    if ( sl_test%count > 0 .and. sl_test%count_matching("<NA>") < sl_test%count ) then
+      call warn( "Legacy column name 'First_day_of_growing_season' detected."           &
+        //"~ Please rename to 'Growing_season_start_date'.",                             &
+        lFatal=TRUE )
+    end if
+
+    ! Last_day_of_growing_season → Growing_season_end_date
+    call params%get_parameters( sKey="Last_day_of_growing_season", slValues=sl_test, lFatal=FALSE )
+    if ( sl_test%count > 0 .and. sl_test%count_matching("<NA>") < sl_test%count ) then
+      call warn( "Legacy column name 'Last_day_of_growing_season' detected."            &
+        //"~ Please rename to 'Growing_season_end_date'.",                               &
+        lFatal=TRUE )
+    end if
+
+    ! GDD_plant → Growing_season_start_GDD
+    call params%get_parameters( sKey="GDD_plant", slValues=sl_test, lFatal=FALSE )
+    if ( sl_test%count > 0 .and. sl_test%count_matching("<NA>") < sl_test%count ) then
+      call warn( "Legacy column name 'GDD_plant' detected."                             &
+        //"~ Please rename to 'Growing_season_start_GDD'.",                              &
+        lFatal=TRUE )
+    end if
+
+    ! GDD_first_day_of_growing_season → Growing_season_start_GDD
+    call params%get_parameters( sKey="GDD_first_day_of_growing_season", slValues=sl_test, lFatal=FALSE )
+    if ( sl_test%count > 0 .and. sl_test%count_matching("<NA>") < sl_test%count ) then
+      call warn( "Legacy column name 'GDD_first_day_of_growing_season' detected."       &
+        //"~ Please rename to 'Growing_season_start_GDD'.",                              &
+        lFatal=TRUE )
+    end if
+
+  end subroutine detect_legacy_column_names
 
   !---------------------------------------------------------------------------
   !> @brief Dispatch phenology update to the appropriate method for a landuse.

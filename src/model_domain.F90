@@ -12,7 +12,7 @@ module model_domain
   use snowfall__original
   use fstring_list, only      : FSTRING_LIST_T
   use grid
-  use parameters, only       : PARAMS, PARAMS_DICT
+  use parameters, only       : PARAMS
   use netcdf4_support, only  : NC_FILL_FLOAT
   use fstring
   implicit none
@@ -2567,7 +2567,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call phenology_initialize()
+    call phenology_initialize(PARAMS)
 
   end subroutine model_initialize_phenology
 
@@ -3436,7 +3436,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call crop_coefficients_FAO56_initialize()
+    call crop_coefficients_FAO56_initialize(PARAMS)
 
   end subroutine model_initialize_crop_coefficient_FAO56
 

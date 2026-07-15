@@ -27,6 +27,7 @@ module parameters
     type (FSTRING_LIST_T)               :: filenames
     type (FSTRING_LIST_T)               :: delimiters
     type (FSTRING_LIST_T)               :: comment_chars
+    type (DICT_T)                       :: dict
     integer (c_int)                     :: count           = 0
 
   contains
@@ -66,7 +67,6 @@ module parameters
   end type PARAMETERS_T
 
   type (PARAMETERS_T), public :: PARAMS
-  type (DICT_T), public       :: PARAMS_DICT
 
   integer (c_int), parameter  :: MAX_TABLE_RECORD_LEN = 2048
 
@@ -190,7 +190,7 @@ contains
 
           column_name = DF%slColNames%get(iColIndex)
 
-          if ( PARAMS_DICT%key_already_in_use( column_name ) ) then
+          if ( this%dict%key_already_in_use( column_name ) ) then
 
             skip_this_column( iColIndex ) = TRUE
 
@@ -206,7 +206,7 @@ contains
 
             ! call DF%slColNames%replace( iColIndex, tempstr )
             ! call pDict%add_key( asUppercase( tempstr ) )
-            ! call PARAMS_DICT%add_entry( pDict )
+            ! call this%dict%add_entry( pDict )
 
           else
 
@@ -219,7 +219,7 @@ contains
             ! first add the key to the dictionary entry,
             ! then add dictionary entry to dictionary
             call pDict%add_key( column_name )
-            call PARAMS_DICT%add_entry( pDict )
+            call this%dict%add_entry( pDict )
 
           endif
 
@@ -254,7 +254,7 @@ contains
           
             ! find pointer associated with header name
             ! (inefficient, but should be OK for small # of columns)
-            pCurrentDict => PARAMS_DICT%get_entry( column_name )
+            pCurrentDict => this%dict%get_entry( column_name )
 
             if ( associated( pCurrentDict )) then
 
@@ -282,7 +282,7 @@ contains
           column_name = DF%slColNames%get(iColIndex)
 
           ! Retrieve the existing values for this key
-          call PARAMS_DICT%get_values(sKey=column_name, slString=existing_values)
+          call this%dict%get_values(sKey=column_name, slString=existing_values)
 
           ! Check length match
           if (existing_values%count /= duplicate_column_data(iColIndex)%count) then
@@ -352,7 +352,7 @@ contains
 
 
     pCurrentDict => null()
-    pCurrentDict => PARAMS_DICT%get_entry( sKey )
+    pCurrentDict => this%dict%get_entry( sKey )
 
     if ( .not. associated( pCurrentDict )) then
 
@@ -364,7 +364,7 @@ contains
 
       ! add dictionary entry to dictionary
       call pCurrentDict%add_key( sKey )
-      call PARAMS_DICT%add_entry( pCurrentDict )
+      call this%dict%add_entry( pCurrentDict )
 
     endif
 
@@ -430,7 +430,7 @@ contains
       lFatal_l = FALSE
     endif
 
-    slList = PARAMS_DICT%grep_keys( asUppercase( sKey ) )
+    slList = this%dict%grep_keys( asUppercase( sKey ) )
 
     if ( lFatal_l ) then
 
@@ -463,7 +463,7 @@ contains
 
     if ( present( slKeys) ) then
 
-      call PARAMS_DICT%get_values( slKeys=slKeys, lValues=lValues,            &
+      call this%dict%get_values( slKeys=slKeys, lValues=lValues,            &
         is_fatal=lFatal_l )
 
 !       if ( any( iValues <= iTINYVAL ) ) &
@@ -472,7 +472,7 @@ contains
 
     else if ( present( sKey) ) then
 
-      call PARAMS_DICT%get_values( sKey=sKey, lValues=lValues )
+      call this%dict%get_values( sKey=sKey, lValues=lValues )
 
 !       if ( any( iValues <= iTINYVAL ) ) &
 !         call warn( "Failed to find a lookup table column named " &
@@ -506,11 +506,11 @@ contains
 
     if ( present( slKeys) ) then
 
-      call PARAMS_DICT%get_values( slKeys=slKeys, slString=slValues, is_fatal=lFatal_l )
+      call this%dict%get_values( slKeys=slKeys, slString=slValues, is_fatal=lFatal_l )
 
     else if ( present( sKey) ) then
 
-      call PARAMS_DICT%get_values( sKey=sKey, slString=slValues )
+      call this%dict%get_values( sKey=sKey, slString=slValues )
 
     endif
 
@@ -543,7 +543,7 @@ contains
 
     if ( present( slKeys) ) then
 
-      call PARAMS_DICT%get_values( slKeys=slKeys, slString=slValues,          &
+      call this%dict%get_values( slKeys=slKeys, slString=slValues,          &
         is_fatal=lFatal_l )
 
        if ( slValues%get(1) .strequal. "<NA>" ) then
@@ -553,7 +553,7 @@ contains
 
     else if ( present( sKey) ) then
 
-      call PARAMS_DICT%get_values( sKey=sKey, slString=slValues )
+      call this%dict%get_values( sKey=sKey, slString=slValues )
 
       if ( slValues%get(1) .strequal. "<NA>" ) then
         call warn( "Failed to find a lookup table column named "              &
@@ -585,7 +585,7 @@ contains
 
     if ( present( slKeys) ) then
 
-      call PARAMS_DICT%get_values( slKeys=slKeys, iValues=iValues,            &
+      call this%dict%get_values( slKeys=slKeys, iValues=iValues,            &
         is_fatal=lFatal_l )
 
       if ( any( iValues <= iTINYVAL ) ) &
@@ -594,7 +594,7 @@ contains
 
     else if ( present( sKey) ) then
 
-      call PARAMS_DICT%get_values( sKey=sKey, iValues=iValues,                &
+      call this%dict%get_values( sKey=sKey, iValues=iValues,                &
         is_fatal=lFatal_l )
 
       if ( any( iValues <= iTINYVAL ) ) &
@@ -626,7 +626,7 @@ contains
 
     if ( present( slKeys) ) then
 
-      call PARAMS_DICT%get_values( slKeys=slKeys, fValues=fValues )
+      call this%dict%get_values( slKeys=slKeys, fValues=fValues )
 
       if ( any( fValues <= fTINYVAL ) ) &
         call warn( "Failed to find a lookup table column named " &
@@ -634,7 +634,7 @@ contains
 
     else if ( present( sKey) ) then
 
-      call PARAMS_DICT%get_values( sKey=sKey, fValues=fValues,                &
+      call this%dict%get_values( sKey=sKey, fValues=fValues,                &
         is_fatal=lFatal_l )
 
       if ( any( fValues <= fTINYVAL ) ) &
@@ -672,7 +672,7 @@ contains
       lFatal_l = FALSE
     endif
 
-    slList = PARAMS%grep_name( sPrefix )
+    slList = this%grep_name( sPrefix )
 
     iNumCols = slList%count
 
@@ -694,7 +694,7 @@ contains
       do iIndex = 1, iNumCols
 
         sText = trim( slList%get( iIndex ) )
-        call PARAMS_DICT%get_values( sKey=sText, fValues=fTempVal,            &
+        call this%dict%get_values( sKey=sText, fValues=fTempVal,            &
           is_fatal=lFatal_l )
 
         call assert( size( fTempVal, 1) == size( fValues, 1),                 &

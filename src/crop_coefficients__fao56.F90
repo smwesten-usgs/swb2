@@ -16,7 +16,6 @@ module crop_coefficients__fao56
   use datetime
   use logfiles, only                  : LOGS, LOG_ALL
   use exceptions, only                : assert, warn, die
-  use parameters, only                : PARAMS
   use simulation_datetime, only       : SIM_DT
   use fstring, only                   : asCharacter, sQuote, operator(.contains.)
   use fstring_list
@@ -94,7 +93,10 @@ contains
   end function crop_coefficients_calculate_planting_date
 
 
-  subroutine crop_coefficients_FAO56_initialize()
+  subroutine crop_coefficients_FAO56_initialize(params)
+
+    use parameters, only : PARAMETERS_T
+    type(PARAMETERS_T), intent(inout) :: params
 
     ! [ LOCALS ]
     ! type (FSTRING_LIST_T)            :: slREW, slTEW
@@ -146,54 +148,54 @@ contains
    slList = create_list("LU_Code, Landuse_Code, Landuse_Lookup_Code")
 
    !> Determine how many landuse codes are present
-   call PARAMS%get_parameters( slKeys=slList, iValues=LANDUSE_CODE )
+   call params%get_parameters( slKeys=slList, iValues=LANDUSE_CODE )
    iNumberOfLanduses = count( LANDUSE_CODE >= 0 )
    !> @todo Implement thorough input error checking:
    !! are all soils in grid included in table values?
    !> is soil suffix vector continuous?
 
    ! Retrieve and populate the Readily Evaporable Water (REW) table values
-  !  CALL PARAMS%get_parameters( fValues=REW, sPrefix="REW_", iNumRows=iNumberOfLanduses )
+  !  CALL params%get_parameters( fValues=REW, sPrefix="REW_", iNumRows=iNumberOfLanduses )
 
    ! Retrieve and populate the Total Evaporable Water (TEW) table values
-  !  CALL PARAMS%get_parameters( fValues=TEW, sPrefix="TEW_", iNumRows=iNumberOfLanduses )
+  !  CALL params%get_parameters( fValues=TEW, sPrefix="TEW_", iNumRows=iNumberOfLanduses )
 
    !> @TODO What should happen if the TEW / REW header entries do *not* fall in a
    !!       logical sequence of values? In other words, if the user has columns named
    !!       REW_1, REW_3, REW_5, only the values associated with "REW_1" would be retrieved.
    !!       Needless to say, this would be catastrophic.
 
-   call PARAMS%get_parameters( sKey="Planting_date", slValues=SL_PLANTING_DATE )
+   call params%get_parameters( sKey="Growing_season_start_date", slValues=SL_PLANTING_DATE )
 
-   call PARAMS%get_parameters( sKey="L_ini", fValues=L_ini_l)
-   call PARAMS%get_parameters( sKey="L_dev", fValues=L_dev_l)
-   call PARAMS%get_parameters( sKey="L_mid", fValues=L_mid_l)
-   call PARAMS%get_parameters( sKey="L_late", fValues=L_late_l)
-   call PARAMS%get_parameters( sKey="L_fallow", fValues=L_fallow_l)
+   call params%get_parameters( sKey="L_ini", fValues=L_ini_l)
+   call params%get_parameters( sKey="L_dev", fValues=L_dev_l)
+   call params%get_parameters( sKey="L_mid", fValues=L_mid_l)
+   call params%get_parameters( sKey="L_late", fValues=L_late_l)
+   call params%get_parameters( sKey="L_fallow", fValues=L_fallow_l)
 
-   call PARAMS%get_parameters( sKey="GDD_plant", fValues=GDD_plant_l)
-   call PARAMS%get_parameters( sKey="GDD_ini", fValues=GDD_ini_l)
-   call PARAMS%get_parameters( sKey="GDD_dev", fValues=GDD_dev_l)
-   call PARAMS%get_parameters( sKey="GDD_mid", fValues=GDD_mid_l)
-   call PARAMS%get_parameters( sKey="GDD_late", fValues=GDD_late_l)
+   call params%get_parameters( sKey="Growing_season_start_GDD", fValues=GDD_plant_l)
+   call params%get_parameters( sKey="GDD_ini", fValues=GDD_ini_l)
+   call params%get_parameters( sKey="GDD_dev", fValues=GDD_dev_l)
+   call params%get_parameters( sKey="GDD_mid", fValues=GDD_mid_l)
+   call params%get_parameters( sKey="GDD_late", fValues=GDD_late_l)
 
-   call PARAMS%get_parameters( sKey="Kcb_ini", fValues=KCB_ini_l)
-   call PARAMS%get_parameters( sKey="Kcb_mid", fValues=KCB_mid_l)
-   call PARAMS%get_parameters( sKey="Kcb_end", fValues=KCB_end_l)
-   call PARAMS%get_parameters( sKey="Kcb_min", fValues=KCB_min_l)
+   call params%get_parameters( sKey="Kcb_ini", fValues=KCB_ini_l)
+   call params%get_parameters( sKey="Kcb_mid", fValues=KCB_mid_l)
+   call params%get_parameters( sKey="Kcb_end", fValues=KCB_end_l)
+   call params%get_parameters( sKey="Kcb_min", fValues=KCB_min_l)
 
-   call PARAMS%get_parameters( sKey="Kcb_Jan", fValues=KCB_jan )
-   call PARAMS%get_parameters( sKey="Kcb_Feb", fValues=KCB_feb )
-   call PARAMS%get_parameters( sKey="Kcb_Mar", fValues=KCB_mar )
-   call PARAMS%get_parameters( sKey="Kcb_Apr", fValues=KCB_apr )
-   call PARAMS%get_parameters( sKey="Kcb_May", fValues=KCB_may )
-   call PARAMS%get_parameters( sKey="Kcb_Jun", fValues=KCB_jun )
-   call PARAMS%get_parameters( sKey="Kcb_Jul", fValues=KCB_jul )
-   call PARAMS%get_parameters( sKey="Kcb_Aug", fValues=KCB_aug )
-   call PARAMS%get_parameters( sKey="Kcb_Sep", fValues=KCB_sep )
-   call PARAMS%get_parameters( sKey="Kcb_Oct", fValues=KCB_oct )
-   call PARAMS%get_parameters( sKey="Kcb_Nov", fValues=KCB_nov )
-   call PARAMS%get_parameters( sKey="Kcb_Dec", fValues=KCB_dec )
+   call params%get_parameters( sKey="Kcb_Jan", fValues=KCB_jan )
+   call params%get_parameters( sKey="Kcb_Feb", fValues=KCB_feb )
+   call params%get_parameters( sKey="Kcb_Mar", fValues=KCB_mar )
+   call params%get_parameters( sKey="Kcb_Apr", fValues=KCB_apr )
+   call params%get_parameters( sKey="Kcb_May", fValues=KCB_may )
+   call params%get_parameters( sKey="Kcb_Jun", fValues=KCB_jun )
+   call params%get_parameters( sKey="Kcb_Jul", fValues=KCB_jul )
+   call params%get_parameters( sKey="Kcb_Aug", fValues=KCB_aug )
+   call params%get_parameters( sKey="Kcb_Sep", fValues=KCB_sep )
+   call params%get_parameters( sKey="Kcb_Oct", fValues=KCB_oct )
+   call params%get_parameters( sKey="Kcb_Nov", fValues=KCB_nov )
+   call params%get_parameters( sKey="Kcb_Dec", fValues=KCB_dec )
 
 
     allocate( GROWTH_STAGE_LENGTH_IN_DAYS( 5, iNumberOfLanduses ), stat=iStat )

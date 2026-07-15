@@ -32,3 +32,6 @@ For Fortran code:
        * @see publicVar()
        * @return The test results
        */
+
+CLI interaction:
+* user prefers to run compilation steps by hand; please provide brief build hints if needed.

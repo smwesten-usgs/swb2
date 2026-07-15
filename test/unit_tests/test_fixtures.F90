@@ -17,7 +17,7 @@ module test_fixtures
   use iso_c_binding, only: c_int, c_float, c_double, c_bool
   use constants_and_conversions
   use logfiles, only: LOGS, LOG_DEBUG
-  use parameters, only: PARAMETERS_T
+  use parameters, only: PARAMETERS_T, PARAMS
   use simulation_datetime, only: SIM_DT
   use crop_coefficients__FAO56
   use growing_degree_day
@@ -32,11 +32,8 @@ module test_fixtures
   public :: reset_environment
 
   ! --- Shared state accessible by test modules ---
-  public :: TEST_PARAMS
   public :: DEFAULT_IS_CELL_ACTIVE
   public :: DEFAULT_LANDUSE_INDEX
-
-  type(PARAMETERS_T) :: TEST_PARAMS
 
   logical(c_bool) :: DEFAULT_IS_CELL_ACTIVE(3,3) = .true._c_bool
   integer(c_int)  :: DEFAULT_LANDUSE_INDEX(9) = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -84,9 +81,8 @@ contains
     if (doy_ready) return
     call setup_common()
 
-    call TEST_PARAMS%add_file("../test_data/tables/Lookup__crop_coefficient_test.txt")
-    ! this should be OK to run again; duplicate entries should now be ignored
-    call TEST_PARAMS%munge_file()
+    call PARAMS%add_file("../test_data/tables/Lookup__crop_coefficient_test.txt")
+    call PARAMS%munge_file()
 
     doy_ready = .true.
 
@@ -105,17 +101,16 @@ contains
     if (fao56_dates_ready) return
     call setup_common()
 
-    call TEST_PARAMS%add_file("../test_data/tables/Lookup__crop_coefficient_test.txt")
-    call TEST_PARAMS%add_file("../test_data/tables/FAO56_Example_35.txt")
-    call TEST_PARAMS%add_file("../test_data/tables/FAO56_equation_72_calcs.txt")
-    ! this should be OK to run again; duplicate entries should now be ignored
-    call TEST_PARAMS%munge_file()
+    call PARAMS%add_file("../test_data/tables/Lookup__crop_coefficient_test.txt")
+    call PARAMS%add_file("../test_data/tables/FAO56_Example_35.txt")
+    call PARAMS%add_file("../test_data/tables/FAO56_equation_72_calcs.txt")
+    call PARAMS%munge_file()
 
     ! Ensure date format is MM/DD/YYYY before FAO56 init (other tests may have
     ! changed the module-level sDATE_FORMAT via setDateFormat)
     call SIM_DT%start%setDateFormat("MM/DD/YYYY")
 
-    call crop_coefficients_FAO56_initialize()
+    call crop_coefficients_FAO56_initialize(PARAMS)
 
     doy_ready = .true.
     fao56_dates_ready = .true.

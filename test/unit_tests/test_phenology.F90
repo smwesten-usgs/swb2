@@ -20,7 +20,7 @@ module test_phenology
                        GROWING_SEASON_START_GDD, KILLING_FROST_TEMP, &
                        PHENOLOGY_METHOD_INDEX, &
                        PHENOLOGY_NONE, PHENOLOGY_DOY_BASED, PHENOLOGY_GDD_THRESHOLD, &
-                       PHENOLOGY_FAO56_DATES, &
+                       PHENOLOGY_FAO56_DATES, PHENOLOGY_FAO56_GDD, &
                        GROWTH_STAGE_DORMANT, GROWTH_STAGE_INI, GROWTH_STAGE_DEV, &
                        GROWTH_STAGE_MID, GROWTH_STAGE_LATE
   use parameters, only: PARAMETERS_T, PARAMS
@@ -463,9 +463,10 @@ contains
     logical, save :: initialized = .false.
     if (initialized) return
     call setup_common()
+    call PARAMS%add_file("../test_data/tables/Lookup__crop_coefficient_test.txt")
     call PARAMS%add_file("../test_data/tables/phenology_test.txt")
     call PARAMS%munge_file()
-    call phenology_initialize()
+    call phenology_initialize(PARAMS)
     initialized = .true.
   end subroutine ensure_phenology_initialized
 
@@ -482,15 +483,15 @@ contains
     call check(error, size(lu_codes) == 9, trim(msg))
   end subroutine test_init_lu_code_count
 
-  !> @brief mm/dd format is correctly converted to DOY (04/15 → 105).
+  !> @brief mm/dd format is correctly converted to DOY (05/01 → 121).
   subroutine test_init_reads_mmdd_as_doy(error)
     type(error_type), allocatable, intent(out) :: error
 
     call ensure_phenology_initialized()
 
-    ! LU 1 (Corn, index 1): 04/15 → DOY 105
-    call check(error, GROWING_SEASON_START_DOY(1) == 105, &
-               "04/15 should convert to DOY 105")
+    ! LU 1 (Corn, index 1): 05/01 → DOY 121
+    call check(error, GROWING_SEASON_START_DOY(1) == 121, &
+               "05/01 should convert to DOY 121")
     if (allocated(error)) return
 
     ! LU 1 (Corn, index 1): 10/15 → DOY 288
@@ -498,34 +499,34 @@ contains
                "10/15 should convert to DOY 288")
   end subroutine test_init_reads_mmdd_as_doy
 
-  !> @brief Integer DOY strings are read correctly (100, 280).
+  !> @brief Integer DOY strings are read correctly (280 for Sorghum end date).
   subroutine test_init_reads_integer_doy(error)
     type(error_type), allocatable, intent(out) :: error
 
     call ensure_phenology_initialized()
 
-    ! LU 4 (Sorghum, index 2): start=100, end=280 as integer DOY
-    call check(error, GROWING_SEASON_START_DOY(2) == 100, &
-               "Integer DOY 100 should be read directly")
+    ! LU 4 (Sorghum, index 2): start=05/01 → DOY 121, end=280 as integer DOY
+    call check(error, GROWING_SEASON_START_DOY(2) == 121, &
+               "Sorghum start (05/01) should be DOY 121")
     if (allocated(error)) return
 
     call check(error, GROWING_SEASON_END_DOY(2) == 280, &
-               "Integer DOY 280 should be read directly")
+               "Integer DOY 280 should be read directly for end date")
   end subroutine test_init_reads_integer_doy
 
-  !> @brief GDD threshold values read correctly for GDD_THRESHOLD landuses.
+  !> @brief GDD threshold and killing frost values read correctly.
   subroutine test_init_reads_gdd_threshold(error)
     type(error_type), allocatable, intent(out) :: error
 
     call ensure_phenology_initialized()
 
-    ! LU 5 (Soybeans, index 3): GDD=200, frost=28.0
-    call check(error, abs(GROWING_SEASON_START_GDD(3) - 200.0) < 0.01, &
-               "Growing_season_start_GDD should be 200.0 for Soybeans")
+    ! LU 6 (Sunflower, index 4): GDD=250, frost=30.0
+    call check(error, abs(GROWING_SEASON_START_GDD(4) - 250.0) < 0.01, &
+               "Growing_season_start_GDD should be 250.0 for Sunflower")
     if (allocated(error)) return
 
-    call check(error, abs(KILLING_FROST_TEMP(3) - 28.0) < 0.01, &
-               "Killing_frost_temperature should be 28.0 for Soybeans")
+    call check(error, abs(KILLING_FROST_TEMP(4) - 30.0) < 0.01, &
+               "Killing_frost_temperature should be 30.0 for Sunflower")
   end subroutine test_init_reads_gdd_threshold
 
   !> @brief Landuses with <NA> for a column get appropriate NODATA values.
@@ -534,14 +535,15 @@ contains
 
     call ensure_phenology_initialized()
 
-    ! LU 5 (Soybeans, index 3): no DOY columns → NODATA_INT (-9999)
-    call check(error, GROWING_SEASON_START_DOY(3) == -9999, &
-               "DOY start should be -9999 for GDD-only landuse")
+    ! LU 12 (Sweet Corn, index 5): all <NA> for DOY and GDD in phenology table
+    ! Start DOY comes from crop coeff table (empty → NODATA)
+    call check(error, GROWING_SEASON_END_DOY(5) == -9999, &
+               "DOY end should be -9999 for Sweet Corn (no end date)")
     if (allocated(error)) return
 
-    ! LU 1 (Corn, index 1): no GDD columns → NA_FLOAT
-    call check(error, .not. (GROWING_SEASON_START_GDD(1) > NA_FLOAT), &
-               "GDD start should be NA_FLOAT for DOY-only landuse")
+    ! LU 24 (Winter Wheat, index 8): no GDD columns → NA_FLOAT
+    call check(error, .not. (GROWING_SEASON_START_GDD(8) > NA_FLOAT), &
+               "GDD start should be NA_FLOAT for DOY-only landuse (Winter Wheat)")
   end subroutine test_init_nodata_for_missing
 
   !---------------------------------------------------------------------------
@@ -558,27 +560,25 @@ contains
                "Corn should have PHENOLOGY_FAO56_DATES method (DOY + stage lengths present)")
   end subroutine test_init_method_index_doy
 
-  !> @brief GDD landuse gets PHENOLOGY_GDD_THRESHOLD method index.
+  !> @brief GDD landuse gets a GDD-based method (FAO56_GDD when stage GDDs present).
   subroutine test_init_method_index_gdd(error)
     type(error_type), allocatable, intent(out) :: error
     call ensure_phenology_initialized()
-    ! LU 5 (Soybeans, index 3): has GDD columns
-    call check(error, PHENOLOGY_METHOD_INDEX(3) == PHENOLOGY_GDD_THRESHOLD, &
-               "Soybeans should have PHENOLOGY_GDD_THRESHOLD method")
+    ! LU 12 (Sweet Corn, index 5): has Growing_season_start_GDD + GDD_ini/dev/mid/late
+    ! from crop coeff table → FAO56_GDD
+    call check(error, PHENOLOGY_METHOD_INDEX(5) == PHENOLOGY_FAO56_GDD, &
+               "Sweet Corn should have PHENOLOGY_FAO56_GDD method")
   end subroutine test_init_method_index_gdd
 
-  !> @brief Landuse with neither DOY nor GDD gets PHENOLOGY_NONE.
-  !! Note: In this test table all landuses have either DOY or GDD, so
-  !! we test this indirectly — if a future table has a bare landuse, it
-  !! should get PHENOLOGY_NONE. For now, verify a GDD landuse is NOT DOY.
+  !> @brief Verify a non-DOY landuse is not tagged DOY_BASED.
   subroutine test_init_method_index_none(error)
     type(error_type), allocatable, intent(out) :: error
     call ensure_phenology_initialized()
-    ! LU 5 (Soybeans, index 3): should NOT be DOY
-    call check(error, PHENOLOGY_METHOD_INDEX(3) /= PHENOLOGY_DOY_BASED, &
-               "Soybeans should not have PHENOLOGY_DOY_BASED")
+    ! LU 26 (Dbl Crop, index 9): should NOT be DOY
+    call check(error, PHENOLOGY_METHOD_INDEX(9) /= PHENOLOGY_DOY_BASED, &
+               "Dbl Crop should not have PHENOLOGY_DOY_BASED")
     if (allocated(error)) return
-    ! LU 1 (Corn, index 1): should NOT be GDD
+    ! LU 1 (Corn, index 1): should NOT be plain GDD_THRESHOLD
     call check(error, PHENOLOGY_METHOD_INDEX(1) /= PHENOLOGY_GDD_THRESHOLD, &
                "Corn should not have PHENOLOGY_GDD_THRESHOLD")
   end subroutine test_init_method_index_none

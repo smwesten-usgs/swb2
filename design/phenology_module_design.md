@@ -660,3 +660,53 @@ ERROR: Legacy column name 'Planting_date' detected in lookup table.
 ```
 
 **Implementation:** Simple — after the main parameter reads, call `PARAMS%get_parameters` with `lFatal=FALSE` for each legacy name. If any returns data, emit the fatal error with the rename instructions.
+
+
+---
+
+## Design Decision: PARAMS Dependency Injection for Test Isolation
+
+**Date:** 2026-07-10
+**Status:** Planned (implement incrementally as modules are touched)
+**Affects:** All modules that call `PARAMS%get_parameters(...)`, test infrastructure
+
+**Problem:** Unit test suites share a single global `PARAMS` instance. When multiple test suites load different lookup tables, earlier suites pollute PARAMS for later suites. This causes:
+- Test execution order dependency
+- Fragile tests that break when table column names overlap
+- "Relaxed" test assertions that don't actually test anything specific
+
+**Root cause:** `phenology_initialize()`, `crop_coefficients_FAO56_initialize()`, and other init routines all reach directly for the module-level global `PARAMS` instance. Tests cannot provide an isolated parameter set.
+
+**Solution: Dependency injection.** Each initialize routine accepts an optional (or required) `PARAMETERS_T` argument:
+
+```fortran
+! Production code:
+subroutine phenology_initialize(params)
+  type(PARAMETERS_T), intent(inout) :: params
+  call params%get_parameters(sKey="Growing_season_start_date", ...)
+end subroutine
+
+! In model_initialize.F90:
+call phenology_initialize(PARAMS)  ! pass global
+
+! In test:
+type(PARAMETERS_T) :: my_params
+call my_params%add_file("phenology_test.txt")
+call my_params%munge_file()
+call phenology_initialize(my_params)  ! isolated, no contamination
+```
+
+**Benefits:**
+- Complete test isolation — each suite controls exactly what data it sees
+- No execution order dependency
+- Tests become precise and deterministic
+- No need for a "clear PARAMS" hack
+- Production code unchanged (just pass the global instance)
+
+**Migration path:**
+1. When next modifying a module's initialize routine, add `type(PARAMETERS_T), intent(inout) :: params` as the first argument
+2. Replace internal `PARAMS%get_parameters(...)` with `params%get_parameters(...)`
+3. Update callers in model_initialize.F90 to pass `PARAMS`
+4. Update test callers to pass a local instance
+
+**Interim workaround (current):** Test suite execution order in `tester.F90` is arranged so that suites with isolated data needs run first (phenology before fao56). This works but is fragile.

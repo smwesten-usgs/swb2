@@ -43,12 +43,12 @@ program tester
     new_testsuite("exceptions", collect_exceptions), &
     new_testsuite("gash", collect_gash), &
     new_testsuite("datetime", collect_datetime), &
+    new_testsuite("phenology", collect_phenology), &
     new_testsuite("fao56", collect_fao56), &
     new_testsuite("constants", collect_constants_and_conversions), &
     new_testsuite("fstring_list", collect_fstring_list), &
     new_testsuite("parameters", collect_parameters), &
-    new_testsuite("solar", collect_solar_calculations), &
-    new_testsuite("phenology", collect_phenology) &
+    new_testsuite("solar", collect_solar_calculations) &
   ]
 
   call get_argument(1, suite_name)

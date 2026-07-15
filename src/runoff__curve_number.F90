@@ -7,7 +7,7 @@ module runoff__curve_number
   use simulation_datetime
   use fstring
   use fstring_list
-  use parameters, only                    : PARAMS, PARAMS_DICT
+  use parameters, only                    : PARAMS
   implicit none
 
   private

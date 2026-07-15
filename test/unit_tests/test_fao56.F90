@@ -23,7 +23,8 @@ module test_fao56
   use growing_degree_day, only: growing_degree_day_calculate
   use simulation_datetime, only: SIM_DT
   use fstring, only: as_character
-  use test_fixtures, only: setup_environment_fao56_gdd, TEST_PARAMS
+  use test_fixtures, only: setup_environment_fao56_gdd
+  use parameters, only: PARAMS
   implicit none
   private
 
@@ -214,10 +215,10 @@ contains
     character(len=2048) :: failure_msg
     character(len=120) :: line
 
-    call TEST_PARAMS%get_parameters(wind_spd, sKey="eq72_u2")
-    call TEST_PARAMS%get_parameters(RHmin, sKey="eq72_rhmin")
-    call TEST_PARAMS%get_parameters(plant_height_m, sKey="eq72_plant_height")
-    call TEST_PARAMS%get_parameters(kcb_max_expected, sKey="eq72_kc_max")
+    call PARAMS%get_parameters(wind_spd, sKey="eq72_u2")
+    call PARAMS%get_parameters(RHmin, sKey="eq72_rhmin")
+    call PARAMS%get_parameters(plant_height_m, sKey="eq72_plant_height")
+    call PARAMS%get_parameters(kcb_max_expected, sKey="eq72_kc_max")
 
     num_failures = 0
     failure_msg = ""
@@ -268,14 +269,14 @@ contains
     evaporable_water_storage = 0.0
     evaporable_water_deficit = TEW_
 
-    call TEST_PARAMS%get_parameters(ex35_kr, sKey="EX35_KR")
-    call TEST_PARAMS%get_parameters(ex35_ke, sKey="EX35_ke")
-    call TEST_PARAMS%get_parameters(ex35_ET0, sKey="EX35_ET0")
-    call TEST_PARAMS%get_parameters(ex35_Kcb, sKey="EX35_Kcb")
-    call TEST_PARAMS%get_parameters(ex35_p_minus_ro, sKey="ex35_p_minus_ro")
-    call TEST_PARAMS%get_parameters(ex35_irrigation, sKey="ex35_irrigation")
-    call TEST_PARAMS%get_parameters(ex35_few, sKey="ex35_few")
-    call TEST_PARAMS%get_parameters(ex35_fw, sKey="ex35_fw")
+    call PARAMS%get_parameters(ex35_kr, sKey="EX35_KR")
+    call PARAMS%get_parameters(ex35_ke, sKey="EX35_ke")
+    call PARAMS%get_parameters(ex35_ET0, sKey="EX35_ET0")
+    call PARAMS%get_parameters(ex35_Kcb, sKey="EX35_Kcb")
+    call PARAMS%get_parameters(ex35_p_minus_ro, sKey="ex35_p_minus_ro")
+    call PARAMS%get_parameters(ex35_irrigation, sKey="ex35_irrigation")
+    call PARAMS%get_parameters(ex35_few, sKey="ex35_few")
+    call PARAMS%get_parameters(ex35_fw, sKey="ex35_fw")
 
     Kcb_max = crop_coefficients_FAO56_calculate_Kcb_Max( &
                 wind_speed_meters_per_sec=1.5, &

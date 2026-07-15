@@ -1594,7 +1594,6 @@ contains
     character (len=:), allocatable    :: sCmdText
     character (len=:), allocatable    :: sOptionText
     character (len=:), allocatable    :: sArgText
-    type (PARAMETERS_T)               :: PARAMS_LU_TABLE
     integer (c_int)                   :: iCount
 
     iCount = 0
@@ -1636,7 +1635,7 @@ contains
 
         if ( index(string=sCmdText, substring="LOOKUP_TABLE" ) > 0 ) then
 
-            call PARAMS_LU_TABLE%add_file( fix_pathname( sOptionText ))
+            call PARAMS%add_file( fix_pathname( sOptionText ))
             iCount = iCount + 1
 
         else
@@ -1650,8 +1649,8 @@ contains
 
       if ( iCount > 0 ) then
 
-        call PARAMS_LU_TABLE%munge_file(delimiters=TAB)
-        call PARAMS_DICT%print_all(sDescription="LOOKUP TABLE dictionary",      &
+        call PARAMS%munge_file(delimiters=TAB)
+        call PARAMS%dict%print_all(sDescription="LOOKUP TABLE dictionary",      &
                                    iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
       endif
