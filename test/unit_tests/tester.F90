@@ -21,6 +21,7 @@ program tester
   use test_parameters, only: collect_parameters
   use test_solar_calculations, only: collect_solar_calculations
   use test_phenology, only: collect_phenology
+  use test_interception_bucket, only: collect_interception_bucket
   implicit none
 
   integer :: stat, suite_index, total_tests
@@ -44,6 +45,7 @@ program tester
     new_testsuite("gash", collect_gash), &
     new_testsuite("datetime", collect_datetime), &
     new_testsuite("phenology", collect_phenology), &
+    new_testsuite("interception_bucket", collect_interception_bucket), &
     new_testsuite("fao56", collect_fao56), &
     new_testsuite("constants", collect_constants_and_conversions), &
     new_testsuite("fstring_list", collect_fstring_list), &

@@ -273,14 +273,14 @@ contains
                                                       fPrecip,                                           &
                                                       fFog,                                              &
                                                       fCanopy_Cover_Fraction,                            &
-                                                      it_is_growing_season,                              &
+                                                      growth_fraction,                                   &
                                                       fInterception )
 
     integer (c_int), intent(in)   :: iLanduseIndex
     real (c_float), intent(in)    :: fPrecip
     real (c_float), intent(in)    :: fFog
     real (c_float), intent(in)    :: fCanopy_Cover_Fraction
-    logical (c_bool), intent(in)  :: it_is_growing_season
+    real (c_float), intent(in)    :: growth_fraction
     real (c_float), intent(out)   :: fInterception
 
     ! [ LOCALS ]
@@ -289,21 +289,14 @@ contains
 
     precip_plus_fog = fPrecip + fFog
 
-    if ( it_is_growing_season ) then
-
-      fPotentialInterception =   INTERCEPTION_A_VALUE_GROWING_SEASON( iLanduseIndex )   ! &
-!                               + INTERCEPTION_B_VALUE_GROWING_SEASON( iLanduseIndex )    &
-!                               * precip_plus_fog                                         &
-!                               ** INTERCEPTION_N_VALUE_GROWING_SEASON( iLanduseIndex )
-
-    else
-
-      fPotentialInterception =   INTERCEPTION_A_VALUE_NONGROWING_SEASON( iLanduseIndex )   ! &
- !                              + INTERCEPTION_B_VALUE_NONGROWING_SEASON( iLanduseIndex )    &
- !                              * precip_plus_fog                                            &
- !                              ** INTERCEPTION_N_VALUE_NONGROWING_SEASON( iLanduseIndex )
-
-    endif
+    ! Interpolate potential interception between nongrowing and growing values
+    ! using growth_fraction (0.0 = dormant, 1.0 = fully developed canopy).
+    ! For DOY_BASED/GDD_THRESHOLD methods, growth_fraction is binary (0 or 1)
+    ! so this produces identical results to the former if/else switch.
+    fPotentialInterception = INTERCEPTION_A_VALUE_NONGROWING_SEASON( iLanduseIndex )     &
+                           + growth_fraction                                             &
+                           * ( INTERCEPTION_A_VALUE_GROWING_SEASON( iLanduseIndex )      &
+                             - INTERCEPTION_A_VALUE_NONGROWING_SEASON( iLanduseIndex ) )
 
     fInterception = min( fPotentialInterception, fPrecip + fFog )  * fCanopy_Cover_Fraction
 

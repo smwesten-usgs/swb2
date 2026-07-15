@@ -76,7 +76,27 @@ contains
       new_unittest("fao56_gdd_ini_stage", test_fao56_gdd_ini_stage), &
       new_unittest("fao56_gdd_mid_stage", test_fao56_gdd_mid_stage), &
       new_unittest("fao56_gdd_frost_kills_and_latches", test_fao56_gdd_frost_latch), &
-      new_unittest("fao56_gdd_dormant_after_all_stages", test_fao56_gdd_dormant_after) &
+      new_unittest("fao56_gdd_dormant_after_all_stages", test_fao56_gdd_dormant_after), &
+      ! --- growth_fraction trajectory tests ---
+      new_unittest("gf_doy_is_binary_one", test_gf_doy_is_binary_one), &
+      new_unittest("gf_doy_is_binary_zero", test_gf_doy_is_binary_zero), &
+      new_unittest("gf_gdd_threshold_is_binary_one", test_gf_gdd_threshold_is_binary_one), &
+      new_unittest("gf_gdd_threshold_is_binary_zero", test_gf_gdd_threshold_is_binary_zero), &
+      new_unittest("gf_dates_ini_start", test_gf_dates_ini_start), &
+      new_unittest("gf_dates_ini_end", test_gf_dates_ini_end), &
+      new_unittest("gf_dates_dev_start", test_gf_dates_dev_start), &
+      new_unittest("gf_dates_dev_midpoint", test_gf_dates_dev_midpoint), &
+      new_unittest("gf_dates_mid_start", test_gf_dates_mid_start), &
+      new_unittest("gf_dates_mid_holds", test_gf_dates_mid_holds), &
+      new_unittest("gf_dates_late_start", test_gf_dates_late_start), &
+      new_unittest("gf_dates_late_midpoint", test_gf_dates_late_midpoint), &
+      new_unittest("gf_dates_late_end", test_gf_dates_late_end), &
+      new_unittest("gf_dates_dormant", test_gf_dates_dormant), &
+      new_unittest("gf_gdd_ini_midpoint", test_gf_gdd_ini_midpoint), &
+      new_unittest("gf_gdd_dev_midpoint", test_gf_gdd_dev_midpoint), &
+      new_unittest("gf_gdd_mid", test_gf_gdd_mid), &
+      new_unittest("gf_gdd_late_midpoint", test_gf_gdd_late_midpoint), &
+      new_unittest("gf_gdd_dormant_after", test_gf_gdd_dormant_after) &
     ]
   end subroutine collect_phenology
 
@@ -1001,5 +1021,427 @@ contains
     call check(error, it_is_growing_season .eqv. .false., &
                "Past all stages: it_is_growing_season should be FALSE")
   end subroutine test_fao56_gdd_dormant_after
+
+  !---------------------------------------------------------------------------
+  ! GROWTH_FRACTION TRAJECTORY TESTS
+  !
+  ! These tests pin down the exact growth_fraction values at known positions
+  ! within the growing season. This is the contract that downstream consumers
+  ! (interception, etc.) depend on.
+  !
+  ! FAO56_DATES setup: planting DOY=100, L_ini=20, L_dev=30, L_mid=40, L_late=25
+  !   Stage boundaries (days since planting):
+  !     INI:  0–19    growth_fraction: 0.0 → 0.1
+  !     DEV:  20–49   growth_fraction: 0.1 → 1.0
+  !     MID:  50–89   growth_fraction: 1.0
+  !     LATE: 90–114  growth_fraction: 1.0 → 0.2
+  !     DORMANT: ≥115 growth_fraction: 0.0
+  !
+  ! FAO56_GDD setup: start_gdd=200, gdd_ini=100, gdd_dev=200, gdd_mid=400, gdd_late=150
+  !   Stage boundaries (GDD since planting threshold):
+  !     INI:  0–99    growth_fraction: 0.0 → 0.1
+  !     DEV:  100–299 growth_fraction: 0.1 → 1.0
+  !     MID:  300–699 growth_fraction: 1.0
+  !     LATE: 700–849 growth_fraction: 1.0 → 0.2
+  !     DORMANT: ≥850 growth_fraction: 0.0
+  !---------------------------------------------------------------------------
+
+  !> @brief DOY_BASED: growth_fraction is exactly 1.0 when growing (binary).
+  subroutine test_gf_doy_is_binary_one(error)
+    type(error_type), allocatable, intent(out) :: error
+    real(c_float) :: growth_fraction
+    logical(c_bool) :: it_is_growing_season
+    integer(c_int) :: growth_stage
+
+    call phenology_update_doy_based( &
+      current_doy=150, growing_season_start_doy=100, growing_season_end_doy=280, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season, &
+      growth_stage=growth_stage)
+
+    call check(error, abs(growth_fraction - 1.0) < 1.0e-6, &
+               "DOY_BASED growing: growth_fraction must be exactly 1.0")
+  end subroutine test_gf_doy_is_binary_one
+
+  !> @brief DOY_BASED: growth_fraction is exactly 0.0 when dormant (binary).
+  subroutine test_gf_doy_is_binary_zero(error)
+    type(error_type), allocatable, intent(out) :: error
+    real(c_float) :: growth_fraction
+    logical(c_bool) :: it_is_growing_season
+    integer(c_int) :: growth_stage
+
+    call phenology_update_doy_based( &
+      current_doy=50, growing_season_start_doy=100, growing_season_end_doy=280, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season, &
+      growth_stage=growth_stage)
+
+    call check(error, abs(growth_fraction) < 1.0e-6, &
+               "DOY_BASED dormant: growth_fraction must be exactly 0.0")
+  end subroutine test_gf_doy_is_binary_zero
+
+  !> @brief GDD_THRESHOLD: growth_fraction is exactly 1.0 when growing (binary).
+  subroutine test_gf_gdd_threshold_is_binary_one(error)
+    type(error_type), allocatable, intent(out) :: error
+    real(c_float) :: growth_fraction
+    logical(c_bool) :: it_is_growing_season, frost_killed_season
+    integer(c_int) :: growth_stage
+
+    frost_killed_season = FALSE
+    call phenology_update_gdd_threshold( &
+      current_gdd=500.0_c_float, mean_air_temperature=65.0_c_float, &
+      growing_season_start_gdd=200.0_c_float, killing_frost_temperature=28.0_c_float, &
+      it_is_growing_season_in=TRUE, frost_killed_season=frost_killed_season, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season, &
+      growth_stage=growth_stage)
+
+    call check(error, abs(growth_fraction - 1.0) < 1.0e-6, &
+               "GDD_THRESHOLD growing: growth_fraction must be exactly 1.0")
+  end subroutine test_gf_gdd_threshold_is_binary_one
+
+  !> @brief GDD_THRESHOLD: growth_fraction is exactly 0.0 when dormant (binary).
+  subroutine test_gf_gdd_threshold_is_binary_zero(error)
+    type(error_type), allocatable, intent(out) :: error
+    real(c_float) :: growth_fraction
+    logical(c_bool) :: it_is_growing_season, frost_killed_season
+    integer(c_int) :: growth_stage
+
+    frost_killed_season = FALSE
+    call phenology_update_gdd_threshold( &
+      current_gdd=100.0_c_float, mean_air_temperature=50.0_c_float, &
+      growing_season_start_gdd=200.0_c_float, killing_frost_temperature=28.0_c_float, &
+      it_is_growing_season_in=FALSE, frost_killed_season=frost_killed_season, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season, &
+      growth_stage=growth_stage)
+
+    call check(error, abs(growth_fraction) < 1.0e-6, &
+               "GDD_THRESHOLD dormant: growth_fraction must be exactly 0.0")
+  end subroutine test_gf_gdd_threshold_is_binary_zero
+
+  !> @brief FAO56_DATES: start of INI stage → growth_fraction = 0.0
+  subroutine test_gf_dates_ini_start(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+
+    ! Day 0 since planting (DOY=100, planting=100)
+    call phenology_update_fao56_dates( &
+      current_doy=100, growing_season_start_doy=100, &
+      l_ini=20, l_dev=30, l_mid=40, l_late=25, days_in_year=365, &
+      growth_stage=growth_stage, stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season)
+
+    call check(error, abs(growth_fraction) < 0.01, &
+               "FAO56_DATES INI start (day 0): growth_fraction should be ~0.0")
+  end subroutine test_gf_dates_ini_start
+
+  !> @brief FAO56_DATES: end of INI stage → growth_fraction = 0.1
+  subroutine test_gf_dates_ini_end(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+
+    ! Day 19 since planting (last day of INI, stage_fraction = 19/20 = 0.95)
+    ! growth_fraction = 0.95 * 0.1 = 0.095
+    call phenology_update_fao56_dates( &
+      current_doy=119, growing_season_start_doy=100, &
+      l_ini=20, l_dev=30, l_mid=40, l_late=25, days_in_year=365, &
+      growth_stage=growth_stage, stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_INI, &
+               "Day 19: should still be INI")
+    if (allocated(error)) return
+    call check(error, abs(growth_fraction - 0.095) < 0.01, &
+               "FAO56_DATES end of INI (day 19): growth_fraction should be ~0.095")
+  end subroutine test_gf_dates_ini_end
+
+  !> @brief FAO56_DATES: start of DEV stage → growth_fraction = 0.1
+  subroutine test_gf_dates_dev_start(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+
+    ! Day 20 since planting (first day of DEV, stage_fraction = 0/30 = 0.0)
+    ! growth_fraction = 0.1 + 0.0 * 0.9 = 0.1
+    call phenology_update_fao56_dates( &
+      current_doy=120, growing_season_start_doy=100, &
+      l_ini=20, l_dev=30, l_mid=40, l_late=25, days_in_year=365, &
+      growth_stage=growth_stage, stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_DEV, &
+               "Day 20: should be DEV")
+    if (allocated(error)) return
+    call check(error, abs(growth_fraction - 0.1) < 0.01, &
+               "FAO56_DATES start of DEV (day 20): growth_fraction should be 0.1")
+  end subroutine test_gf_dates_dev_start
+
+  !> @brief FAO56_DATES: midpoint of DEV stage → growth_fraction = 0.55
+  subroutine test_gf_dates_dev_midpoint(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+
+    ! Day 35 since planting (15 days into 30-day DEV, stage_fraction = 0.5)
+    ! growth_fraction = 0.1 + 0.5 * 0.9 = 0.55
+    call phenology_update_fao56_dates( &
+      current_doy=135, growing_season_start_doy=100, &
+      l_ini=20, l_dev=30, l_mid=40, l_late=25, days_in_year=365, &
+      growth_stage=growth_stage, stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_DEV, &
+               "Day 35: should be DEV")
+    if (allocated(error)) return
+    call check(error, abs(growth_fraction - 0.55) < 0.01, &
+               "FAO56_DATES midpoint of DEV (day 35): growth_fraction should be 0.55")
+  end subroutine test_gf_dates_dev_midpoint
+
+  !> @brief FAO56_DATES: end of DEV / start of MID → growth_fraction = 1.0
+  subroutine test_gf_dates_mid_start(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+
+    ! Day 50 since planting (first day of MID, stage_fraction = 0/40 = 0.0)
+    ! growth_fraction = 1.0
+    call phenology_update_fao56_dates( &
+      current_doy=150, growing_season_start_doy=100, &
+      l_ini=20, l_dev=30, l_mid=40, l_late=25, days_in_year=365, &
+      growth_stage=growth_stage, stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_MID, &
+               "Day 50: should be MID")
+    if (allocated(error)) return
+    call check(error, abs(growth_fraction - 1.0) < 0.01, &
+               "FAO56_DATES start of MID (day 50): growth_fraction should be 1.0")
+  end subroutine test_gf_dates_mid_start
+
+  !> @brief FAO56_DATES: mid-season holds at growth_fraction = 1.0
+  subroutine test_gf_dates_mid_holds(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+
+    ! Day 70 since planting (20 days into 40-day MID)
+    ! growth_fraction = 1.0 (constant through MID)
+    call phenology_update_fao56_dates( &
+      current_doy=170, growing_season_start_doy=100, &
+      l_ini=20, l_dev=30, l_mid=40, l_late=25, days_in_year=365, &
+      growth_stage=growth_stage, stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season)
+
+    call check(error, abs(growth_fraction - 1.0) < 0.01, &
+               "FAO56_DATES middle of MID (day 70): growth_fraction should be 1.0")
+  end subroutine test_gf_dates_mid_holds
+
+  !> @brief FAO56_DATES: start of LATE → growth_fraction = 1.0
+  subroutine test_gf_dates_late_start(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+
+    ! Day 90 since planting (first day of LATE, stage_fraction = 0/25 = 0.0)
+    ! growth_fraction = 1.0 (structure remains fully developed through LATE)
+    call phenology_update_fao56_dates( &
+      current_doy=190, growing_season_start_doy=100, &
+      l_ini=20, l_dev=30, l_mid=40, l_late=25, days_in_year=365, &
+      growth_stage=growth_stage, stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_LATE, &
+               "Day 90: should be LATE")
+    if (allocated(error)) return
+    call check(error, abs(growth_fraction - 1.0) < 0.01, &
+               "FAO56_DATES start of LATE (day 90): growth_fraction should be 1.0")
+  end subroutine test_gf_dates_late_start
+
+  !> @brief FAO56_DATES: midpoint of LATE → growth_fraction = 1.0 (structure intact)
+  subroutine test_gf_dates_late_midpoint(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+
+    ! Day 102 since planting (12 days into 25-day LATE, stage_fraction = 12/25 = 0.48)
+    ! growth_fraction = 1.0 (plant structure remains fully developed during senescence)
+    call phenology_update_fao56_dates( &
+      current_doy=202, growing_season_start_doy=100, &
+      l_ini=20, l_dev=30, l_mid=40, l_late=25, days_in_year=365, &
+      growth_stage=growth_stage, stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_LATE, &
+               "Day 102: should be LATE")
+    if (allocated(error)) return
+    call check(error, abs(growth_fraction - 1.0) < 0.01, &
+               "FAO56_DATES midpoint of LATE (day 102): growth_fraction should be 1.0")
+  end subroutine test_gf_dates_late_midpoint
+
+  !> @brief FAO56_DATES: end of LATE → growth_fraction = 1.0 (structure intact until dormancy)
+  subroutine test_gf_dates_late_end(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+
+    ! Day 114 since planting (24 days into 25-day LATE, stage_fraction = 24/25 = 0.96)
+    ! growth_fraction = 1.0 (structure fully intact, drops to 0 only at DORMANT)
+    call phenology_update_fao56_dates( &
+      current_doy=214, growing_season_start_doy=100, &
+      l_ini=20, l_dev=30, l_mid=40, l_late=25, days_in_year=365, &
+      growth_stage=growth_stage, stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season)
+
+    call check(error, growth_stage == GROWTH_STAGE_LATE, &
+               "Day 114: should be LATE")
+    if (allocated(error)) return
+    call check(error, abs(growth_fraction - 1.0) < 0.01, &
+               "FAO56_DATES end of LATE (day 114): growth_fraction should be 1.0")
+  end subroutine test_gf_dates_late_end
+
+  !> @brief FAO56_DATES: past season end → growth_fraction = 0.0 (dormant)
+  subroutine test_gf_dates_dormant(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season
+
+    ! Day 120 since planting → past total season length of 115
+    call phenology_update_fao56_dates( &
+      current_doy=220, growing_season_start_doy=100, &
+      l_ini=20, l_dev=30, l_mid=40, l_late=25, days_in_year=365, &
+      growth_stage=growth_stage, stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season)
+
+    call check(error, abs(growth_fraction) < 1.0e-6, &
+               "FAO56_DATES dormant (past season): growth_fraction must be 0.0")
+  end subroutine test_gf_dates_dormant
+
+  !> @brief FAO56_GDD: INI stage midpoint → growth_fraction = 0.05
+  subroutine test_gf_gdd_ini_midpoint(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season, frost_killed_season
+
+    frost_killed_season = FALSE
+
+    ! GDD=250 → 50 since planting threshold (200), midpoint of 100-GDD INI
+    ! stage_fraction = 50/100 = 0.5, growth_fraction = 0.5 * 0.1 = 0.05
+    call phenology_update_fao56_gdd( &
+      current_gdd=250.0_c_float, mean_air_temperature=70.0_c_float, &
+      growing_season_start_gdd=200.0_c_float, killing_frost_temperature=28.0_c_float, &
+      gdd_ini=100.0_c_float, gdd_dev=200.0_c_float, &
+      gdd_mid=400.0_c_float, gdd_late=150.0_c_float, &
+      frost_killed_season=frost_killed_season, &
+      growth_stage=growth_stage, stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season)
+
+    call check(error, abs(growth_fraction - 0.05) < 0.01, &
+               "FAO56_GDD INI midpoint (50 of 100 GDD): growth_fraction should be 0.05")
+  end subroutine test_gf_gdd_ini_midpoint
+
+  !> @brief FAO56_GDD: DEV stage midpoint → growth_fraction = 0.55
+  subroutine test_gf_gdd_dev_midpoint(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season, frost_killed_season
+
+    frost_killed_season = FALSE
+
+    ! GDD=400 → 200 since planting (200). INI ends at 100, so 100 into 200-GDD DEV.
+    ! stage_fraction = 100/200 = 0.5, growth_fraction = 0.1 + 0.5 * 0.9 = 0.55
+    call phenology_update_fao56_gdd( &
+      current_gdd=400.0_c_float, mean_air_temperature=70.0_c_float, &
+      growing_season_start_gdd=200.0_c_float, killing_frost_temperature=28.0_c_float, &
+      gdd_ini=100.0_c_float, gdd_dev=200.0_c_float, &
+      gdd_mid=400.0_c_float, gdd_late=150.0_c_float, &
+      frost_killed_season=frost_killed_season, &
+      growth_stage=growth_stage, stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season)
+
+    call check(error, abs(growth_fraction - 0.55) < 0.01, &
+               "FAO56_GDD DEV midpoint (100 of 200 GDD): growth_fraction should be 0.55")
+  end subroutine test_gf_gdd_dev_midpoint
+
+  !> @brief FAO56_GDD: MID stage → growth_fraction = 1.0
+  subroutine test_gf_gdd_mid(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season, frost_killed_season
+
+    frost_killed_season = FALSE
+
+    ! GDD=700 → 500 since planting. INI=100, DEV=200 (ends at 300). 200 into 400-GDD MID.
+    ! growth_fraction = 1.0
+    call phenology_update_fao56_gdd( &
+      current_gdd=700.0_c_float, mean_air_temperature=70.0_c_float, &
+      growing_season_start_gdd=200.0_c_float, killing_frost_temperature=28.0_c_float, &
+      gdd_ini=100.0_c_float, gdd_dev=200.0_c_float, &
+      gdd_mid=400.0_c_float, gdd_late=150.0_c_float, &
+      frost_killed_season=frost_killed_season, &
+      growth_stage=growth_stage, stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season)
+
+    call check(error, abs(growth_fraction - 1.0) < 0.01, &
+               "FAO56_GDD MID stage: growth_fraction should be 1.0")
+  end subroutine test_gf_gdd_mid
+
+  !> @brief FAO56_GDD: LATE stage midpoint → growth_fraction = 1.0 (structure intact)
+  subroutine test_gf_gdd_late_midpoint(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season, frost_killed_season
+
+    frost_killed_season = FALSE
+
+    ! GDD=975 → 775 since planting. end_mid=700, so 75 into 150-GDD LATE.
+    ! stage_fraction = 75/150 = 0.5, growth_fraction = 1.0 (structure intact)
+    call phenology_update_fao56_gdd( &
+      current_gdd=975.0_c_float, mean_air_temperature=70.0_c_float, &
+      growing_season_start_gdd=200.0_c_float, killing_frost_temperature=28.0_c_float, &
+      gdd_ini=100.0_c_float, gdd_dev=200.0_c_float, &
+      gdd_mid=400.0_c_float, gdd_late=150.0_c_float, &
+      frost_killed_season=frost_killed_season, &
+      growth_stage=growth_stage, stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season)
+
+    call check(error, abs(growth_fraction - 1.0) < 0.01, &
+               "FAO56_GDD LATE midpoint: growth_fraction should be 1.0 (structure intact)")
+  end subroutine test_gf_gdd_late_midpoint
+
+  !> @brief FAO56_GDD: past all stages → growth_fraction = 0.0
+  subroutine test_gf_gdd_dormant_after(error)
+    type(error_type), allocatable, intent(out) :: error
+    integer(c_int) :: growth_stage
+    real(c_float) :: stage_fraction, growth_fraction
+    logical(c_bool) :: it_is_growing_season, frost_killed_season
+
+    frost_killed_season = FALSE
+
+    ! GDD=1100 → 900 since planting. end_late=850. Past all stages.
+    call phenology_update_fao56_gdd( &
+      current_gdd=1100.0_c_float, mean_air_temperature=70.0_c_float, &
+      growing_season_start_gdd=200.0_c_float, killing_frost_temperature=28.0_c_float, &
+      gdd_ini=100.0_c_float, gdd_dev=200.0_c_float, &
+      gdd_mid=400.0_c_float, gdd_late=150.0_c_float, &
+      frost_killed_season=frost_killed_season, &
+      growth_stage=growth_stage, stage_fraction=stage_fraction, &
+      growth_fraction=growth_fraction, it_is_growing_season=it_is_growing_season)
+
+    call check(error, abs(growth_fraction) < 1.0e-6, &
+               "FAO56_GDD past all stages: growth_fraction must be 0.0")
+  end subroutine test_gf_gdd_dormant_after
 
 end module test_phenology

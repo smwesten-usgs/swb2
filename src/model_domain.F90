@@ -1669,7 +1669,8 @@ contains
               //"awc, latitude, reference_ET0, "                                                                   &
               //"actual_ET, curve_num_adj, gross_precip, inflow, runon, "                                          &
               //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "            &
-              //"rainfall, net_rainfall, monthly_gross_precip, monthly_runoff, interception_storage, tmax, tmin, " &
+              //"rainfall, net_rainfall, monthly_gross_precip, monthly_runoff, interception_storage, "             &
+              //"interception_storage_max, tmax, tmin, "                                                           &
               //" tmean, snow_storage, soil_storage, soil_storage_max, "                                           &
               //"evaporable_water_storage, evaporable_water_deficit, delta_soil_storage, "                         &
               //"soil_moisture_deficit, surface_storage, "                                                         &
@@ -1724,14 +1725,14 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    where ( this%it_is_growing_season )
-      this%interception_storage_max = BUCKET_INTERCEPTION_STORAGE_MAX_GROWING_SEASON( this%landuse_index )
-    elsewhere 
-      this%interception_storage_max = BUCKET_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON( this%landuse_index )
-    end where
+    this%interception_storage_max =                                                              &
+      BUCKET_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON( this%landuse_index )                    &
+      + this%growth_fraction                                                                    &
+      * ( BUCKET_INTERCEPTION_STORAGE_MAX_GROWING_SEASON( this%landuse_index )                   &
+        - BUCKET_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON( this%landuse_index ) )
 
     call interception_bucket_calculate( this%landuse_index, this%gross_precip, this%fog,           &
-                                        this%canopy_cover_fraction, this%it_is_growing_season,     &
+                                        this%canopy_cover_fraction, this%growth_fraction,          &
                                         this%interception )
 
   end subroutine model_calculate_interception_bucket
@@ -3002,7 +3003,7 @@ contains
     if (allocated(this%monthly_runoff) )  monthly_runoff = this%monthly_runoff( cell_indx )
     if (allocated(this%monthly_gross_precip) )  monthly_gross_precip = this%monthly_gross_precip( cell_indx )
 
-      write( unit=unitnum, fmt="(i4,'-',i2.2,'-',i2.2,',',i2,',',i2,',',i4,',',9(i6,','),66(g20.12,','),g20.12)")  &
+      write( unit=unitnum, fmt="(i4,'-',i2.2,'-',i2.2,',',i2,',',i2,',',i4,',',9(i6,','),67(g20.12,','),g20.12)")  &
         SIM_DT%curr%iYear, SIM_DT%curr%iMonth, SIM_DT%curr%iDay,  &
         SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,  &
         this%landuse_code( cell_indx ),  & 
@@ -3034,6 +3035,7 @@ contains
         monthly_gross_precip,  &
         monthly_runoff,  &
         this%interception_storage( cell_indx ),  &
+        this%interception_storage_max( cell_indx ),  &
         this%tmax( cell_indx ),  & 
         this%tmin( cell_indx ),  &
         this%tmean( cell_indx ),  &

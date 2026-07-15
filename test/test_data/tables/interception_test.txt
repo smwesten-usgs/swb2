@@ -1,0 +1,12 @@
+# Interception test lookup table — same LU_Code values as Lookup__crop_coefficient_test.txt
+# Provides growing/nongrowing interception 'a' values and storage maxima.
+LU_Code	Description	Growing_season_interception	Nongrowing_season_interception	Interception_storage_max_growing	Interception_storage_max_nongrowing
+1	Corn	0.10	0.02	0.15	0.03
+4	Sorghum	0.08	0.02	0.12	0.03
+5	Soybeans	0.10	0.02	0.15	0.03
+6	Sunflower	0.08	0.02	0.12	0.03
+12	Sweet Corn	0.10	0.02	0.15	0.03
+21	Barley	0.08	0.02	0.12	0.03
+23	Spring Wheat	0.08	0.02	0.12	0.03
+24	Winter Wheat	0.08	0.02	0.12	0.03
+26	Dbl Crop WinWht/Soybeans	0.10	0.02	0.15	0.03

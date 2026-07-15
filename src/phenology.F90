@@ -9,8 +9,37 @@
 !> Supported methods:
 !>   - DOY_BASED: binary on/off from Growing_season_start_date / Growing_season_end_date
 !>   - GDD_THRESHOLD: binary on/off from Growing_season_start_GDD / Killing_frost_temperature
-!>   - FAO56_DATES: (Phase 2) continuous growth_fraction from date-based stage lengths
-!>   - FAO56_GDD: (Phase 3) continuous growth_fraction from GDD-based stage lengths
+!>   - FAO56_DATES: continuous growth_fraction from date-based stage lengths
+!>   - FAO56_GDD: continuous growth_fraction from GDD-based stage lengths
+!>
+!> ## growth_fraction semantics
+!>
+!> growth_fraction (0.0–1.0) represents the structural development of the plant —
+!> how much of its full physical form (canopy, root system) is in place. It is NOT
+!> a measure of physiological activity or transpiration rate.
+!>
+!> Trajectory for FAO56 methods:
+!>   - DORMANT: 0.0 (bare soil / no leaves / post-harvest)
+!>   - INI:     0.0 → 0.1 (emergence, seedling establishment)
+!>   - DEV:     0.1 → 1.0 (rapid canopy and root development)
+!>   - MID:     1.0 (fully developed)
+!>   - LATE:    1.0 (structure remains intact during senescence)
+!>   - DORMANT: 0.0 (harvest / leaf-off / frost kill — abrupt transition)
+!>
+!> For DOY_BASED and GDD_THRESHOLD methods: strictly 0.0 or 1.0 (binary).
+!>
+!> ## Intended downstream consumers of growth_fraction
+!>
+!>   - interception__bucket.F90: interpolate storage capacity between nongrowing
+!>     and growing-season maxima
+!>   - rooting_depth__FAO56.F90: (future) scale Zr between Zr_min and Zr_max
+!>   - any module needing a continuous 0–1 signal for vegetation presence
+!>
+!> Note: Kcb interpolation does NOT use growth_fraction. It uses growth_stage +
+!> stage_fraction, which captures the late-season Kcb decline independently.
+!> Rooting depth and plant height currently derive from Kcb directly (FAO-56
+!> methodology); growth_fraction is an alternative for modules that need a
+!> structural signal without coupling to the crop coefficient method.
 
 module phenology
 
@@ -388,10 +417,60 @@ contains
 
     call LOGS%write( "", iLinesAfter=1 )
 
+    ! --- Warn if monthly Kcb columns exist but no phenology method is defined ---
+    call validate_monthly_kcb_has_phenology(params, landuse_codes, number_of_landuses)
+
     ! --- Detect legacy column names and emit fatal error with migration guide ---
     call detect_legacy_column_names(params)
 
   end subroutine phenology_initialize
+
+  !---------------------------------------------------------------------------
+  !> @brief Warn when monthly Kcb columns are present but no phenology method is defined.
+  !!
+  !! If a land use has monthly Kcb values (Kcb_Jan...Kcb_Dec) but PHENOLOGY_NONE,
+  !! growth_fraction will be 0.0 permanently, which means interception capacity
+  !! will be stuck at the nongrowing value. This is almost certainly unintended.
+  !!
+  !! @param[inout] params              PARAMETERS_T instance to probe
+  !! @param[in]    landuse_codes       Array of land use code values
+  !! @param[in]    number_of_landuses  Number of land uses in the table
+  !---------------------------------------------------------------------------
+  subroutine validate_monthly_kcb_has_phenology(params, landuse_codes, number_of_landuses)
+
+    type(PARAMETERS_T), intent(inout) :: params
+    integer(c_int), intent(in)        :: landuse_codes(:)
+    integer(c_int), intent(in)        :: number_of_landuses
+
+    ! [ LOCALS ]
+    real(c_float), allocatable :: kcb_jan_vals(:)
+    integer(c_int) :: indx
+
+    ! Probe for Kcb_Jan — if present, monthly Kcb is in use
+    call params%get_parameters( sKey="Kcb_Jan", fValues=kcb_jan_vals, lFatal=FALSE )
+
+    if ( .not. allocated( kcb_jan_vals ) ) return
+    if ( size( kcb_jan_vals ) /= number_of_landuses ) return
+
+    do indx = 1, number_of_landuses
+
+      if ( kcb_jan_vals(indx) > 0.0_c_float &
+           .and. PHENOLOGY_METHOD_INDEX(indx) == PHENOLOGY_NONE ) then
+
+        call warn( "Land use "//asCharacter( landuse_codes(indx) )          &
+          //" has monthly Kcb values but no phenology method."               &
+          //"~ growth_fraction will be 0.0 (dormant) permanently,"           &
+          //" which affects interception capacity."                           &
+          //"~ Add Growing_season_start_date and Growing_season_end_date"     &
+          //" columns (e.g. 01/01 and 12/31 for evergreen land uses)"        &
+          //" to enable DOY_BASED phenology.",                               &
+          lFatal=TRUE )
+
+      end if
+
+    end do
+
+  end subroutine validate_monthly_kcb_has_phenology
 
   !---------------------------------------------------------------------------
   !> @brief Detect legacy column names and emit fatal errors with migration guide.
@@ -470,7 +549,7 @@ contains
   !! @param[in]    mean_air_temperature     Current mean daily air temperature
   !! @param[in]    it_is_growing_season_in  Growing season state from previous day
   !! @param[inout] frost_killed_season      TRUE if frost already ended season this year
-  !! @param[out]   growth_fraction          0.0 (dormant) to 1.0 (full growth)
+  !! @param[out]   growth_fraction          0.0 (dormant) to 1.0 (fully developed structure)
   !! @param[out]   it_is_growing_season     Updated growing season state
   !! @param[out]   growth_stage             Current growth stage enum value
   !! @param[out]   stage_fraction           0.0–1.0 position within current stage
@@ -710,9 +789,11 @@ contains
   !---------------------------------------------------------------------------
   !> @brief Determine phenology state for FAO56_DATES method.
   !!
-  !! Continuous growth progression driven by calendar days since planting.
+  !! Structural development driven by calendar days since planting.
   !! Growth stages are determined by cumulative stage lengths (L_ini, L_dev,
-  !! L_mid, L_late) counted from the planting date. Handles year-wrapping
+  !! L_mid, L_late) counted from the planting date. growth_fraction ramps
+  !! from 0 to 1 over INI+DEV and holds at 1.0 through MID and LATE
+  !! (plant structure remains intact during senescence). Handles year-wrapping
   !! for winter crops (planting DOY > harvest DOY wraps into next year).
   !!
   !! @param[in]  current_doy               Current day of year (1-366)
@@ -724,7 +805,7 @@ contains
   !! @param[in]  days_in_year              Number of days in current year (365 or 366)
   !! @param[out] growth_stage              DORMANT, INI, DEV, MID, or LATE
   !! @param[out] stage_fraction            0.0–1.0 position within current stage
-  !! @param[out] growth_fraction           0.0–1.0 overall growth progression
+  !! @param[out] growth_fraction           0.0–1.0 structural development (holds at 1.0 through LATE)
   !! @param[out] it_is_growing_season      TRUE when growth_stage > DORMANT
   !---------------------------------------------------------------------------
   pure subroutine phenology_update_fao56_dates( current_doy,              &
@@ -818,7 +899,7 @@ contains
 
     else
 
-      ! Late season stage — senescence
+      ! Late season stage — structure remains fully developed
       growth_stage   = GROWTH_STAGE_LATE
       if ( l_late > 0 ) then
         stage_fraction = real( days_since_planting - end_mid, c_float ) &
@@ -826,7 +907,7 @@ contains
       else
         stage_fraction = 1.0_c_float
       end if
-      growth_fraction      = 1.0_c_float - stage_fraction * 0.8_c_float
+      growth_fraction      = 1.0_c_float
       it_is_growing_season = TRUE
 
     end if
@@ -836,11 +917,12 @@ contains
   !---------------------------------------------------------------------------
   !> @brief Determine phenology state for FAO56_GDD method.
   !!
-  !! Continuous growth progression driven by growing degree day accumulation.
+  !! Structural development driven by growing degree day accumulation.
   !! Growing season starts when GDD reaches the planting threshold. Growth
   !! stages are determined by cumulative GDD thresholds (GDD_ini, GDD_dev,
-  !! GDD_mid, GDD_late) counted from the planting GDD. Season ends on
-  !! killing frost (hard latch for remainder of year).
+  !! GDD_mid, GDD_late) counted from the planting GDD. growth_fraction ramps
+  !! from 0 to 1 over INI+DEV and holds at 1.0 through MID and LATE.
+  !! Season ends on killing frost (hard latch for remainder of year).
   !!
   !! @param[in]     current_gdd               Accumulated GDD for current year
   !! @param[in]     mean_air_temperature      Current mean daily air temperature
@@ -853,7 +935,7 @@ contains
   !! @param[inout]  frost_killed_season       Hard latch: TRUE after killing frost
   !! @param[out]    growth_stage              DORMANT, INI, DEV, MID, or LATE
   !! @param[out]    stage_fraction            0.0–1.0 position within current stage
-  !! @param[out]    growth_fraction           0.0–1.0 overall growth progression
+  !! @param[out]    growth_fraction           0.0–1.0 structural development (holds at 1.0 through LATE)
   !! @param[out]    it_is_growing_season      TRUE when growth_stage > DORMANT
   !---------------------------------------------------------------------------
   pure subroutine phenology_update_fao56_gdd( current_gdd,               &
@@ -977,7 +1059,7 @@ contains
       else
         stage_fraction = 1.0_c_float
       end if
-      growth_fraction      = 1.0_c_float - stage_fraction * 0.8_c_float
+      growth_fraction      = 1.0_c_float
       it_is_growing_season = TRUE
 
     end if
