@@ -1,0 +1,121 @@
+# FAO-56 (2025) Table 6.10: Base temperature (Tbase) and upper temperature (Tupper)
+# for GDD calculation by crop.
+# Source: Allen et al., 2025, FAO Irrigation and Drainage Paper 56 (revised)
+# Values in °C. To convert to °F: T_F = T_C * 1.8 + 32
+Crop	Category	Tbase_C	Tupper_C
+Asparagus	Roots/tubers/bulbs	4.5	35
+Carrots	Roots/tubers/bulbs	6	30
+Cassava	Roots/tubers/bulbs	10	40
+Celery	Roots/tubers/bulbs	4	24
+Garlic	Roots/tubers/bulbs	4	30
+Onions	Roots/tubers/bulbs	4.5	35
+Potato	Roots/tubers/bulbs	2	30
+Radish	Roots/tubers/bulbs	4.5	30
+Sweet potato	Roots/tubers/bulbs	12	30
+Table beets	Roots/tubers/bulbs	4.5	30
+Turnip	Roots/tubers/bulbs	4	35
+Yam, Taro	Roots/tubers/bulbs	10	35
+Artichoke	Leaves/flowers	5	32
+Broccoli	Leaves/flowers	4.5	30
+Brussel sprouts	Leaves/flowers	4.5	30
+Cabbage	Leaves/flowers	4.5	30
+Cauliflower	Leaves/flowers	4.5	30
+Lettuce	Leaves/flowers	4	28
+Spinach	Leaves/flowers	4	25
+Banana	Fruit vegetable	14	37
+Bell pepper	Fruit vegetable	10	35
+Cucumber	Fruit vegetable	10	32
+Eggplant	Fruit vegetable	10	35
+Melon	Fruit vegetable	10	38
+Melon, cantaloupe	Fruit vegetable	10	38
+Okra	Fruit vegetable	10	35
+Pineapple	Fruit vegetable	13	25
+Pumpkin	Fruit vegetable	10	32
+Squash, Zucchini	Fruit vegetable	10	32
+Strawberries	Fruit vegetable	3	30
+Tomato	Fruit vegetable	7	28
+Watermelon	Fruit vegetable	10	35
+Basil	Spicy/medicinal herbs	10	30
+Black cumin	Spicy/medicinal herbs	5	30
+Black pepper	Spicy/medicinal herbs	10	40
+Coriander	Spicy/medicinal herbs	4	30
+Fenugreek	Spicy/medicinal herbs	4	35
+Lemon balm	Spicy/medicinal herbs	5	35
+Mint	Spicy/medicinal herbs	4	35
+Oregano	Spicy/medicinal herbs	5	30
+Parsley	Spicy/medicinal herbs	4	27
+Saffron	Spicy/medicinal herbs	10	30
+
+Bean	Grain legumes	10	32
+Mungbean	Grain legumes	8	40
+Black and green gram	Grain legumes	10	40
+Chickpea, garbanzo	Grain legumes	5	32
+Cowpea	Grain legumes	10	35
+Fava bean	Grain legumes	5	30
+Groundnut, peanut	Grain legumes	10	35
+Lentil	Grain legumes	2	35
+Pea	Grain legumes	5	27
+Soybean	Grain legumes	10	40
+Cotton	Fiber crops	12.5	35
+Flax, Linseed	Fiber crops	0	36
+Sisal	Fiber crops	10	35
+Camelina	Oil crops	4	30
+Canola	Oil crops	2	30
+Castorbean	Oil crops	10	30
+Guar	Oil crops	15	40
+Mustard	Oil crops	5	40
+Safflower	Oil crops	5	35
+Sesame	Oil crops	10	40
+Sunflower	Oil crops	8	30
+Sugar beet	Sugar crops	5	30
+Sugar cane	Sugar crops	10	45
+Amaranth grain	Cereals	7	40
+Barley	Cereals	0	30
+Maize	Cereals	10	32
+Oats	Cereals	0	30
+Pearl Millet	Cereals	10	40
+Quinoa	Cereals	2	25
+Rye	Cereals	4	35
+Sorghum	Cereals	10	30
+Teff	Cereals	10	30
+Wheat, common	Cereals	0	35
+Wheat, durum	Cereals	0	35
+Rice	Cereals	12	35
+Alfalfa	Grasses	0	30
+Bermuda	Grasses	10	30
+Berseem clover	Grasses	4	30
+Common vetch	Grasses	0	30
+Elephant grass	Grasses	15	40
+Grass pastures	Grasses	4	30
+
+Guinea grass	Grasses	14	40
+Hairy vetch	Grasses	2	25
+Italian ryegrass	Grasses	2	25
+Persian clover	Grasses	6	35
+Sudan grass	Grasses	10	35
+Olive	Fruit trees/vines	7	35
+Wine and table grapes	Fruit trees/vines	10	35
+Citrus	Fruit trees/vines	13	30
+Avocado	Fruit trees/vines	6	33
+Loquat	Fruit trees/vines	4	42
+Pomegranate	Fruit trees/vines	10	35
+Apple	Fruit trees/vines	4	35
+Pear	Fruit trees/vines	4	35
+Apricot	Fruit trees/vines	7	25
+Cherry	Fruit trees/vines	4.5	30
+Peach and nectarine	Fruit trees/vines	7	35
+Plum	Fruit trees/vines	4.5	25
+Almond	Fruit trees/vines	4.5	35
+Pistachio	Fruit trees/vines	9	35
+Walnut	Fruit trees/vines	4.5	30
+Kiwifruit	Fruit trees/vines	6	30
+Hop	Fruit trees/vines	5	30
+Berries	Fruit trees/vines	6	30
+Coffee	Fruit trees/vines	10	32
+Guava	Fruit trees/vines	12	35
+Papaya	Fruit trees/vines	15	35
+Passionfruit	Fruit trees/vines	10	35
+Lychee	Fruit trees/vines	10	30
+Mango	Fruit trees/vines	12	32
+Date palm	Fruit trees/vines	10	35
+Oil palm	Fruit trees/vines	15	40

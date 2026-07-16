@@ -1,0 +1,58 @@
+# FAO-56 (2025) Table 6.11: Cumulative GDD (°C) required to complete each crop growth stage							
+# Source: Allen et al., 2025, FAO Irrigation and Drainage Paper 56 (revised)							
+# Note: Values are in °C degree-days. Multiply by 1.8 to convert to °F degree-days.							
+# Tbase and Tupper values are in Table 6.10 (to be merged separately).							
+Crop	Category	Season	GDD_ini_C	GDD_dev_C	GDD_mid_C	GDD_late_C	GDD_total_C
+Carrots	Roots/tubers/bulbs	Common	320	465	500	290	1575
+Garlic	Roots/tubers/bulbs	Short	150	340	335	315	1140
+Garlic	Roots/tubers/bulbs	Long	580	615	315	240	1750
+Onions	Roots/tubers/bulbs	Common	460	470	880	480	2290
+Potato	Roots/tubers/bulbs	Long	405	530	490	835	2260
+Potato	Roots/tubers/bulbs	Short	260	490	525	325	1600
+Broccoli	Leaves/flowers	Short	195	250	210	100	755
+Broccoli	Leaves/flowers	Long	295	350	525	110	1280
+Lettuce	Leaves/flowers	Short	365	385	215	20	985
+Lettuce	Leaves/flowers	Long	360	455	455	20	1290
+Bell pepper	Fruit vegetable	Common	445	1180	745	45	2415
+Melon	Fruit vegetable	Short	185	520	315	155	1175
+Melon	Fruit vegetable	Long	140	545	460	455	1600
+Tomato	Fruit vegetable	Industry	280	520	880	220	1900
+Tomato	Fruit vegetable	Market	325	660	880	200	2065
+Bean, seed	Grain legumes	Short	160	260	360	180	960
+Bean, seed	Grain legumes	Long	320	410	400	220	1350
+Pea, fresh	Grain legumes	Industry	105	255	510	35	905
+Pea, fresh	Grain legumes	Market	155	350	575	320	1400
+Soybean	Grain legumes	Short	300	350	650	350	1660
+Soybean	Grain legumes	Long	310	410	680	560	1960
+Cotton	Fiber/oil	Short	280	520	800	350	1950
+Cotton	Fiber/oil	Long	345	905	615	285	2150
+Canola	Fiber/oil	Short	330	310	450	595	1685
+Canola	Fiber/oil	Long	460	555	905	595	2515
+Sunflower	Fiber/oil	Short	345	555	715	175	1790
+Sunflower	Fiber/oil	Long	385	570	685	265	1905
+Barley	Cereals	Short	290	455	345	360	1450
+Barley	Cereals	Long	300	675	690	660	2325
+Maize, grain	Cereals	Short	200	380	500	340	1420
+Maize, grain	Cereals	Long	295	420	775	465	1955
+Maize, silage	Cereals	Short	200	380	430	120	1130
+Maize, silage	Cereals	Long	250	500	600	200	1550
+Maize, sweet	Cereals	Short	200	310	360	115	985
+Maize, sweet	Cereals	Long	355	500	430	200	1485
+Oats	Cereals	Common	450	595	550	255	1850
+Sorghum	Cereals	Short	280	300	570	230	1380
+Sorghum	Cereals	Long	280	310	650	280	1520
+Wheat, Winter	Cereals	Short	395	445	440	365	1645
+Wheat, Winter	Cereals	Long	560	405	730	410	2105
+Wheat, Spring	Cereals	Short	360	480	590	190	1620
+Wheat, Spring	Cereals	Long	360	680	720	540	2300
+Rice	Cereals	Short	235	465	665	295	1660
+Rice	Cereals	Long	255	490	740	320	1805
+Almond	Fruit trees/vines	Early	250	300	2260	815	3625
+Almond	Fruit trees/vines	Late	280	325	2730	475	3810
+Citrus	Fruit trees/vines	Common	35	220	1580	60	1895
+Olive	Fruit trees/vines	Early	50	430	1385	800	2665
+Olive	Fruit trees/vines	Late	380	350	2055	720	3505
+Pistachio	Fruit trees/vines	Common	225	555	1130	210	2120
+Pomegranate	Fruit trees/vines	Common	95	185	1900	265	2445
+Wine grapes	Fruit trees/vines	Early	435	1225	505	160	2325
+Wine grapes	Fruit trees/vines	Late	465	1145	800	590	3000

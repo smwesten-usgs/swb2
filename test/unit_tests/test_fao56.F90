@@ -155,23 +155,29 @@ contains
     type(error_type), allocatable, intent(out) :: error
 
     real(c_float) :: TMIN(6), TMAX(6), GDD_EXPECTED(6)
-    real(c_float) :: tmean(6), gdd
+    real(c_float) :: gdd
     integer(c_int) :: i, num_failures
     character(len=512) :: failure_msg
     character(len=80) :: line
 
     TMIN         = [55., 55., 60., 60., 65., 65.]
     TMAX         = [65., 70., 70., 75., 80., 85.]
+    ! FAO-56 formula: max((max(tmin,base) + min(tmax,gdd_max))/2, base) - base
+    ! base=50, gdd_max=130
+    ! Case 1: max((max(55,50)+min(65,130))/2, 50) - 50 = max((55+65)/2, 50) - 50 = 60 - 50 = 10
+    ! Case 2: max((max(55,50)+min(70,130))/2, 50) - 50 = max((55+70)/2, 50) - 50 = 62.5 - 50 = 12.5
+    ! Case 3: max((max(60,50)+min(70,130))/2, 50) - 50 = max((60+70)/2, 50) - 50 = 65 - 50 = 15
+    ! Case 4: max((max(60,50)+min(75,130))/2, 50) - 50 = max((60+75)/2, 50) - 50 = 67.5 - 50 = 17.5
+    ! Case 5: max((max(65,50)+min(80,130))/2, 50) - 50 = max((65+80)/2, 50) - 50 = 72.5 - 50 = 22.5
+    ! Case 6: max((max(65,50)+min(85,130))/2, 50) - 50 = max((65+85)/2, 50) - 50 = 75 - 50 = 25
     GDD_EXPECTED = [10., 12.5, 15., 17.5, 22.5, 25.]
-
-    tmean = clip(value=((TMIN + TMAX) / 2.0), minval=50., maxval=85.)
 
     num_failures = 0
     failure_msg = ""
 
     do i = 1, 6
       gdd = 0.0
-      call growing_degree_day_calculate(gdd, tmean(i), 1)
+      call growing_degree_day_calculate(gdd, TMIN(i), TMAX(i), 1)
       if (abs(gdd - GDD_EXPECTED(i)) > 1.0e-4) then
         num_failures = num_failures + 1
         write(line, '("  Case ", i1, ": Tmin=", f4.0, " Tmax=", f4.0, &

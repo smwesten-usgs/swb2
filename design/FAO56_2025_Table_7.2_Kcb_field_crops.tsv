@@ -1,0 +1,68 @@
+# FAO-56 (2025) Table 7.2: Basal crop coefficients (Kcb), maximum plant heights, and
+# maximum fraction of ground cover for non-stressed, well-managed field crops
+# in subhumid climates (RHmin~45%, u2~2 m/s) for use with FAO Penman-Monteith ETo.
+# Source: Allen et al., 2025, FAO Irrigation and Drainage Paper 56 (revised)
+Crop	Category	Season	Kcb_ini	Kcb_mid	Kcb_end	Height_max_m	fc_max
+Bean, green	Grain legumes	Green	0.15	1.00	0.85	0.60	0.80
+Bean, dry	Grain legumes	Dry	0.15	1.00	0.30	0.60	0.80
+Butter bean, lima bean	Grain legumes	Common	0.15	0.90	0.25	1.20	0.60
+Mat bean, moth bean	Grain legumes	Common	0.15	0.95	0.20	0.20	0.80
+Black gram	Grain legumes	Dry	0.15	1.05	0.25	0.60	0.95
+Green gram	Grain legumes	Green	0.15	1.05	0.30	0.75	0.95
+Chickpea, garbanzo	Grain legumes	Common	0.15	1.00	0.25	0.60	0.90
+Clusterbean, guar	Grain legumes	Green beans	0.15	0.90	0.80	1.15	0.85
+Clusterbean, guar	Grain legumes	Guar gum	0.15	0.90	0.30	1.15	0.85
+Cowpea, green	Grain legumes	Green	0.15	1.00	0.50	0.70	0.80
+Cowpea, dry	Grain legumes	Dry	0.15	1.00	0.25	0.70	0.80
+Fava bean, fresh	Grain legumes	Fresh	0.15	1.05	0.95	0.80	0.85
+Fava bean, dry	Grain legumes	Dry	0.15	1.05	0.30	0.80	0.85
+Groundnut, peanut	Grain legumes	Common	0.15	1.00	0.50	0.50	0.90
+Lentil	Grain legumes	Common	0.15	1.00	0.20	0.50	0.85
+Pea, fresh	Grain legumes	Fresh	0.15	1.10	1.05	0.60	0.98
+Pea, dry	Grain legumes	Dry	0.15	1.05	0.20	0.80	0.98
+Soybean	Grain legumes	Common	0.15	1.05	0.35	0.80	0.98
+Cotton	Fiber crops	Common	0.15	1.05	0.40	1.20	0.90
+Flax, Linseed	Fiber crops	Common	0.15	1.00	0.20	1.00	0.85
+Jute mallow, fibre	Fiber crops	Common	0.15	0.95	0.55	1.90	0.90
+Kenaf	Fiber crops	Common	0.15	1.05	0.60	3.50	0.95
+Sisal	Fiber crops	Common	0.15	0.50	0.50	1.50	0.85
+Sunn hemp	Fiber crops	Common	0.15	1.00	0.90	1.10	0.85
+Camelina	Oil crops	Common	0.15	1.05	0.35	0.80	0.95
+Canola	Oil crops	Common	0.15	1.05	0.25	1.25	0.95
+Castorbean	Oil crops	Common	0.15	1.00	0.30	1.25	0.95
+Linseed	Oil crops	Common	0.15	0.90	0.15	0.90	0.90
+Mustard	Oil crops	Common	0.15	1.05	0.30	1.75	0.95
+Safflower	Oil crops	Common	0.15	1.00	0.15	1.10	0.90
+Sesame	Oil crops	Common	0.15	1.00	0.20	1.30	0.85
+Sunflower	Oil crops	Common	0.15	1.10	0.20	2.00	0.90
+Sugar beet	Sugar crops	Common	0.15	1.05	0.65	0.50	0.90
+Sugar cane	Sugar crops	Common	0.15	1.15	0.70	3.50	0.95
+
+Amaranth grain	Cereals	Common	0.15	1.05	0.20	2.00	0.80
+Barley	Cereals	Common	0.15	1.05	0.20	0.80	0.90
+Buckwheat	Cereals	Common	0.15	1.00	0.20	1.10	0.90
+Maize, grain (low moisture)	Cereals	Grain low	0.15	1.15	0.25	3.00	0.95
+Maize, grain (high moisture)	Cereals	Grain high	0.15	1.15	0.55	3.00	0.95
+Maize, silage	Cereals	Silage	0.15	1.10	0.80	2.85	0.90
+Maize, sweet	Cereals	Sweet	0.15	1.10	1.00	2.00	0.85
+Oats	Cereals	Common	0.15	1.00	0.20	0.95	0.90
+Pearl Millet	Cereals	Common	0.15	1.05	0.20	2.00	0.85
+Quinoa	Cereals	Common	0.15	1.05	0.40	1.10	0.80
+Rye	Cereals	Common	0.15	0.95	0.20	0.90	0.90
+Sorghum, grain	Cereals	Grain	0.15	1.00	0.35	1.75	0.85
+Sorghum, silage	Cereals	Silage	0.15	0.95	0.85	2.50	0.80
+Sorghum, sweet	Cereals	Sweet	0.15	1.05	0.90	3.50	0.95
+Teff	Cereals	Common	0.15	1.00	0.20	1.10	0.80
+Wheat, winter (low moisture)	Cereals	Winter low	0.15	1.10	0.20	0.90	0.95
+Wheat, winter (high moisture)	Cereals	Winter high	0.15	1.10	0.45	0.90	0.95
+Wheat, spring (low moisture)	Cereals	Spring low	0.15	1.10	0.20	0.90	0.95
+Wheat, spring (high moisture)	Cereals	Spring high	0.15	1.10	0.40	0.90	0.95
+Wheat, durum winter (low moisture)	Cereals	Winter low	0.15	1.00	0.20	0.90	0.95
+Wheat, durum winter (high moisture)	Cereals	Winter high	0.15	1.00	0.45	0.90	0.95
+Rice, flooded	Rice	Flooded	0.15	1.15	0.90	1.00	0.95
+Rice, flooded dry seeding	Rice	Flooded dry seed	0.15	1.15	0.90	1.00	0.95
+Rice, flooded anticipated cutoff	Rice	Flooded cutoff	0.15	1.15	0.70	1.00	0.95
+Rice, intermittent irrigation	Rice	Intermittent	0.15	1.15	0.85	1.00	0.95
+Rice, aerobic sprinkler	Rice	Aerobic sprinkler	0.15	1.05	0.70	0.80	0.95
+Rice, aerobic surface	Rice	Aerobic surface	0.15	1.05	0.70	0.80	0.95
+Rice, rainfed	Rice	Rainfed	0.15	0.95	0.70	0.70	0.90

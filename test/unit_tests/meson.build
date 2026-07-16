@@ -16,6 +16,7 @@ test_srcs = files(
   'test_solar_calculations.F90',
   'test_phenology.F90',
   'test_interception_bucket.F90',
+  'test_growing_degree_day.F90',
   'tester.F90',
 )
 
@@ -31,6 +32,6 @@ swbtest = executable('swbtest',
 test('All unit tests', swbtest, workdir: meson.current_source_dir())
 
 # Register individual suites for selective execution
-foreach suite : ['timer', 'allocatable_string', 'exceptions', 'gash', 'datetime', 'phenology', 'interception_bucket', 'fao56', 'constants', 'fstring_list', 'parameters', 'solar']
+foreach suite : ['timer', 'allocatable_string', 'exceptions', 'gash', 'datetime', 'phenology', 'interception_bucket', 'growing_degree_day', 'fao56', 'constants', 'fstring_list', 'parameters', 'solar']
   test(suite, swbtest, args: suite, workdir: meson.current_source_dir())
 endforeach

@@ -1323,21 +1323,16 @@ contains
 
       elseif( ( Method_Name .strapprox. "SIMPLE" )                       &
         .or. ( Method_Name .strapprox. "SIMPLE_GROWING_DEGREE_DAY" )     &
-        .or. ( Method_Name .strapprox. "SIMPLE_GROWING_DEGREE-DAY") )          then
+        .or. ( Method_Name .strapprox. "SIMPLE_GROWING_DEGREE-DAY")      &
+        .or. ( Method_Name .strapprox. "MODIFIED" )                      &
+        .or. ( Method_Name .strapprox. "MODIFIED_GROWING_DEGREE-DAY" )   &
+        .or. ( Method_Name .strapprox. "MODIFIED_GROWING_DEGREE_DAY" ) )       then
 
         this%init_GDD => model_initialize_GDD
         this%calc_GDD => model_calculate_GDD
         call LOGS%WRITE( "==> Growing degree-day (GDD) will be calculated using "  &
-          //"simple averaging of TMAX and TMIN.", iLogLevel = LOG_ALL, lEcho = FALSE )
-
-      elseif( ( Method_Name .strapprox. "MODIFIED" )                      &
-        .or. ( Method_Name .strapprox. "MODIFIED_GROWING_DEGREE-DAY" )    &
-        .or. ( Method_Name .strapprox. "MODIFIED_GROWING_DEGREE_DAY" )  )        then
-
-        this%init_GDD => model_initialize_GDD
-        this%calc_GDD => model_calculate_modified_GDD
-        call LOGS%WRITE( "==> Modified growing degree-day (GDD) will be calculated using "  &
-          //"a simple averaging of TMAX and TMIN.", iLogLevel = LOG_ALL, lEcho = FALSE )
+          //"FAO-56 method: GDD = max((max(Tmin,Tbase) + min(Tmax,Tupper))/2, Tbase) - Tbase.", &
+          iLogLevel = LOG_ALL, lEcho = FALSE )
 
       else
 
@@ -2828,25 +2823,11 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     call growing_degree_day_calculate( gdd=this%gdd,                                        &
-                                       tmean=this%tmean,                                    &
+                                       tmin=this%tmin,                                      &
+                                       tmax=this%tmax,                                      &
                                        order=this%sort_order )
 
   end subroutine model_calculate_GDD
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine model_calculate_modified_GDD( this )
-
-    use growing_degree_day, only           : modified_growing_degree_day_calculate
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    call modified_growing_degree_day_calculate( gdd=this%gdd,                                 &
-                                                tmin=this%tmin,                               &
-                                                tmax=this%tmax,                               &
-                                                order=this%sort_order )
-
-  end subroutine model_calculate_modified_GDD
 
 !--------------------------------------------------------------------------------------------------
 

@@ -1,0 +1,71 @@
+# FAO-56 (2025) Table 6.12: Approximate ranges for cumulative GDD (°C) for crops
+# not found in Table 6.11. Derived from original Table 11 of 1998 FAO-56.
+# Source: Allen et al., 2025, FAO Irrigation and Drainage Paper 56 (revised)
+# Note: Values in °C degree-days. Multiply by 1.8 to convert to °F degree-days.
+# Season types: "Min" = minimum length, "Max" = maximum length, "Common" = typical single value
+Crop	Category	Season	GDD_ini_C	GDD_dev_C	GDD_mid_C	GDD_late_C	GDD_total_C
+Asparagus	Roots/tubers/bulbs	Min	380	350	2510	480	3720
+Asparagus	Roots/tubers/bulbs	Max	670	540	2670	1480	5360
+Cassava, 1st year	Roots/tubers/bulbs	Common	260	510	1260	850	2880
+Celery roots	Roots/tubers/bulbs	Min	400	370	510	190	1470
+Celery roots	Roots/tubers/bulbs	Max	130	420	1730	400	2680
+Sweet potato	Roots/tubers/bulbs	Min	150	300	480	430	1360
+Sweet potato	Roots/tubers/bulbs	Max	170	320	560	370	1420
+Table beets	Roots/tubers/bulbs	Min	30	130	180	100	440
+Table beets	Roots/tubers/bulbs	Max	40	150	180	100	470
+Artichoke, 1st year	Leaves/flowers	Common	290	510	2100	80	2980
+Artichoke, 2nd year	Leaves/flowers	Common	120	230	2560	50	2960
+Asparagus	Leaves/flowers	Min	380	350	2510	480	3720
+Asparagus	Leaves/flowers	Max	670	540	2670	1480	5360
+Cabbage	Leaves/flowers	Common	790	620	220	80	1710
+Cauliflower	Leaves/flowers	Common	700	610	200	60	1570
+Mint	Leaves/flowers	Common	120	290	2510	820	3740
+Spinach	Leaves/flowers	Min	130	190	180	70	570
+Spinach	Leaves/flowers	Max	250	200	140	20	610
+Bean, green	Fruit/pod vegetable	Min	20	110	220	100	450
+Bean, green	Fruit/pod vegetable	Max	230	390	400	150	1170
+Cucumber	Fruit/pod vegetable	Min	80	170	450	270	970
+Cucumber	Fruit/pod vegetable	Max	370	510	520	120	1520
+Eggplant	Fruit/pod vegetable	Min	280	440	380	80	1180
+Eggplant	Fruit/pod vegetable	Max	230	540	480	180	1430
+Pumpkin, Winter squash	Fruit/pod vegetable	Min	170	380	370	150	1070
+Pumpkin, Winter squash	Fruit/pod vegetable	Max	230	440	430	200	1300
+Squash, Zucchini	Fruit/pod vegetable	Min	90	200	210	130	630
+Squash, Zucchini	Fruit/pod vegetable	Max	160	370	360	260	1150
+Black and green gram	Grain legumes	Common	110	240	420	200	970
+Chickpea	Grain legumes	Min	80	200	400	220	900
+Chickpea	Grain legumes	Max	120	250	430	210	1010
+Cowpea	Grain legumes	Min	220	350	440	230	1240
+Cowpea	Grain legumes	Max	310	450	550	300	1610
+
+Fava bean	Grain legumes	Min	80	200	400	220	900
+Fava bean	Grain legumes	Max	120	250	430	210	1010
+Groundnut, peanut	Grain legumes	Min	240	470	760	460	1930
+Groundnut, peanut	Grain legumes	Max	430	800	600	310	2140
+Lentil	Grain legumes	Min	130	270	830	620	1850
+Lentil	Grain legumes	Max	120	300	860	650	1930
+Flax, Linseed	Fiber/oil	Min	210	450	840	730	2230
+Flax, Linseed	Fiber/oil	Max	760	710	1530	1150	4150
+Castorbean	Fiber/oil	Min	280	530	640	330	1780
+Castorbean	Fiber/oil	Max	190	490	880	550	2110
+Safflower	Fiber/oil	Min	110	410	800	470	1790
+Safflower	Fiber/oil	Max	220	520	910	580	2230
+Sesame	Fiber/oil	Common	170	400	570	190	1330
+Sugar beet	Sugar crops	Min	300	290	790	520	1900
+Sugar beet	Sugar crops	Max	490	690	1770	120	3070
+Sugar cane, virgin	Sugar crops	Min	350	810	3480	1510	6150
+Sugar cane, virgin	Sugar crops	Max	830	2110	4990	3450	11380
+Sugar cane, ratoon	Sugar crops	Min	250	910	2630	770	4560
+Sugar cane, ratoon	Sugar crops	Max	350	1730	3500	730	6310
+Teff	Pseudo-cereals	Min	140	310	750	280	1480
+Teff	Pseudo-cereals	Max	500	700	1070	620	2890
+Hops	Vines	Common	90	360	1430	170	2050
+Alfalfa, first cutting	Forages/hay	Min	130	270	290	160	850
+Alfalfa, first cutting	Forages/hay	Max	70	310	380	180	940
+Alfalfa, middle cycles	Forages/hay	Min	80	170	180	100	530
+Alfalfa, middle cycles	Forages/hay	Max	70	340	190	220	820
+Bermuda, hay	Forages/hay	Min	30	260	510	450	1250
+Bermuda, hay	Forages/hay	Max	80	260	490	660	1490
+Grass Pasture	Forages/hay	Common	30	260	510	400	1200
+Sudan grass	Forages/hay	Min	50	290	250	160	750
+Sudan grass	Forages/hay	Max	320	410	290	210	1230

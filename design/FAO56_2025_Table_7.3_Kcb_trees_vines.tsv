@@ -1,0 +1,195 @@
+# FAO-56 (2025) Table 7.3: Basal crop coefficients (Kcb), maximum plant heights, and
+# maximum fraction of ground cover for non-stressed, well-managed fruit trees and vines
+# for use with FAO Penman-Monteith ETo.
+# Source: Allen et al., 2025, FAO Irrigation and Drainage Paper 56 (revised)
+# Note: fc and height given as ranges; midpoints used where practical.
+# Density column preserves the original description for reference.
+Crop	Category	Density/System	fc_mid	Height_max_m	Kcb_ini	Kcb_mid	Kcb_end
+Olive	Mediterranean	Young (<7yr traditional, <4yr intensive)	0.23	1.75	0.20	0.30	0.20
+Olive	Mediterranean	Traditional non-irrigated; 100-200 pl/ha	0.23	3.00	0.25	0.30	0.30
+Olive	Mediterranean	Traditional non-irrigated; 200-300 pl/ha	0.30	3.75	0.30	0.35	0.35
+Olive	Mediterranean	Intensive hedge-prune; 300-800 pl/ha	0.35	3.25	0.40	0.50	0.45
+Olive	Mediterranean	Super-intensive hedgerow; 800-1500 pl/ha	0.40	3.25	0.45	0.60	0.55
+Olive	Mediterranean	Super-intensive hedgerow; 1500-2000 pl/ha	0.50	3.50	0.50	0.65	0.60
+Table grapes	Mediterranean	Low (young); diverse trellis	0.35	1.25	0.20	0.55	0.45
+Table grapes	Mediterranean	Medium; T/Y-trellis, VSP; 1200-1700 pl/ha	0.50	1.85	0.25	0.85	0.60
+Table grapes	Mediterranean	High; Y-trellis, overhead; 1200-1700 pl/ha	0.78	2.25	0.35	1.05	0.75
+Wine grapes	Mediterranean	Very low (young <5yr); 2000-3300 pl/ha	0.12	1.25	0.10	0.20	0.15
+Wine grapes	Mediterranean	Low; diverse trellis; 2000-3300 pl/ha	0.25	1.75	0.20	0.45	0.25
+Wine grapes	Mediterranean	Medium; VSP/Guyot/GDC/Lyre; 2000-3300 pl/ha	0.43	1.75	0.25	0.70	0.45
+Wine grapes	Mediterranean	High; VSP/GDC/Lyre/Pergola; 2000-4300 pl/ha	0.55	2.00	0.30	0.85	0.55
+Wine grapes	Mediterranean	Very high; Y-trellis/GDC/overhead; 2000-4300 pl/ha	0.65	2.15	0.35	0.95	0.60
+Clementine/Mandarin/Lime	Citrus	Young (<5yr); vase	0.15	1.25	0.35	0.35	0.35
+Clementine/Mandarin/Lime	Citrus	Low; vase; <400 pl/ha	0.28	2.00	0.40	0.50	0.50
+Clementine/Mandarin/Lime	Citrus	Medium; vase; 400-550 pl/ha	0.48	2.75	0.60	0.65	0.65
+Clementine/Mandarin/Lime	Citrus	High; vase; >550 pl/ha	0.65	3.50	0.70	0.75	0.75
+Lemon	Citrus	Young (<5yr); vase	0.15	1.25	0.35	0.35	0.35
+Lemon	Citrus	Low; vase; <200 pl/ha	0.35	2.00	0.40	0.55	0.55
+Lemon	Citrus	Medium; vase; 200-400 pl/ha	0.60	2.75	0.65	0.70	0.70
+Lemon	Citrus	High; vase; >400 pl/ha	0.75	3.50	0.70	0.75	0.75
+Lemon	Citrus	Hedgerow (industry); >1000 pl/ha	0.65	2.75	0.70	0.75	0.75
+Orange/Grapefruit/Tangelo	Citrus	Young (<5yr); vase	0.15	1.75	0.35	0.35	0.35
+Orange/Grapefruit/Tangelo	Citrus	Low; vase; <400 pl/ha	0.30	2.50	0.40	0.50	0.45
+Orange/Grapefruit/Tangelo	Citrus	Medium; vase; 400-600 pl/ha	0.55	3.50	0.60	0.65	0.60
+Orange/Grapefruit/Tangelo	Citrus	High; vase; 600-950 pl/ha	0.75	4.50	0.65	0.75	0.70
+Orange/Grapefruit/Tangelo	Citrus	Hedgerow (industry); >1250 pl/ha	0.65	2.75	0.65	0.70	0.70
+Avocado	Mediterranean	Young (<3yr); vase	0.15	1.75	0.30	0.35	0.35
+Avocado	Mediterranean	Low; vase; <300 pl/ha	0.28	2.50	0.45	0.55	0.50
+Avocado	Mediterranean	Medium-high; vase; 300-400 pl/ha	0.48	3.50	0.65	0.75	0.70
+Avocado	Mediterranean	Very high; vase; >400 pl/ha	0.65	4.50	0.80	0.90	0.80
+Avocado	Mediterranean	Hedgerow medium; 300-400 pl/ha	0.48	2.75	0.70	0.75	0.70
+Avocado	Mediterranean	Hedgerow high; >400 pl/ha	0.73	3.25	0.85	0.90	0.80
+
+Fig tree	Mediterranean	Young (<5yr)	0.15	1.25	0.15	0.25	0.15
+Fig tree	Mediterranean	Low; <400 pl/ha	0.25	1.75	0.20	0.50	0.20
+Fig tree	Mediterranean	Medium-high; 800-1000 pl/ha	0.40	2.25	0.25	0.75	0.30
+Loquat	Mediterranean	Young (<4yr); vase	0.20	2.25	0.30	0.35	0.35
+Loquat	Mediterranean	Low-medium; vase; 450-600 pl/ha	0.38	3.00	0.40	0.65	0.60
+Loquat	Mediterranean	High; vase; >600 pl/ha	0.55	3.75	0.50	0.75	0.65
+Persimmon	Mediterranean	Young (<5yr)	0.12	1.75	0.15	0.25	0.10
+Persimmon	Mediterranean	Low-medium; 300-500 pl/ha	0.28	2.25	0.15	0.55	0.20
+Persimmon	Mediterranean	High; 500-800 pl/ha	0.50	2.75	0.20	0.80	0.45
+Pomegranate	Mediterranean	Young (<5yr)	0.20	1.75	0.15	0.30	0.20
+Pomegranate	Mediterranean	Low; vase; 500-800 pl/ha	0.33	2.25	0.20	0.45	0.25
+Pomegranate	Mediterranean	Medium; vase; 500-800 pl/ha	0.50	2.75	0.30	0.65	0.35
+Pomegranate	Mediterranean	High; vase; >800 pl/ha	0.65	3.25	0.35	0.85	0.50
+Pomegranate	Mediterranean	Young hedgerow; 7000-13500 pl/ha	0.40	0.60	0.60	0.70	0.70
+Pomegranate	Mediterranean	Mature hedgerow; 7000-13500 pl/ha	0.70	0.85	0.95	0.95	0.95
+Tea	Mediterranean	Young (<2yr); low hedgerow; 7000-13500 pl/ha	0.40	0.60	0.60	0.70	0.70
+Tea	Mediterranean	Mature; hedgerow; 7000-13500 pl/ha	0.70	0.85	0.95	0.95	0.95
+Apple	Temperate pome	Young (<4yr); central leader	0.20	2.75	0.20	0.45	0.25
+Apple	Temperate pome	Low; central leader; <1500 pl/ha	0.33	3.50	0.25	0.55	0.30
+Apple	Temperate pome	Medium; central leader; 1500-3000 pl/ha	0.45	3.50	0.35	0.75	0.35
+Apple	Temperate pome	High; central leader; 1500-3000 pl/ha	0.60	3.75	0.40	0.90	0.50
+Apple	Temperate pome	Very high; central leader; >3000 pl/ha	0.75	3.25	0.45	0.95	0.50
+Pear	Temperate pome	Young (<5yr); all systems	0.30	2.25	0.25	0.50	0.35
+Pear	Temperate pome	Low; vase; <1000 pl/ha	0.38	2.25	0.30	0.70	0.40
+Pear	Temperate pome	Medium; central leader; 1000-1600 pl/ha	0.48	3.25	0.40	0.90	0.50
+Pear	Temperate pome	High; central leader/trellis; >1500 pl/ha	0.65	3.75	0.55	1.00	0.60
+Apricot/Plum	Temperate stone	Young (<5yr); vase	0.35	2.25	0.20	0.50	0.25
+Apricot/Plum	Temperate stone	Low; vase; <200 pl/ha	0.53	2.75	0.30	0.70	0.35
+Apricot/Plum	Temperate stone	Medium; vase; 200-400 pl/ha	0.68	3.75	0.40	0.85	0.45
+Apricot/Plum	Temperate stone	High; vase; >400 pl/ha	0.75	4.25	0.45	0.95	0.55
+Apricot/Plum	Temperate stone	Very high; vase; >400 pl/ha	0.85	4.25	0.50	1.00	0.60
+Cherry	Temperate stone	Young (<5yr)	0.25	2.75	0.25	0.50	0.35
+Cherry	Temperate stone	Low; vase; <800 pl/ha	0.33	3.50	0.30	0.55	0.40
+Cherry	Temperate stone	Medium-high (vigorous); vase; <800 pl/ha	0.55	4.50	0.35	0.80	0.45
+Cherry	Temperate stone	Low-medium (semi-vigorous); central leader; 800-1250 pl/ha	0.45	4.50	0.35	0.75	0.50
+Cherry	Temperate stone	Medium-high (semi-dwarf); central leader; >1200 pl/ha	0.55	2.75	0.45	0.85	0.55
+Cherry	Temperate stone	High (dwarf); central leader; >1200 pl/ha	0.80	2.75	0.50	0.95	0.60
+
+Peach	Temperate stone	Young (<4yr)	0.25	1.75	0.20	0.50	0.25
+Peach	Temperate stone	Low (high vigour); vase; 400-600 pl/ha	0.40	2.75	0.25	0.70	0.40
+Peach	Temperate stone	Medium (medium vigour); vase; 400-700 pl/ha	0.58	4.00	0.30	0.90	0.50
+Peach	Temperate stone	High (low vigour); vase; >700 pl/ha	0.70	4.25	0.35	1.00	0.60
+Peach	Temperate stone	Medium; trellis; >1100 pl/ha	0.45	4.00	0.30	0.80	0.45
+Peach	Temperate stone	High; trellis; >1500 pl/ha	0.68	3.75	0.35	1.05	0.55
+Peach	Temperate stone	Very high; trellis; >2000 pl/ha	0.80	3.75	0.40	1.10	0.65
+Almond	Temperate nut	Young (<4yr)	0.25	2.75	0.15	0.40	0.30
+Almond	Temperate nut	Low (high vigour); vase; <400 pl/ha	0.30	3.00	0.25	0.50	0.35
+Almond	Temperate nut	Medium (medium vigour); vase; <400 pl/ha	0.48	4.25	0.30	0.80	0.45
+Almond	Temperate nut	High (low vigour); vase; >200 pl/ha	0.60	4.75	0.35	0.95	0.55
+Almond	Temperate nut	Very high (low vigour); vase; >200 pl/ha	0.70	4.75	0.35	1.05	0.60
+Almond	Temperate nut	Hedgerow/super-intensive (dwarf); >2500 pl/ha	0.38	2.25	0.25	0.80	0.40
+Hazelnut	Temperate nut	Young (<6yr)	0.30	1.75	0.20	0.55	0.35
+Hazelnut	Temperate nut	Low-medium; shrub; <500 pl/ha	0.45	2.75	0.25	0.70	0.40
+Hazelnut	Temperate nut	Medium-high; shrub; 500-700 pl/ha	0.63	4.00	0.35	0.80	0.45
+Hazelnut	Temperate nut	Very high; shrub; >700 pl/ha	0.75	4.75	0.40	0.90	0.50
+Hazelnut	Temperate nut	Hedgerow/super-intensive; >1000 pl/ha	0.60	2.75	0.40	0.90	0.50
+Pecans	Temperate nut	Young (<8yr)	0.35	7.00	0.25	0.60	0.40
+Pecans	Temperate nut	Low; vase; >100 pl/ha	0.50	9.00	0.30	0.65	0.45
+Pecans	Temperate nut	Medium-high; vase; 100-250 pl/ha	0.70	11.50	0.40	0.80	0.55
+Pecans	Temperate nut	Very high; vase; 250-300 pl/ha	0.85	14.00	0.45	0.90	0.60
+Pistachio	Temperate nut	Young (<10yr)	0.30	2.75	0.15	0.40	0.25
+Pistachio	Temperate nut	Low; vase; >100 pl/ha	0.43	3.50	0.25	0.70	0.35
+Pistachio	Temperate nut	Medium-high; vase; 150-350 pl/ha	0.60	4.25	0.30	0.85	0.45
+Pistachio	Temperate nut	Very high; vase; >300 pl/ha	0.75	4.75	0.35	0.95	0.55
+Pistachio	Temperate nut	Hedgerow/super-intensive; >1000 pl/ha	0.35	2.75	0.30	0.90	0.45
+Walnut	Temperate nut	Young (<7yr); vase	0.45	5.50	0.25	0.70	0.45
+Walnut	Temperate nut	Low; vase; <200 pl/ha	0.65	8.00	0.30	1.00	0.50
+Walnut	Temperate nut	Medium-very high; vase; 200-550 pl/ha	0.85	11.00	0.40	1.05	0.60
+Kiwifruit	Temperate other	Young (<6yr); trellis	0.50	1.75	0.20	0.65	0.40
+Kiwifruit	Temperate other	Medium; T-bar trellis; <800 pl/ha	0.70	2.10	0.25	0.85	0.70
+Kiwifruit	Temperate other	High; pergola; >800 pl/ha	0.78	2.25	0.30	0.90	0.75
+Hop	Temperate other	Common; trellis; <3500 pl/ha	0.10	6.50	0.15	0.95	0.80
+Blueberries	Temperate other	Young (<3yr)	0.40	1.25	0.20	0.55	0.35
+Blueberries	Temperate other	Common; 2500-5000 pl/ha	0.65	1.75	0.45	0.85	0.65
+
+Lowbush blueberry	Temperate other	Young (<2yr)	0.40	0.50	0.20	0.55	0.40
+Lowbush blueberry	Temperate other	Common; >5000 pl/ha	0.65	0.80	0.35	0.75	0.60
+Rabbiteye blueberry	Temperate other	Young (<3yr)	0.40	0.50	0.20	0.55	0.40
+Rabbiteye blueberry	Temperate other	Common; 2500-5000 pl/ha	0.65	0.80	0.35	0.70	0.60
+Blackberry	Temperate other	Young (<3yr)	0.40	0.75	0.20	0.35	0.25
+Blackberry	Temperate other	Common; 2000-5000 pl/ha	0.68	1.50	0.25	0.85	0.40
+Acerola	Subtropical	Young (<5yr)	0.40	1.75	0.35	0.45	0.40
+Acerola	Subtropical	Medium-high; 250-700 pl/ha	0.60	3.00	0.60	0.65	0.60
+Carambola	Subtropical	Young (<4yr)	0.35	1.75	0.55	0.90	0.70
+Carambola	Subtropical	Common; 156-278 pl/ha	0.50	3.00	0.85	1.05	1.00
+Cherimoya	Subtropical	Young (<3yr)	0.12	1.25	0.15	0.25	0.20
+Cherimoya	Subtropical	Low-medium; 125-400 pl/ha	0.25	2.50	0.30	0.45	0.40
+Cherimoya	Subtropical	Medium-high; 500-1250 pl/ha	0.40	3.25	0.55	0.80	0.65
+Cocoa	Subtropical	Young (<4yr); shading	0.40	1.75	0.45	0.65	0.60
+Cocoa	Subtropical	Medium shading; <1100 pl/ha	0.60	2.25	0.80	0.85	0.85
+Cocoa	Subtropical	High shading; <1500 pl/ha	0.75	2.25	0.90	0.95	0.95
+Coffee	Subtropical	Young (<4yr)	0.15	1.75	0.30	0.35	0.35
+Coffee	Subtropical	Low-medium; <6000 pl/ha	0.35	2.25	0.60	0.70	0.70
+Coffee	Subtropical	High (incl hedgerow); >6000 pl/ha	0.55	2.25	0.85	0.90	0.90
+Dragon fruit	Subtropical	Young (<3yr)	0.15	1.75	0.15	0.25	0.25
+Dragon fruit	Subtropical	Medium; <1800 pl/ha	0.25	2.25	0.25	0.50	0.40
+Dragon fruit	Subtropical	High; >1800 pl/ha	0.35	2.25	0.50	0.80	0.60
+Dragon fruit	Subtropical	High hedgerow; >2000 pl/ha	0.30	2.25	0.45	0.80	0.55
+Guava	Subtropical	Young (<8yr)	0.15	1.25	0.15	0.30	0.25
+Guava	Subtropical	Low-medium; <300 pl/ha	0.30	1.75	0.40	0.60	0.55
+Guava	Subtropical	High; <350 pl/ha	0.50	2.25	0.65	0.85	0.80
+Guava	Subtropical	Very high; >300 pl/ha	0.65	2.75	0.80	0.90	0.85
+Jujube	Subtropical	Young (<3yr)	0.20	1.75	0.15	0.30	0.20
+Jujube	Subtropical	Low-medium; <1100 pl/ha	0.33	2.50	0.20	0.45	0.30
+Jujube	Subtropical	High; >1100 pl/ha	0.45	3.25	0.25	0.70	0.45
+Papaya	Subtropical	Young (<1yr)	0.35	1.25	0.35	0.60	0.55
+Papaya	Subtropical	Medium (single row); 3000-4500 pl/ha	0.55	2.25	0.55	0.85	0.60
+Papaya	Subtropical	High (single/double row); <7000 pl/ha	0.78	2.75	0.75	1.00	0.80
+
+Passionfruit	Subtropical	Young; VSP	0.12	1.75	0.25	0.30	0.25
+Passionfruit	Subtropical	Medium; VSP; 500 pl/ha	0.25	1.75	0.45	0.60	0.50
+Passionfruit	Subtropical	High; VSP; 1000 pl/ha	0.40	1.75	0.70	0.85	0.75
+Passionfruit	Subtropical	Young; hedgerow	0.30	1.75	0.50	0.60	0.55
+Passionfruit	Subtropical	High; hedgerow; 1000 pl/ha	0.40	1.75	0.80	0.95	0.80
+Passionfruit	Subtropical	Young; overhead trellis	0.50	2.00	0.60	0.75	0.70
+Passionfruit	Subtropical	Very high; overhead trellis; 2000 pl/ha	0.65	2.00	0.95	1.00	0.95
+Cashew, dwarf	Tropical	Young (<5yr)	0.40	2.75	0.30	0.50	0.40
+Cashew, dwarf	Tropical	Common; 150-330 pl/ha	0.58	4.00	0.55	0.60	0.55
+Jaboticaba	Tropical	Young (<5yr)	0.40	1.75	0.35	0.45	0.40
+Jaboticaba	Tropical	Common; 250-500 pl/ha	0.55	2.75	0.55	0.80	0.65
+Longan	Tropical	Young (<5yr)	0.25	1.50	0.30	0.45	0.45
+Longan	Tropical	Common; 250-300 pl/ha	0.35	3.25	0.70	0.90	0.85
+Lychee	Tropical	Young (<5yr); vase	0.15	2.25	0.35	0.40	0.40
+Lychee	Tropical	Low-medium; vase; 100-200 pl/ha	0.25	3.25	0.45	0.60	0.55
+Lychee	Tropical	High; vase; 200-400 pl/ha	0.35	4.50	0.70	0.90	0.80
+Macadamia	Tropical	Young (<10yr)	0.40	1.75	0.35	0.50	0.40
+Macadamia	Tropical	Medium-high; 300-500 pl/ha	0.55	3.25	0.55	0.60	0.55
+Mango	Tropical	Young (<4yr)	0.20	1.75	0.25	0.40	0.35
+Mango	Tropical	Low-medium; 100-250 pl/ha	0.33	2.50	0.45	0.70	0.60
+Mango	Tropical	High; 400-600 pl/ha	0.45	3.25	0.65	0.85	0.75
+Cactus pear	Plantations	Young (<3yr)	0.25	1.25	0.15	0.20	0.20
+Cactus pear	Plantations	Medium; 350-800 pl/ha	0.40	1.75	0.20	0.30	0.25
+Cactus pear	Plantations	High; >800 pl/ha	0.55	2.25	0.30	0.45	0.35
+Coconut/Acai palm	Plantations	Young	0.25	2.25	0.30	0.35	0.35
+Coconut/Acai palm	Plantations	Medium; 100-200 pl/ha	0.40	3.75	0.60	0.65	0.65
+Coconut/Acai palm	Plantations	High; >200 pl/ha	0.55	5.50	0.90	0.90	0.90
+Date palm	Plantations	Young (<10yr)	0.15	3.50	0.25	0.35	0.35
+Date palm	Plantations	Medium; 100-130 pl/ha	0.35	7.00	0.50	0.60	0.60
+Date palm	Plantations	High; 130-200 pl/ha	0.60	8.50	0.80	0.80	0.80
+Date palm	Plantations	Very high; >200 pl/ha	0.75	10.50	0.85	0.90	0.90
+Jatropha	Plantations	Young (<2yr); vase	0.12	0.75	0.25	0.25	0.25
+Jatropha	Plantations	Low-medium; vase; 1100-1500 pl/ha	0.25	1.50	0.35	0.55	0.40
+Jatropha	Plantations	High; vase; >1500 pl/ha	0.40	2.25	0.55	0.80	0.70
+
+Oil palm	Plantations	Young (<3yr)	0.25	2.25	0.30	0.35	0.35
+Oil palm	Plantations	Medium; 100-150 pl/ha	0.40	3.75	0.60	0.70	0.70
+Oil palm	Plantations	High; >150 pl/ha	0.55	5.50	0.85	0.95	0.95
+Peach palm	Plantations	Young (<=2.5yr)	0.25	1.75	0.25	0.50	0.40
+Peach palm	Plantations	Common; 3000-5000 pl/ha (palmito)	0.35	2.25	0.55	0.75	0.70
+Ramie	Plantations	Young (<2yr)	0.70	0.85	0.15	0.55	0.50
+Ramie	Plantations	Common; 40000-60000 pl/ha	0.88	1.50	0.20	1.00	0.95
+Rubber tree	Plantations	Young (<6yr)	0.65	7.00	0.40	0.60	0.50
+Rubber tree	Plantations	Common; 400-700 pl/ha	0.83	11.50	0.75	0.90	0.80

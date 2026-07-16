@@ -1,0 +1,110 @@
+# FAO-56 (2025) Table 7.1: Basal crop coefficients (Kcb), maximum plant heights, and
+# maximum fraction of ground cover for non-stressed, well-managed vegetable crops
+# in subhumid climates (RHmin~45%, u2~2 m/s) for use with FAO Penman-Monteith ETo.
+# Source: Allen et al., 2025, FAO Irrigation and Drainage Paper 56 (revised)
+# Note: Where ranges are given (e.g., "0.30-0.45"), midpoint or representative value used.
+Crop	Category	Season	Kcb_ini	Kcb_mid	Kcb_end	Height_max_m	fc_max
+Asparagus	Roots/tubers/bulbs	Common	0.15	0.80	0.20	0.80	0.90
+Carrots	Roots/tubers/bulbs	Common	0.15	0.90	0.75	0.30	0.90
+Cassava	Roots/tubers/bulbs	Year 1	0.15	0.95	0.50	1.00	0.80
+Cassava	Roots/tubers/bulbs	Year 2	0.50	1.00	0.50	1.50	0.80
+Celeriac	Roots/tubers/bulbs	Common	0.15	0.95	0.85	0.75	0.95
+Chufa, tigernut	Roots/tubers/bulbs	Common	0.15	1.00	0.50	0.60	0.98
+Garlic	Roots/tubers/bulbs	Common	0.15	1.00	0.50	0.50	0.85
+Leek	Roots/tubers/bulbs	Common	0.15	0.95	0.85	0.50	0.80
+Mashua	Roots/tubers/bulbs	Common	0.15	1.00	0.65	0.60	0.85
+Onions, dry	Roots/tubers/bulbs	Dry	0.15	1.00	0.60	0.45	0.85
+Onions, green	Roots/tubers/bulbs	Green	0.15	0.95	0.80	0.45	0.75
+Onions, seed	Roots/tubers/bulbs	Seed	0.15	0.95	0.45	0.45	0.75
+Parsnip	Roots/tubers/bulbs	Common	0.15	1.00	0.95	0.40	0.85
+Potato	Roots/tubers/bulbs	Long	0.15	1.05	0.30	0.60	0.90
+Potato	Roots/tubers/bulbs	Short	0.15	1.05	0.50	0.60	0.90
+Radish	Roots/tubers/bulbs	Common	0.15	0.90	0.75	0.30	0.80
+Rutabaga	Roots/tubers/bulbs	Common	0.15	1.05	0.90	0.60	0.85
+Sweet potato	Roots/tubers/bulbs	Common	0.15	1.05	0.50	0.50	0.95
+Table beets	Roots/tubers/bulbs	Common	0.15	1.00	0.90	0.40	0.85
+Turnip	Roots/tubers/bulbs	Common	0.15	1.00	0.95	0.60	0.85
+Yam, Taro	Roots/tubers/bulbs	Common	0.15	1.00	0.95	1.20	0.80
+African cabbage	Leaves/flowers	Common	0.15	0.90	0.75	0.38	0.85
+African spinach	Leaves/flowers	Common	0.15	1.00	0.90	0.85	0.95
+Artichoke	Leaves/flowers	Common	0.15	0.85	0.80	0.80	0.75
+Arugula, rocket	Leaves/flowers	Common	0.15	0.95	0.95	0.45	0.85
+Broccoli	Leaves/flowers	Common	0.15	1.00	1.00	0.60	0.90
+Brussel sprouts	Leaves/flowers	Common	0.15	1.00	1.00	0.75	0.90
+Cabbage	Leaves/flowers	Common	0.15	1.00	0.90	0.40	0.85
+Kale, Collard green	Leaves/flowers	Year 1	0.15	0.90	0.80	1.00	0.85
+Kale, Collard green	Leaves/flowers	Year 2	0.55	0.90	0.75	1.00	0.85
+Chinese cabbage, bok choy	Leaves/flowers	Year 1	0.15	1.00	0.90	0.40	0.85
+Chinese cabbage, bok choy	Leaves/flowers	Year 2	0.55	1.00	0.80	0.40	0.85
+Chinese cabbage, pak choi	Leaves/flowers	Year 1	0.15	0.95	0.80	0.35	0.90
+Chinese cabbage, pak choi	Leaves/flowers	Year 2	0.50	0.95	0.75	0.35	0.90
+Cauliflower	Leaves/flowers	Common	0.15	1.00	0.95	0.40	0.85
+Celery	Leaves/flowers	Common	0.15	1.00	0.95	0.60	0.80
+Endive, escarola	Leaves/flowers	Common	0.15	0.80	0.75	0.40	0.95
+Jute mallow	Leaves/flowers	Common	0.15	0.95	0.85	1.30	0.95
+Lettuce	Leaves/flowers	Common	0.15	1.00	1.00	0.35	0.80
+Purslane	Leaves/flowers	Common	0.15	0.90	0.85	0.40	0.90
+
+Spinach	Leaves/flowers	Common	0.15	0.95	0.95	0.35	0.80
+Banana	Fruit vegetable	1st cycle	0.15	1.00	0.90	2.65	0.95
+Banana	Fruit vegetable	2nd cycle	0.60	1.05	1.00	3.25	0.85
+Bell pepper	Fruit vegetable	Common	0.15	1.00	0.70	0.70	0.90
+Bitter gourd	Fruit vegetable	Common	0.15	0.85	0.60	1.75	0.95
+Cape gooseberry	Fruit vegetable	Year 1	0.25	0.40	0.30	1.00	0.30
+Cape gooseberry	Fruit vegetable	Following years	0.35	0.85	0.50	1.50	0.40
+Chili habanero	Fruit vegetable	Common	0.15	1.05	0.65	0.80	0.85
+Chili pepper	Fruit vegetable	Common	0.15	1.05	0.70	0.75	0.85
+Chili tabasco	Fruit vegetable	First harvest	0.15	1.05	0.65	0.80	0.85
+Chili tabasco	Fruit vegetable	Second harvest	0.55	1.00	0.60	0.80	0.85
+Cucumber, processing	Fruit vegetable	Processing	0.15	0.95	0.80	0.40	0.90
+Cucumber, fresh	Fruit vegetable	Fresh market	0.15	0.95	0.70	0.40	0.90
+Cucumber, trellis	Fruit vegetable	Trellis	0.15	0.95	0.70	1.00	0.90
+Eggplant	Fruit vegetable	Common	0.15	1.00	0.90	0.80	0.75
+Fennel	Fruit vegetable	Common	0.15	0.90	0.30	0.58	0.85
+Melon	Fruit vegetable	Common	0.15	0.95	0.75	0.30	0.95
+Melon, cantaloupe	Fruit vegetable	Common	0.15	0.95	0.70	0.30	0.90
+Nightshade, sunberry	Fruit vegetable	Common	0.15	0.85	0.80	0.75	0.80
+Okra	Fruit vegetable	Common	0.15	0.90	0.75	0.90	0.90
+Pineapple	Fruit vegetable	Common	0.15	0.85	0.80	0.40	0.90
+Pumpkin, winter squash	Fruit vegetable	Common	0.15	0.90	0.55	0.40	0.90
+Strawberries	Fruit vegetable	Common	0.15	0.75	0.65	0.20	0.75
+Tomato, processing	Fruit vegetable	Processing	0.15	1.05	0.75	0.60	0.90
+Tomato, fresh	Fruit vegetable	Fresh market	0.15	1.05	0.90	0.60	0.90
+Tomato, trellis	Fruit vegetable	Trellis	0.15	1.10	0.80	1.50	0.90
+Watermelon	Fruit vegetable	Common	0.15	1.00	0.60	0.40	0.85
+Zucchini, Squash	Fruit vegetable	Common	0.15	0.90	0.60	0.50	0.90
+Chicory	Spicy/medicinal herbs	Common	0.15	0.85	0.75	0.68	0.85
+Ginger	Spicy/medicinal herbs	Common	0.15	0.75	0.50	0.70	0.95
+Licorice	Spicy/medicinal herbs	Common	0.15	0.90	0.75	1.00	0.90
+Nutgrass	Spicy/medicinal herbs	Common	0.15	0.80	0.40	1.10	0.90
+Turmeric	Spicy/medicinal herbs	Common	0.15	0.95	0.75	1.00	0.90
+Absinthe, wormwood	Spicy/medicinal herbs	Common	0.15	0.70	0.30	1.00	0.85
+Basil	Spicy/medicinal herbs	Common	0.15	0.95	0.90	0.75	0.95
+Cardamom	Spicy/medicinal herbs	Common	0.15	0.85	0.85	2.25	0.80
+Chamomile	Spicy/medicinal herbs	Common	0.15	0.80	0.40	0.70	0.95
+Coriander	Spicy/medicinal herbs	Common	0.15	1.00	0.95	0.30	0.95
+Fenugreek	Spicy/medicinal herbs	Common	0.15	0.90	0.60	1.00	0.95
+Lavender	Spicy/medicinal herbs	Common	0.15	0.85	0.65	0.40	0.85
+Lemon balm	Spicy/medicinal herbs	Common	0.15	1.00	0.90	0.50	0.80
+
+Mint, Japanese	Spicy/medicinal herbs	Common	0.15	1.05	1.00	0.55	0.95
+Peppermint, single harvest	Spicy/medicinal herbs	Single harvest	0.15	1.05	0.95	0.40	0.95
+Peppermint, multiple harvest	Spicy/medicinal herbs	Multiple harvest	0.15	0.90	0.85	0.40	0.90
+Spearmint	Spicy/medicinal herbs	Common	0.15	0.95	0.85	0.40	0.95
+Oregano	Spicy/medicinal herbs	Common	0.15	0.80	0.65	0.45	0.95
+Parsley	Spicy/medicinal herbs	Common	0.15	0.95	0.85	0.38	0.95
+Plumed cockscomb	Spicy/medicinal herbs	Common	0.15	0.85	0.30	0.55	0.95
+Roselle	Spicy/medicinal herbs	Common	0.15	0.95	0.70	0.60	0.80
+Rosemary	Spicy/medicinal herbs	Common	0.15	0.80	0.60	0.63	0.85
+Saffron	Spicy/medicinal herbs	Common	0.15	0.85	0.30	0.13	0.30
+Stevia	Spicy/medicinal herbs	Common	0.15	0.85	0.60	0.55	0.90
+Summer savory	Spicy/medicinal herbs	Common	0.15	1.00	0.95	0.50	0.90
+Thyme	Spicy/medicinal herbs	Common	0.15	0.85	0.70	0.40	0.90
+Yarrow	Spicy/medicinal herbs	Common	0.15	0.90	0.70	0.95	0.75
+Ajowan	Spicy/medicinal herbs	Common	0.15	0.70	0.20	0.83	0.65
+Black cumin	Spicy/medicinal herbs	Common	0.15	0.95	0.35	0.40	0.95
+Chia	Spicy/medicinal herbs	Common	0.15	0.90	0.30	0.80	0.95
+Cumin	Spicy/medicinal herbs	Common	0.15	0.80	0.30	0.28	0.95
+Milk thistle	Spicy/medicinal herbs	Common	0.15	0.75	0.55	1.43	0.75
+Lesquerella, popweed	Spicy/medicinal herbs	Common	0.15	0.75	0.20	0.40	0.90
+Vanilla	Spicy/medicinal herbs	Common	0.95	0.95	0.95	1.75	0.95
