@@ -247,7 +247,11 @@ contains
     call assert( status == 0, "phenology_initialize: allocation failed", __FILE__, __LINE__ )
     if ( allocated( temp_float_values ) &
          .and. size( temp_float_values ) == number_of_landuses ) then
-      L_INI_DAYS = int( temp_float_values, c_int )
+      where ( temp_float_values > NA_FLOAT )
+        L_INI_DAYS = int( temp_float_values, c_int )
+      elsewhere
+        L_INI_DAYS = NODATA_INT
+      end where
       deallocate( temp_float_values )
     else
       L_INI_DAYS = NODATA_INT
@@ -258,7 +262,11 @@ contains
     call assert( status == 0, "phenology_initialize: allocation failed", __FILE__, __LINE__ )
     if ( allocated( temp_float_values ) &
          .and. size( temp_float_values ) == number_of_landuses ) then
-      L_DEV_DAYS = int( temp_float_values, c_int )
+      where ( temp_float_values > NA_FLOAT )
+        L_DEV_DAYS = int( temp_float_values, c_int )
+      elsewhere
+        L_DEV_DAYS = NODATA_INT
+      end where
       deallocate( temp_float_values )
     else
       L_DEV_DAYS = NODATA_INT
@@ -269,7 +277,11 @@ contains
     call assert( status == 0, "phenology_initialize: allocation failed", __FILE__, __LINE__ )
     if ( allocated( temp_float_values ) &
          .and. size( temp_float_values ) == number_of_landuses ) then
-      L_MID_DAYS = int( temp_float_values, c_int )
+      where ( temp_float_values > NA_FLOAT )
+        L_MID_DAYS = int( temp_float_values, c_int )
+      elsewhere
+        L_MID_DAYS = NODATA_INT
+      end where
       deallocate( temp_float_values )
     else
       L_MID_DAYS = NODATA_INT
@@ -280,7 +292,11 @@ contains
     call assert( status == 0, "phenology_initialize: allocation failed", __FILE__, __LINE__ )
     if ( allocated( temp_float_values ) &
          .and. size( temp_float_values ) == number_of_landuses ) then
-      L_LATE_DAYS = int( temp_float_values, c_int )
+      where ( temp_float_values > NA_FLOAT )
+        L_LATE_DAYS = int( temp_float_values, c_int )
+      elsewhere
+        L_LATE_DAYS = NODATA_INT
+      end where
       deallocate( temp_float_values )
     else
       L_LATE_DAYS = NODATA_INT

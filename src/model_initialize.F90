@@ -170,9 +170,7 @@ contains
 
     ! at this point the list of files that need to be incorporated into the parameter
     ! database should be complete; munge each file in turn and add the parameter values to
-    ! the parameter dictionary
-    
-    ! this should be OK to run again; duplicate entries should now be ignored
+    ! the parameter dictionary (files already munged in initialize_lookup_tables are skipped)
     call PARAMS%munge_file()
 
     ! scan the control file input for method specifications

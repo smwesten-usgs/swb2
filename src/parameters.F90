@@ -28,6 +28,7 @@ module parameters
     type (FSTRING_LIST_T)               :: delimiters
     type (FSTRING_LIST_T)               :: comment_chars
     type (DICT_T)                       :: dict
+    type (FSTRING_LIST_T)               :: munged_files
     integer (c_int)                     :: count           = 0
 
   contains
@@ -122,7 +123,6 @@ contains
     character (len=:), allocatable :: comment_chars_
     character (len=:), allocatable :: delimiters_
     logical (c_bool), allocatable  :: skip_this_column(:)
-    type (FSTRING_LIST_T)          :: unique_file_list
     integer (kind=c_int)           :: row_indx
     integer (c_int)                :: number_of_columns
     character (len=MAX_TABLE_RECORD_LEN) :: sRecord, sItem
@@ -160,9 +160,9 @@ contains
         filename1 = this%filenames%get(iFileIndex)
 
         ! if this filename has already been seen and processed, ignore and move on to next filename
-        if ( unique_file_list%count_matching(filename1) > 0 ) cycle
+        if ( this%munged_files%count_matching(filename1) > 0 ) cycle
 
-        call unique_file_list%append(filename1)
+        call this%munged_files%append(filename1)
 
         ! open the file associated with current file index value
         call DF%open(sFilename = filename1,                                  &

@@ -101,10 +101,14 @@ contains
 
 
     if ( ubound( gdd_max_l, 1 ) == number_of_landuse_codes        &
-        .and. gdd_max_l(1) > rTINYVAL ) then
+        .and. any( gdd_max_l > rTINYVAL ) ) then
 
       do indx=1, ubound( landuse_index, 1)
-        GDD_MAX( indx ) = gdd_max_l( landuse_index( indx ) )
+        if ( gdd_max_l( landuse_index( indx ) ) > rTINYVAL ) then
+          GDD_MAX( indx ) = gdd_max_l( landuse_index( indx ) )
+        else
+          GDD_MAX( indx ) = 86.0_c_float
+        end if
       enddo
 
     else
@@ -116,10 +120,14 @@ contains
 
 
     if ( ubound( gdd_base_l, 1 ) == number_of_landuse_codes        &
-        .and. gdd_base_l(1) > rTINYVAL  ) then
+        .and. any( gdd_base_l > rTINYVAL ) ) then
 
       do indx=1, ubound( landuse_index, 1)
-        GDD_BASE( indx ) = gdd_base_l( landuse_index( indx ) )
+        if ( gdd_base_l( landuse_index( indx ) ) > rTINYVAL ) then
+          GDD_BASE( indx ) = gdd_base_l( landuse_index( indx ) )
+        else
+          GDD_BASE( indx ) = 50.0_c_float
+        end if
       enddo
 
     else
