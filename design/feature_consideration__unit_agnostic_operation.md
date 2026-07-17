@@ -217,3 +217,66 @@ INTERNAL_TEMPERATURE_UNITS  CELSIUS # or FAHRENHEIT (default)
 - **CI pipeline (Phase 4 of improvement plan):** Essential before attempting Phase 2. Need automated regression tests to catch unit bugs.
 - **test-drive migration:** Unit tests for each process module should include metric-mode variants.
 - **PROJ modernization:** Orthogonal — coordinate system units (meters vs feet) are separate from the water-balance length units.
+
+
+---
+
+## Update (2026-07-17): Practical Recommendation After FAO56_GDD Implementation
+
+### The Immediate Pain Point
+
+The FAO56_GDD phenology feature is working correctly, but the user experience is poor: all GDD values from FAO-56 (2025) are published in °C and °C·d, requiring manual ×1.8 conversion for every crop before entry into the lookup table. This was a source of bugs during integration testing (forest stage lengths were accidentally left in °C·d, causing seasons to end in June).
+
+The Kcb values, curve numbers, and depletion fractions are dimensionless — no conversion needed. The GDD parameters are the only ones that create friction.
+
+### Recommended Approach: Lookup Table Temperature Units Directive
+
+Add a single control file directive that tells SWB what temperature units the lookup table uses:
+
+```
+LOOKUP_TABLE_TEMPERATURE_UNITS  CELSIUS     # or FAHRENHEIT (default)
+```
+
+When set to CELSIUS, SWB auto-converts on read:
+- `GDD_Base` and `GDD_Max`: standard T conversion (°C × 1.8 + 32 → °F)
+- `GDD_ini`, `GDD_dev`, `GDD_mid`, `GDD_late`: degree-day conversion (°C·d × 1.8 → °F·d)
+- `Growing_season_start_GDD`: same degree-day conversion (°C·d × 1.8 → °F·d)
+- `Killing_frost_temperature`: standard T conversion (°C × 1.8 + 32 → °F)
+
+Internal calculations remain in °F — no process module changes needed.
+
+### Implementation Scope
+
+| File | Change | Effort |
+|------|--------|--------|
+| `model_initialize.F90` | Parse `LOOKUP_TABLE_TEMPERATURE_UNITS` directive | 30 min |
+| `constants_and_conversions.F90` | Add `LOOKUP_TABLE_TEMP_UNIT` global enum | 15 min |
+| `growing_degree_day.F90` | After reading `gdd_base_l` / `gdd_max_l`, apply conversion if CELSIUS | 30 min |
+| `phenology.F90` | After reading `Growing_season_start_GDD`, `GDD_ini/dev/mid/late`, `Killing_frost_temperature`, apply conversion if CELSIUS | 1 hour |
+| `crop_coefficients__fao56.F90` | Same — convert `GROWTH_STAGE_GDD` values after read | 30 min |
+
+**Total effort: ~3 hours. Zero risk to calculation correctness** (conversions happen at read time, before any values enter the calculation engine).
+
+### Why This Is Better Than Full MKS Conversion
+
+1. **Addresses 100% of the user pain** with 1% of the effort
+2. **Zero regression risk** — internal engine untouched
+3. **Backward compatible** — default is FAHRENHEIT, existing control files unchanged
+4. **FAO-56 values go directly from the publication into the lookup table** — no manual conversion, no conversion bugs
+5. **Can be implemented and tested in a single session** without CI infrastructure
+
+### Why NOT Full Internal Metric (Yet)
+
+- The CN formula constants (1000, 10 in inches) are deeply embedded and well-tested
+- CFGI has decade-tested thresholds in °F/inches
+- No CI pipeline exists yet to catch regressions (prerequisite from Phase 4)
+- The ET modules already convert internally — making them metric-native saves some CPU cycles but doesn't change results
+- The benefit/risk ratio is poor until regression test infrastructure is in place
+
+### Sequencing
+
+1. **Now**: Implement `LOOKUP_TABLE_TEMPERATURE_UNITS CELSIUS` (3 hours, immediate user value)
+2. **Phase 1** (from original plan): Output-only conversion to mm/°C (1-2 days)
+3. **After CI exists**: Full internal metric option (3-4 weeks)
+
+This lets users write FAO-56 GDD tables directly in °C·d today, get output in metric units soon, and eventually run the whole engine in metric once the safety net of automated testing is in place.

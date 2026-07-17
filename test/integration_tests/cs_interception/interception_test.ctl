@@ -32,7 +32,7 @@ AVAILABLE_WATER_CONTENT_METHOD   GRIDDED
 ROOTING_DEPTH_METHOD             STATIC
 
 %% Climate data — use existing Central Sands Daymet NetCDFs (2012 only)
-PRECIPITATION NETCDF ../../test_data/cs/prcp_Daymet_v3_2012.nc
+PRECIPITATION NETCDF prcp_Daymet_v3_2012.nc
 PRECIPITATION_GRID_PROJECTION_DEFINITION +proj=lcc +lat_1=25.0 +lat_2=60.0 +lat_0=42.5 +lon_0=-100.0 +x_0=0.0 +y_0=0.0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs
 PRECIPITATION_NETCDF_Z_VAR                prcp
 PRECIPITATION_SCALE_FACTOR          0.03937008
@@ -40,7 +40,7 @@ PRECIPITATION_MISSING_VALUES_CODE      -9999.0
 PRECIPITATION_MISSING_VALUES_OPERATOR      <=
 PRECIPITATION_MISSING_VALUES_ACTION       zero
 
-TMAX NETCDF ../../test_data/cs/tmax_Daymet_v3_2012.nc
+TMAX NETCDF tmax_Daymet_v3_2012.nc
 TMAX_GRID_PROJECTION_DEFINITION +proj=lcc +lat_1=25.0 +lat_2=60.0 +lat_0=42.5 +lon_0=-100.0 +x_0=0.0 +y_0=0.0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs
 TMAX_SCALE_FACTOR                 1.8
 TMAX_ADD_OFFSET                  32.0
@@ -48,7 +48,7 @@ TMAX_MISSING_VALUES_CODE      -9999.0
 TMAX_MISSING_VALUES_OPERATOR      <=
 TMAX_MISSING_VALUES_ACTION       mean
 
-TMIN NETCDF ../../test_data/cs/tmin_Daymet_v3_2012.nc
+TMIN NETCDF tmin_Daymet_v3_2012.nc
 TMIN_GRID_PROJECTION_DEFINITION +proj=lcc +lat_1=25.0 +lat_2=60.0 +lat_0=42.5 +lon_0=-100.0 +x_0=0.0 +y_0=0.0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs
 TMIN_SCALE_FACTOR                 1.8
 TMIN_ADD_OFFSET                  32.0
@@ -57,16 +57,16 @@ TMIN_MISSING_VALUES_OPERATOR      <=
 TMIN_MISSING_VALUES_ACTION       mean
 
 %% Static grids — use existing Central Sands data
-FLOW_DIRECTION ARC_GRID ../../test_data/cs/d8_flow_direction.asc
+FLOW_DIRECTION ARC_GRID d8_flow_direction.asc
 FLOW_DIRECTION_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m
 
-HYDROLOGIC_SOILS_GROUP ARC_GRID ../../test_data/cs/hydrologic_soils_group.asc
+HYDROLOGIC_SOILS_GROUP ARC_GRID hydrologic_soils_group.asc
 HYDROLOGIC_SOILS_GROUP_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m
 
-LAND_USE ARC_GRID ../../test_data/cs/landuse.asc
+LAND_USE ARC_GRID landuse.asc
 LANDUSE_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m
 
-AVAILABLE_WATER_CONTENT ARC_GRID ../../test_data/cs/available_water_capacity.asc
+AVAILABLE_WATER_CONTENT ARC_GRID available_water_capacity.asc
 AVAILABLE_WATER_CONTENT_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m
 
 %% Frozen ground
