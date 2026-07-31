@@ -1,0 +1,15 @@
+# KCB method detection test table — exercises all phenology/Kcb combinations
+# Row 1 (LU 12): FAO56_GDD — has Growing_season_start_GDD + GDD_ini/dev/mid/late + Kcb staged
+# Row 2 (LU  5): FAO56_DATES — has Growing_season_start_date + L_ini/dev/mid/late + Kcb staged
+# Row 3 (LU 141): DOY_BASED + monthly Kcb — has start/end dates + Kcb_Jan..Dec
+# Row 4 (LU 23): DOY_BASED + staged Kcb — has start/end dates + Kcb_ini/mid/end/min
+# Row 5 (LU 131): PHENOLOGY_NONE + explicit Kcb=0 — all phenology <NA>, Kcb_ini=0, etc.
+# Row 6 (LU 111): PHENOLOGY_NONE + missing Kcb — should FATAL
+#
+LU_Code	Description	Growing_season_start_date	Growing_season_end_date	Growing_season_start_GDD	Killing_frost_temperature	L_ini	L_dev	L_mid	L_late	GDD_ini	GDD_dev	GDD_mid	GDD_late	GDD_Base	GDD_Max	KCB_ini	KCB_mid	KCB_end	KCB_min	Kcb_Jan	Kcb_Feb	Kcb_Mar	Kcb_Apr	Kcb_May	Kcb_Jun	Kcb_Jul	Kcb_Aug	Kcb_Sep	Kcb_Oct	Kcb_Nov	Kcb_Dec
+12	Sweet Corn (FAO56_GDD)	<NA>	<NA>	100.0	28.0	<NA>	<NA>	<NA>	<NA>	350	1000	1600	2000	50	130	0.20	0.96	0.60	0.19	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>
+5	Soybeans (FAO56_DATES)	05/20	<NA>	<NA>	<NA>	20	30	60	25	<NA>	<NA>	<NA>	<NA>	50	130	0.20	1.05	0.30	0.19	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>
+141	Deciduous Forest (DOY+monthly)	04/15	10/15	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	50	130	<NA>	<NA>	<NA>	<NA>	0.30	0.30	0.40	0.60	0.85	1.00	1.00	0.95	0.80	0.50	0.35	0.30
+23	Spring Wheat (DOY+staged)	04/20	09/01	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	50	130	0.15	1.15	0.25	0.14	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>
+131	Barren (NONE+explicit Kcb=0)	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	50	130	0.0	0.0	0.0	0.0	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>
+111	Open Water (NONE+missing Kcb)	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	50	130	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>	<NA>

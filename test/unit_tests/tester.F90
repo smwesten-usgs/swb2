@@ -23,6 +23,7 @@ program tester
   use test_phenology, only: collect_phenology
   use test_interception_bucket, only: collect_interception_bucket
   use test_growing_degree_day, only: collect_growing_degree_day
+  use test_crop_coefficient_method_detection, only: collect_crop_coefficient_method_detection
   implicit none
 
   integer :: stat, suite_index, total_tests
@@ -45,6 +46,7 @@ program tester
     new_testsuite("exceptions", collect_exceptions), &
     new_testsuite("gash", collect_gash), &
     new_testsuite("datetime", collect_datetime), &
+    new_testsuite("crop_coeff", collect_crop_coefficient_method_detection), &
     new_testsuite("phenology", collect_phenology), &
     new_testsuite("interception_bucket", collect_interception_bucket), &
     new_testsuite("growing_degree_day", collect_growing_degree_day), &

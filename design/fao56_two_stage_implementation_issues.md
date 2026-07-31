@@ -1,12 +1,16 @@
 # FAO-56 Two-Stage Implementation: Known Issues and Planned Fixes
 
-**Date:** June 2026  
+**Date:** June 2026 (updated July 2026)  
 **Source file:** `src/actual_et__fao56__two_stage.F90`  
 **Comparison reference:** pyfao56 package (Thorp, 2022)
 
+**Changelog:**
+- July 2026: Added Issue 1a (irrigation module amplification), quantitative evidence from Michigan SWB model, git chronology of when issues were introduced, and clarified the interaction chain between variable rooting depth, TAW, Ks, and irrigation triggering.
+- July 28, 2026: Revised impact assessment based on controlled 4-run factorial experiment (irrigation × rooting depth). Key finding: because `soil_storage_max` is never updated, the net infiltration threshold is identical regardless of rooting depth method — the bug affects Ks/ET/irrigation triggering but does NOT produce excess net infiltration. Original quantitative evidence was confounded by comparing heterogeneous cell populations rather than controlled runs.
+
 ---
 
-## Issue 1: Soil moisture deficit computed against wrong reference (HIGH priority)
+## Issue 1: Soil moisture deficit computed against wrong reference (MEDIUM priority — revised down from HIGH)
 
 **Current behavior:**
 
@@ -17,6 +21,8 @@ soil_moisture_deficit = max(0.0, soil_storage_max - interim_soil_storage2)
 `soil_storage_max` is the full-profile capacity (AWC × maximum rooting depth), which is a fixed value. TAW is computed from `current_rooting_depth * awc`, which grows over the season. Early in the season when roots are shallow, TAW is small but the deficit is measured against the full profile.
 
 **Problem:** When `soil_moisture_deficit > TAW` (which happens whenever rooting depth is small relative to the full profile), `calculate_water_stress_coefficient_ks` returns Ks = 0, indicating full stress — even when the root zone itself might have adequate water.
+
+**Impact (revised):** Affects the water stress coefficient (Ks) and therefore actual ET partitioning, but does NOT affect net infiltration (see Appendix). The fix is still important for physical correctness of ET estimates, irrigation reporting, and future implementations where `soil_storage_max` is made dynamic.
 
 **FAO-56 intent (Eq. 84):** Dr (root zone depletion) should be bounded by TAW. The deficit is the amount of water missing *from the current root zone*, not from the entire soil column.
 
@@ -33,6 +39,62 @@ soil_moisture_deficit = min(max(0.0, taw - root_zone_water), taw)
 ```
 
 Option B is cleaner but requires tracking root-zone water content separately from the full soil bucket. This may require a more significant refactor of how SWB2's soil storage interacts with the FAO-56 module.
+
+---
+
+## Issue 1a: Irrigation module amplifies the deficit/TAW mismatch (MEDIUM priority — revised down from HIGH)
+
+**Related to:** Issue 1
+
+**Current behavior (`irrigation.F90`, lines 537–541):**
+
+```fortran
+if ( total_available_water > 0.0_c_float ) then
+  depletion_fraction = min( ( soil_storage_max - soil_storage ) / total_available_water, 1.0 )
+else
+  depletion_fraction = min( ( soil_storage_max - soil_storage ) / soil_storage_max, 1.0 )
+endif
+```
+
+The irrigation trigger uses `total_available_water` (= TAW = `current_rooting_depth × AWC`) as the denominator, but `soil_storage_max - soil_storage` (deficit relative to FULL profile) as the numerator.
+
+**Problem:** Early in the growing season when rooting depth is small:
+
+1. TAW is small (e.g., 1 inch for a 0.1 m root zone on a sandy soil)
+2. `soil_storage_max - soil_storage` can be much larger than TAW (deficit relative to full profile)
+3. `depletion_fraction` is clipped to 1.0, meaning it **always exceeds MAD**
+4. Irrigation triggers *every single day* the irrigation season is active
+5. But `Ks = 0` (from Issue 1), so the crop can't transpire the irrigated water
+6. The irrigation water fills `soil_storage` toward `soil_storage_max` (the full-profile capacity)
+7. Next day: because the deficit is measured against the full profile and divided by the small TAW, depletion_fraction still ≥ 1.0 → irrigation triggers again (until `soil_storage` finally reaches `soil_storage_max`)
+
+~~Original claim (incorrect): The irrigation water "passes through the soil column as net infiltration." This is wrong because `soil_storage_max` is the full-profile capacity, not TAW — the water is absorbed into the large fixed bucket.~~
+
+This creates a daily irrigation cycle that persists until roots grow large enough for TAW to approach `soil_storage_max`. (Note: the irrigated water accumulates in `soil_storage` but does NOT overflow as net infiltration because `soil_storage_max` is the full-profile capacity — see revised impact below.)
+
+**Furthermore**, the application amount (for the `APP_FIELD_CAPACITY` method) is:
+
+```fortran
+interim_irrigation_amount = max(0.0, soil_storage_max - soil_storage)
+```
+
+This refills to the full static `soil_storage_max`, not to the current TAW. So early-season applications can be large relative to what the root zone can hold.
+
+**Impact on results (revised July 28, 2026):** The mechanism described above is real — irrigation triggers daily and Ks = 0 suppresses transpiration. However, controlled diagnostic runs (see Appendix: Diagnostic Run Results) demonstrate that this does **not** produce excess net infiltration in the current code. The reason: `soil_storage_max` is the full-profile capacity (`AWC × Zr_max`), and net infiltration only occurs when `soil_storage > soil_storage_max`. Because `soil_storage_max` is the same fixed value whether rooting depth is variable or constant, the irrigation water is absorbed into the large fixed-capacity bucket and does not overflow as recharge.
+
+The actual impacts of Issues 1 and 1a are:
+1. **Incorrect ET partitioning:** Ks = 0 early in the season suppresses transpiration when it should be occurring (albeit at reduced capacity with shallow roots).
+2. **Excessive irrigation application:** The trigger fires daily and the application refills to the full profile, applying far more water than the crop's actual root zone can use. This water accumulates in the bucket.
+3. **No excess net infiltration:** Because `soil_storage_max` is unchanged, the recharge threshold is identical in variable-RZ and constant-RZ runs. The diagnostic comparison shows Comparison E (interaction term) ≈ 0.000 in/yr for all cell categories.
+
+The practical consequence is that the irrigation amounts reported by the model are unrealistically high early in the growing season, and the actual ET partitioning between transpiration and soil evaporation is wrong — but the net infiltration estimate is not inflated by this mechanism.
+
+**Note:** The issues would produce excess net infiltration *if and only if* `soil_storage_max` were updated to track TAW (the proposed fix). Under the proposed fix, a smaller `soil_storage_max` early in the season would correctly cause the bucket to overflow sooner — but the irrigation trigger and Ks calculations would also be correct, preventing the artificial daily cycle. The fix is self-consistent; the current code is self-consistently wrong in a way that happens to not inflate recharge.
+
+**Proposed fix:** Same as Issue 1 — if `soil_storage_max` is updated to track `current_rooting_depth × AWC`, then:
+- Depletion fraction becomes `(TAW - root_zone_storage) / TAW`, bounded [0, 1] by construction
+- Irrigation application fills to `TAW` (current root zone capacity), not the full profile
+- Both the trigger and the amount scale appropriately with the crop's actual water needs
 
 ---
 
@@ -89,11 +151,103 @@ DPe = max(0, (P - RO) + I/fw - De_prev)
 
 ---
 
+## Git Chronology: When These Issues Were Introduced
+
+The core issue has been present since the FAO-56 two-stage module was first written in March 2017 — over 9 years. The following timeline is derived from `git log` on the SWB2 repository.
+
+| Date | Commit | Event |
+|------|--------|-------|
+| 2014-07-13 | `b5b5a17` | `soil_storage_max` first appears in `model_domain.F90` — set as a fixed value at initialization (`rooting_depth_max × AWC`) |
+| 2015-05-22 | `acf16cf` | FAO-56 actual ET module first wired up to the soil moisture framework |
+| **2017-03-03** | `31ef817` | **`actual_et__fao56__two_stage.F90` created.** TAW (`calculate_total_available_water`) implemented. The pattern of computing deficit against `soil_storage_max` while comparing to dynamic TAW was present from day one. |
+| 2017-03-07 | `dfcde07` | Continued development — `soil_storage_max` used in deficit calculation |
+| 2017-03-08 | `bef9f11` | `rooting_depth__FAO56.F90` first appears — variable rooting depth tied to Kcb progression |
+| **2017-09-08** | `2fca655` | "Fix subtle departure from SWB v. 1.0 in irrigation algorithms" — `total_available_water` first used as denominator in irrigation depletion fraction (Issue 1a introduced) |
+| 2018-06-12 | `088c068` | TAW further integrated into irrigation module |
+| 2018-07-27 | `8250217` | `total_available_water` logic in irrigation formalized |
+| 2021-01-06 | `968f194` | Major rework of evaporable water layer tracking — `soil_storage_max` usage refined but fundamental deficit calculation unchanged |
+| 2021-01-25 | `114b497` | "table values work" — further refinements to FAO-56 two-stage integration |
+| **2024-10-31** | `9d2a671` | Per-CDL `variable_rooting_depth` parameter added to irrigation lookup table (the `'varying'`/`'constant'` toggle). Before this, variable rooting depth was all-or-nothing at the model level. |
+| 2024-12-04 | `f271846` | Fix: variable rooting depth should not decrease for Kcb > Kcb_mid |
+
+### Summary
+
+- **Issue 1** (deficit computed against `soil_storage_max` instead of TAW): present since **March 3, 2017**
+- **Issue 1a** (irrigation depletion fraction uses TAW as denominator): present since **September 8, 2017**
+- **Per-CDL variable/constant toggle**: added **October 31, 2024** (before this, the issue affected all CDL codes uniformly when FAO-56 rooting depth was active)
+
+The issues were never caught because:
+1. Early testing focused on getting the FAO-56 equations right in isolation, not on the interaction with the SWB2 soil storage framework
+2. The irrigation module was developed separately and later wired to use TAW without reconsidering the deficit reference
+3. The effect is subtle in non-irrigated cells (Ks = 0 early in season, but ET demand is also low then)
+4. **The errors cancel for net infiltration:** because `soil_storage_max` is fixed at the full-profile value, excess irrigation water fills the large bucket rather than overflowing as recharge. The bug produces wrong Ks and wrong irrigation amounts, but the net infiltration output is unaffected — making the error invisible in the primary output that users inspect
+5. The Ks=0 condition suppresses transpiration early in the season, but this period also has low reference ET, so the actual ET difference is small and easy to overlook
+
+---
+
 ## References
 
 - Allen, R.G., Pereira, L.S., Raes, D., and Smith, M., 1998, Crop evapotranspiration: FAO Irrigation and Drainage Paper 56, 300 p.
 - Thorp, K.R., 2022, pyfao56: FAO-56 evapotranspiration in Python: SoftwareX 19, 101208.
 
+
+---
+
+## Quantitative Evidence: Michigan SWB Model (July 2026)
+
+### Original Evidence (Confounded — July 2026)
+
+The Michigan Lower Peninsula SWB model (1995–2025, 1 km CDL grid, Daymet forcing) uses `ROOTING_DEPTH_METHOD FAO56` with `SOIL_MOISTURE_METHOD FAO56_TWO_STAGE`. Monthly zonal statistics computed from the baseline model output appeared to show a large irrigation × variable rooting depth interaction:
+
+| Category | Cell Count | Annual Total (in/yr) |
+|---|---|---|
+| Variable rooting depth, non-irrigated | 39,735 | 8.67 |
+| Variable rooting depth, irrigated | 11,124 | **18.20** |
+| Constant rooting depth, non-irrigated | 75,560 | 10.15 |
+| Constant rooting depth, irrigated | 4,957 | 11.60 |
+
+**However**, this comparison is confounded: the "variable" and "constant" groups contain different CDL codes with inherently different hydrologic properties (row crops vs. forest/grassland). The ~10 in/yr gap is largely explained by the different land-use compositions of the two groups, not by the rooting depth mechanism.
+
+### Controlled Diagnostic Runs (July 28, 2026)
+
+A 4-run factorial experiment was conducted to isolate the effect:
+- Same grid, same lookup tables, same executable
+- Only `ROOTING_DEPTH_METHOD` (FAO56 vs. NONE) and `IRRIGATION_METHOD` (FAO56 vs. NONE) varied
+
+| Run | Domain Mean | Irrigated Cells | Non-Irrigated Cells |
+|---|---|---|---|
+| Irrigation + Variable RZ | 9.55 in/yr | 13.64 in/yr | 8.98 in/yr |
+| No Irrigation + Variable RZ | 9.46 in/yr | 12.85 in/yr | 8.98 in/yr |
+| Irrigation + Constant RZ | 9.53 in/yr | 13.57 in/yr | 8.96 in/yr |
+| No Irrigation + Constant RZ | 9.44 in/yr | 12.80 in/yr | 8.96 in/yr |
+
+**Key results:**
+- **Comparison E (interaction term) ≈ 0.000 in/yr** for all cell categories including corn on HSG A soils
+- Variable vs. constant rooting depth produces **identical** net infiltration (difference < 0.03 in/yr domain-wide)
+- The irrigation effect is modest (+0.79 in/yr for irrigated cells) and **the same** under both rooting depth methods
+- Corn on HSG A soils (irrigated): 19.92 in/yr under BOTH variable and constant rooting depth
+
+### Why the Expected Signal Did Not Appear
+
+The diagnostic runs confirmed that:
+1. SWB2 correctly reads and applies the `ROOTING_DEPTH_METHOD` directive (log shows "DYNAMIC" vs. "STATIC" submodel selected)
+2. The per-CDL `allow_variable_rooting_depth` flags are set only when `ROOTING_DEPTH_METHOD FAO56` is active
+3. Despite this, `soil_storage_max` remains fixed (`AWC × Zr_max`) in all cases
+4. Net infiltration = `max(0, soil_storage - soil_storage_max)` — since `soil_storage_max` is identical in all runs, the recharge threshold is unchanged
+
+The variable rooting depth affects *internal* calculations (TAW, Ks, irrigation triggering) but NOT the net infiltration pathway. The "daily irrigation → recharge cycle" described in Issue 1a does not manifest as excess recharge because the irrigated water fills the large fixed-capacity bucket (`soil_storage_max = AWC × Zr_max`) rather than overflowing a small dynamic bucket.
+
+### Revised Interpretation
+
+- **The model's +1.57 in/yr positive bias is NOT attributable to Issues 1 and 1a.** The rooting depth × irrigation interaction has near-zero effect on net infiltration.
+- Issues 1 and 1a still produce incorrect behavior: wrong Ks values, wrong irrigation triggering patterns, wrong actual ET partitioning. These are real bugs worth fixing for physical correctness.
+- The positive bias relative to the recharge ensemble must have a different source (e.g., climate forcing differences, CN parameterization, interception, or differences between the local and Hovenweep-compiled executables).
+
+### Recommended validation approach
+
+~~Run the Michigan model with `ROOTING_DEPTH_METHOD STATIC` (all other parameters unchanged) and compare cell-by-cell. The difference isolates the effect of Issues 1 and 1a. Expected result: the variable-RZ run will show higher net infiltration primarily in irrigated agricultural cells on A/B soils during March–June.~~
+
+**Completed July 28, 2026.** Result: no meaningful difference in net infiltration between variable-RZ and constant-RZ runs. The recommended validation confirmed that Issues 1/1a do not affect net infiltration under the current code architecture (see above).
 
 ---
 
@@ -192,6 +346,8 @@ Rather than introducing a second soil layer with different semantics, the FAO-56
 
 This preserves a single bucket concept — the bucket just grows over time. No secondary storage variable needed. The mass balance module, output routines, and all other methods continue to work unchanged.
 
+**Important implication (from diagnostic runs):** Making `soil_storage_max` dynamic will CHANGE the net infiltration output — specifically, it will produce more net infiltration early in the season (when the bucket is small and overflows more easily) and potentially less later (as the bucket grows and captures more water). The current code produces identical net infiltration regardless of rooting depth method because the fixed `soil_storage_max` acts as a large buffer. Making it dynamic removes that buffer and makes the recharge signal responsive to root growth. This is physically correct behavior, but it means the fix is not "neutral" with respect to model outputs — it will require re-evaluation of model calibration and comparison with independent recharge estimates.
+
 ### Key Principle
 
 Changing the `SOIL_MOISTURE_METHOD` should not introduce wildly differing definitions of what "soil storage" means. All methods should be expressible as: *a bucket with a defined capacity, where excess above capacity becomes net infiltration*. The difference is only whether that capacity is fixed (T-M) or grows with root depth (FAO-56).
@@ -208,12 +364,78 @@ Changing the `SOIL_MOISTURE_METHOD` should not introduce wildly differing defini
 | STATIC | THORNTHWAITE-MATHER | Fixed roots, fixed bucket. Consistent. | ✓ OK |
 | STATIC | FAO56_TWO_STAGE | TAW = fixed = soil_storage_max. Deficit reference is correct (both are the same value). | ✓ OK |
 | FAO56 | THORNTHWAITE-MATHER | Rooting depth grows but has **no effect** on T-M water balance. `soil_storage_max` is fixed; T-M doesn't use `current_rooting_depth`. Variable rooting depth is cosmetic only. | ⚠️ Misleading |
-| FAO56 | FAO56_TWO_STAGE | TAW grows with roots (correct), but `soil_moisture_deficit` is computed against fixed `soil_storage_max`. Early season: deficit > TAW → Ks = 0 (incorrect stress). | ❌ Bug |
+| FAO56 | FAO56_TWO_STAGE | TAW grows with roots (correct), but `soil_moisture_deficit` is computed against fixed `soil_storage_max`. Early season: deficit > TAW → Ks = 0 (incorrect stress). Irrigation depletion fraction also uses TAW as denominator → triggers daily when roots are small (Issue 1a). **However**, net infiltration is unaffected because it is gated by the same fixed `soil_storage_max`. | ❌ Bug (ET/irrigation partitioning only; net infiltration unaffected) |
 
 ### Root Cause
 
 `model_update_rooting_depth_FAO56` updates `this%current_rooting_depth` but not `this%soil_storage_max`. The T-M and mass balance modules key off `soil_storage_max` for all capacity decisions. The FAO-56 two-stage module computes TAW from `current_rooting_depth * awc` but then computes the deficit from `soil_storage_max - soil_storage`.
 
+**Critical implication (confirmed by diagnostic runs):** Because net infiltration is triggered by `soil_storage > soil_storage_max`, and `soil_storage_max` is fixed regardless of rooting depth method, the variable rooting depth bug produces zero difference in net infiltration. The bug is "self-limiting" — excess irrigation water fills the large fixed bucket rather than overflowing as recharge. The variable and constant rooting depth runs are identical with respect to net infiltration output.
+
 ### Recommendation
 
 If `ROOTING_DEPTH_METHOD FAO56` is active, `soil_storage_max` should be updated daily to `current_rooting_depth * awc`. This makes the dynamic bucket approach work correctly for FAO56_TWO_STAGE while being harmless for T-M (since T-M with FAO56 rooting depth is a dubious combination anyway — consider emitting a warning if the user requests it).
+
+**Implementation note:** The fix must be applied holistically. If `soil_storage_max` becomes dynamic (= TAW), then the irrigation trigger, Ks calculation, and recharge threshold all become consistent — irrigation only fires when the root zone is actually depleted, Ks reflects actual root-zone stress, and recharge fires when the root zone overflows. Without the fix, all three are independently wrong but the errors happen to cancel for the recharge pathway.
+
+
+---
+
+## Appendix: Diagnostic Comparison Run Results (July 28, 2026)
+
+### Experimental Setup
+
+Four runs on the Michigan Lower Peninsula grid (527×343 cells, 1 km, 1995–2025):
+
+| Run | IRRIGATION_METHOD | ROOTING_DEPTH_METHOD |
+|-----|-------------------|---------------------|
+| 1 | FAO56 | FAO56 (dynamic) |
+| 2 | NONE | FAO56 (dynamic) |
+| 3 | FAO56 | NONE (static) |
+| 4 | NONE | NONE (static) |
+
+All four runs used identical input grids, lookup tables, and the same compiled SWB2 executable on the same workstation. Only the two control file directives differed.
+
+### Results: Mean Annual Net Infiltration (in/yr)
+
+| Zone | Run 1 (I+V) | Run 2 (NoI+V) | Run 3 (I+C) | Run 4 (NoI+C) |
+|------|-------------|---------------|-------------|----------------|
+| All active (128,605 cells) | 9.55 | 9.46 | 9.53 | 9.44 |
+| Irrigated (15,960 cells) | 13.64 | 12.85 | 13.57 | 12.80 |
+| Non-irrigated (112,645 cells) | 8.98 | 8.98 | 8.96 | 8.96 |
+| Corn/HSG A/irrigated (3,893) | 19.92 | 19.58 | 19.92 | 19.58 |
+| Corn/HSG A/non-irrigated (2,129) | 18.17 | 18.17 | 18.17 | 18.17 |
+
+### Comparisons
+
+| Comparison | Description | Domain Mean | Irrigated Cell Mean |
+|---|---|---|---|
+| A: Run 1 − Run 2 | Irrigation effect (variable RZ) | +0.098 | +0.791 |
+| B: Run 3 − Run 4 | Irrigation effect (constant RZ) | +0.095 | +0.765 |
+| C: Run 1 − Run 3 | Variable vs. constant RZ (with irr) | +0.017 | +0.025 |
+| D: Run 2 − Run 4 | Variable vs. constant RZ (no irr) | +0.014 | +0.000 |
+| **E: A − B** | **Interaction term (the "bug" signal)** | **+0.003** | **+0.025** |
+
+### Interpretation
+
+1. **Comparison E ≈ 0:** The variable rooting depth × irrigation interaction does not produce excess net infiltration. The hypothesized "daily irrigation → recharge cycle" does not manifest because `soil_storage_max` is unchanged.
+
+2. **Comparison A ≈ B:** The irrigation effect on net infiltration (+0.79 in/yr for irrigated cells) is real and modest, but it is the **same** regardless of rooting depth method. This is legitimate irrigation-driven recharge from water applications that exceed the full-profile bucket capacity.
+
+3. **Comparison C ≈ D ≈ 0:** Variable vs. constant rooting depth produces no meaningful difference in net infiltration for any cell category, confirming that `current_rooting_depth` does not affect the recharge pathway.
+
+4. **Non-irrigated cells are identical across all 4 runs** (8.98 in/yr for Run 1/2, 8.96 for Run 3/4 — the 0.02 difference is from variable RZ affecting Ks → slightly different AET → slightly different soil_storage trajectory, but the recharge signal is negligible).
+
+### Log Confirmation
+
+- Run 1 log: `ROOTING_DEPTH_METHOD FAO56` → `==> DYNAMIC rooting depth submodel selected.`
+  - Sets `allow_variable_rooting_depth` per CDL code from irrigation lookup table
+- Run 3 log: `ROOTING_DEPTH_METHOD NONE` → `==> STATIC rooting depth submodel selected.`
+  - Does NOT set `allow_variable_rooting_depth` flags (absent from debug log)
+- Despite these different code paths being active, net infiltration output is identical
+
+### Source
+
+Scripts: `mi_swb_report_figures/python/preprocess_diagnostic_runs.py`, `plot_diagnostic_comparisons.py`, `plot_diagnostic_zonal_lines.py`, `summarize_diagnostic_runs.py`
+
+Run outputs: `E:\projects\michigan_swb\PARALLEL_LOCAL_RUNS\{run_name}\output\`

@@ -7,17 +7,11 @@
 
 module crop_coefficients__fao56
 
-  use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
-  use constants_and_conversions, only : M_PER_FOOT, TRUE, FALSE, fTINYVAL,       &
-                                        iTINYVAL, asInt, asFloat, fZERO, in_to_mm, &
-                                        TRUE, FALSE, clip, NEAR_ZERO
-  use data_catalog, only              : DAT
-  use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
-  use datetime
+  use iso_c_binding, only             : c_int, c_float, c_double
+  use constants_and_conversions, only : clip, TRUE, FALSE
   use logfiles, only                  : LOGS, LOG_ALL
-  use exceptions, only                : assert, warn, die
-  use simulation_datetime, only       : SIM_DT
-  use fstring, only                   : asCharacter, sQuote, operator(.contains.)
+  use exceptions, only                : assert, warn
+  use fstring, only                   : asCharacter
   use fstring_list
   implicit none
 
@@ -26,22 +20,10 @@ module crop_coefficients__fao56
   public :: crop_coefficients_FAO56_initialize
   public :: crop_coefficients_FAO56_calculate_Kcb_Max
   public :: crop_coefficients_FAO56_interpolate_Kcb
+  public :: crop_coefficients_FAO56_deallocate
   public :: KCB_MIN, KCB_INI, KCB_MID, KCB_END
   public :: KCB_l, JAN, DEC, KCB_METHOD, KCB_METHOD_GDD, KCB_METHOD_FAO56
-  public :: KCB_METHOD_MONTHLY_VALUES
-
-  enum, bind(c)
-    enumerator :: L_DOY_INI=1, L_DOY_DEV, L_DOY_MID, L_DOY_LATE, L_DOY_FALLOW
-  end enum
-
-  enum, bind(c)
-    enumerator :: GDD_PLANT=1, GDD_INI, GDD_DEV, GDD_MID, GDD_LATE
-  end enum
-
-  enum, bind(c)
-    enumerator :: PLANTING_DATE=1, ENDDATE_INI, ENDDATE_DEV, ENDDATE_MID, ENDDATE_LATE, &
-                    ENDDATE_FALLOW
-  end enum
+  public :: KCB_METHOD_MONTHLY_VALUES, KCB_METHOD_NONE
 
   enum, bind(c)
     enumerator :: KCB_INI=13, KCB_MID, KCB_END, KCB_MIN
@@ -52,7 +34,7 @@ module crop_coefficients__fao56
   end enum
 
    enum, bind(c)
-     enumerator :: KCB_METHOD_GDD = 1, KCB_METHOD_MONTHLY_VALUES, KCB_METHOD_FAO56
+     enumerator :: KCB_METHOD_NONE = 0, KCB_METHOD_GDD = 1, KCB_METHOD_MONTHLY_VALUES, KCB_METHOD_FAO56
    end enum
 
   ! Private, module level variables
@@ -62,67 +44,26 @@ module crop_coefficients__fao56
 !  real (c_float), allocatable   :: TEW(:,:)
   real (c_float), allocatable   :: KCB_l(:,:)
   integer (c_int), allocatable  :: KCB_METHOD(:)
-  real (c_float), allocatable   :: GROWTH_STAGE_LENGTH_IN_DAYS(:,:)
-  real (c_float), allocatable   :: GROWTH_STAGE_GDD(:,:)
-  type (DATETIME_T), allocatable     :: GROWTH_STAGE_DATE(:,:)
-  type (FSTRING_LIST_T)         :: SL_PLANTING_DATE
 
 contains
-
-
-  function crop_coefficients_calculate_planting_date(sPlantingDate, iYear)   result(dtNewPlantingDate)
-    character(len=*), intent(in)      :: sPlantingDate
-    integer (c_int), intent(in)       :: iYear
-    type (DATETIME_T)                 :: dtNewPlantingDate
-
-    ! [ LOCAL ]
-    character (len=10)                :: sMMDDYYYY
-
-    if ( sPlantingDate .contains. "/" ) then
-      sMMDDYYYY = trim(sPlantingDate)//"/"//asCharacter( iYear )
-      call dtNewPlantingDate%parsedate( sMMDDYYYY, __FILE__, __LINE__ )
-
-    else
-      ! assume the value is a day-of-year value
-      sMMDDYYYY = "01/01/"//asCharacter( iYear )
-      call dtNewPlantingDate%parsedate( sMMDDYYYY, __FILE__, __LINE__ )
-      dtNewPlantingDate = dtNewPlantingDate + ( asFloat( sPlantingDate ) - 1.0_c_float )
-      call dtNewPlantingDate%calcJulianDay()
-    endif
-
-  end function crop_coefficients_calculate_planting_date
 
 
   subroutine crop_coefficients_FAO56_initialize(params)
 
     use parameters, only : PARAMETERS_T
+    use phenology, only : PHENOLOGY_METHOD_INDEX, PHENOLOGY_FAO56_GDD,    &
+                          PHENOLOGY_FAO56_DATES, PHENOLOGY_NONE,           &
+                          PHENOLOGY_DOY_BASED, PHENOLOGY_GDD_THRESHOLD,    &
+                          GROWING_SEASON_START_GDD, GDD_INI, GDD_DEV,      &
+                          GDD_MID, GDD_LATE
+
     type(PARAMETERS_T), intent(inout) :: params
 
     ! [ LOCALS ]
-    ! type (FSTRING_LIST_T)            :: slREW, slTEW
     type (FSTRING_LIST_T)             :: slList
-    ! integer (c_int), allocatable :: iTEWSeqNums(:)
-    ! integer (c_int), allocatable :: iREWSeqNums(:)
     integer (c_int)                   :: iNumberOfLanduses
     integer (c_int)                   :: iIndex
     integer (c_int)                   :: iStat
-
-
-    !type (FSTRING_LIST_T)             :: slPlantingDate
-    character (len=:), allocatable    :: PlantingDate_str
-
-    real (c_float), allocatable       :: L_ini_l(:)
-    real (c_float), allocatable       :: L_dev_l(:)
-    real (c_float), allocatable       :: L_mid_l(:)
-    real (c_float), allocatable       :: L_late_l(:)
-    real (c_float), allocatable       :: L_fallow_l(:)
-
-    real (c_float), allocatable       :: GDD_plant_l(:)
-    real (c_float), allocatable       :: GDD_ini_l(:)
-    real (c_float), allocatable       :: GDD_dev_l(:)
-    real (c_float), allocatable       :: GDD_mid_l(:)
-    real (c_float), allocatable       :: GDD_late_l(:)
-
 
     real (c_float), allocatable       :: Kcb_ini_l(:)
     real (c_float), allocatable       :: Kcb_mid_l(:)
@@ -154,31 +95,6 @@ contains
    !! are all soils in grid included in table values?
    !> is soil suffix vector continuous?
 
-   ! Retrieve and populate the Readily Evaporable Water (REW) table values
-  !  CALL params%get_parameters( fValues=REW, sPrefix="REW_", iNumRows=iNumberOfLanduses )
-
-   ! Retrieve and populate the Total Evaporable Water (TEW) table values
-  !  CALL params%get_parameters( fValues=TEW, sPrefix="TEW_", iNumRows=iNumberOfLanduses )
-
-   !> @TODO What should happen if the TEW / REW header entries do *not* fall in a
-   !!       logical sequence of values? In other words, if the user has columns named
-   !!       REW_1, REW_3, REW_5, only the values associated with "REW_1" would be retrieved.
-   !!       Needless to say, this would be catastrophic.
-
-   call params%get_parameters( sKey="Growing_season_start_date", slValues=SL_PLANTING_DATE )
-
-   call params%get_parameters( sKey="L_ini", fValues=L_ini_l)
-   call params%get_parameters( sKey="L_dev", fValues=L_dev_l)
-   call params%get_parameters( sKey="L_mid", fValues=L_mid_l)
-   call params%get_parameters( sKey="L_late", fValues=L_late_l)
-   call params%get_parameters( sKey="L_fallow", fValues=L_fallow_l)
-
-   call params%get_parameters( sKey="Growing_season_start_GDD", fValues=GDD_plant_l)
-   call params%get_parameters( sKey="GDD_ini", fValues=GDD_ini_l)
-   call params%get_parameters( sKey="GDD_dev", fValues=GDD_dev_l)
-   call params%get_parameters( sKey="GDD_mid", fValues=GDD_mid_l)
-   call params%get_parameters( sKey="GDD_late", fValues=GDD_late_l)
-
    call params%get_parameters( sKey="Kcb_ini", fValues=KCB_ini_l)
    call params%get_parameters( sKey="Kcb_mid", fValues=KCB_mid_l)
    call params%get_parameters( sKey="Kcb_end", fValues=KCB_end_l)
@@ -198,18 +114,6 @@ contains
    call params%get_parameters( sKey="Kcb_Dec", fValues=KCB_dec )
 
 
-    allocate( GROWTH_STAGE_LENGTH_IN_DAYS( 5, iNumberOfLanduses ), stat=iStat )
-    call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_LENGTH_IN_DAYS array", &
-      __FILE__, __LINE__ )
-
-    allocate( GROWTH_STAGE_GDD( 5, iNumberOfLanduses ), stat=iStat )
-    call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_GDD array", &
-      __FILE__, __LINE__ )
-
-    allocate( GROWTH_STAGE_DATE( 6, iNumberOfLanduses ), stat=iStat )
-    call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_DATE array", &
-      __FILE__, __LINE__ )
-
     allocate( KCB_l( 16, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for KCB_l array", &
       __FILE__, __LINE__ )
@@ -218,104 +122,8 @@ contains
     call assert( iStat==0, "Failed to allocate memory for KCB_METHOD vector", &
       __FILE__, __LINE__ )
 
-    KCB_METHOD = -9999
+    KCB_METHOD = KCB_METHOD_NONE
     KCB_l = -9999.
-    GROWTH_STAGE_GDD = -9999.
-    GROWTH_STAGE_LENGTH_IN_DAYS = 0.
-
-    if ( ubound(L_ini_l,1) == iNumberOfLanduses )           &
-      GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_INI,  : ) = L_ini_l
-
-    if ( ubound(L_dev_l,1) == iNumberOfLanduses )           &
-      GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_DEV,  : ) = L_dev_l
-
-    if ( ubound(L_mid_l,1) == iNumberOfLanduses )           &
-      GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_MID,  : ) = L_mid_l
-
-    if ( ubound(L_late_l,1) == iNumberOfLanduses )          &
-      GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_LATE, : ) = L_late_l
-
-    if ( ubound(L_fallow_l,1) == iNumberOfLanduses )        &
-      GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_FALLOW, : ) = L_fallow_l
-
-    call LOGS%write(" ## Crop Kcb Curve Summary ##", iLinesAfter=1)
-    call LOGS%write(" _only meaningful for landuses where the Kcb curve is defined " &
-      //"in terms of days _", iLinesAfter=1)
-    call LOGS%write("Landuse Code | Planting Date | End of 'ini' | End of 'dev' " &
-      //"| End of 'mid' | End of 'late' | End of 'fallow' ")
-    call Logs%write("-------------|---------------|--------------|--------------" &
-      //"|--------------|---------------|-----------------")
-
-    if ( SL_PLANTING_DATE%count == iNumberOfLanduses .and. SL_PLANTING_DATE%count > 0 ) then
-
-      do iIndex=1, SL_PLANTING_DATE%count
-
-        PlantingDate_str = SL_PLANTING_DATE%get( iIndex )
-
-        ! if there is no planting date entry, assume user is specifying
-        ! a planting GDD for this landuse code
-        if ( len_trim(PlantingDate_str) == 0 ) cycle
-
-        ! if ( PlantingDate_str .contains. "/" ) then
-
-        !   ! append current year to the end of the user-entered planting date in mm/dd
-        !   sMMDDYYYY = trim(PlantingDate_str)//"/"//asCharacter( SIM_DT%start%iYear )
-        !   call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY, __FILE__, __LINE__ )
-
-        !   GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)
-
-        ! else
-        !   ! assume the value is a day-of-year value
-        !   dtPlantingDate = SIM_DT%start + asFloat( PlantingDate_str)
-        !   call dtPlantingDate%calcJulianDay()
-        !   GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = dtPlantingDate
-        ! endif
-
-        GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) =                                     &
-            crop_coefficients_calculate_planting_date(sPlantingDate=PlantingDate_str,   &
-                                                      iYear=SIM_DT%start%iYear)
-
-        ! march forward through time calculating the various dates on the Kcb curve
-        ! GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) + L_ini_l( iIndex )
-        ! GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) + L_dev_l( iIndex )
-        ! GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) + L_mid_l( iIndex )
-        ! GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) + L_late_l( iIndex )
-        ! GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) + L_fallow_l( iIndex )
-
-        ! if any of the L_* length values is missing, a value of zero will be used, resulting in a wierd looking Kcb curve
-        GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )                        &
-                                                   + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_INI, iIndex ) )
-        GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )                          &
-                                                   + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_DEV, iIndex ) )
-        GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )                          &
-                                                   + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_MID, iIndex ) )
-        GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )                         &
-                                                   + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_LATE, iIndex ) )
-        GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )                      &
-                                                     + (GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_FALLOW, iIndex ) )
-
-        call LOGS%write( "| "//asCharacter( LANDUSE_CODE( iIndex ))//" | "                                    &
-           //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )                                  &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%getDayOfYear() )//") | "     &
-           //trim( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%prettydate() )//" | "                             &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%getDayOfYear() )//") | "       &
-           //trim( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%prettydate() )//" | "                             &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%getDayOfYear() )//") | "       &
-           //trim( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%prettydate() )//" | "                             &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%getDayOfYear() )//") | "       &
-           //trim( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate() )//" | "                            &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%getDayOfYear() )//") | "      &
-           //trim( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%prettydate() )                                 &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%getDayOfYear() )//") | ")
-      enddo
-
-    endif
-
-    if (ubound(GDD_plant_l,1) == iNumberOfLanduses)  GROWTH_STAGE_GDD( GDD_PLANT,  : ) = GDD_plant_l
-    if (ubound(GDD_ini_l,1) == iNumberOfLanduses)    GROWTH_STAGE_GDD( GDD_INI,  : ) = GDD_ini_l
-    if (ubound(GDD_dev_l,1) == iNumberOfLanduses)    GROWTH_STAGE_GDD( GDD_DEV,  : ) = GDD_dev_l
-    if (ubound(GDD_mid_l,1) == iNumberOfLanduses)    GROWTH_STAGE_GDD( GDD_MID,  : ) = GDD_mid_l
-    if (ubound(GDD_late_l,1) == iNumberOfLanduses)   GROWTH_STAGE_GDD( GDD_LATE, : ) = GDD_late_l
 
     if (ubound(KCB_ini_l,1) == iNumberOfLanduses)  KCB_l( KCB_INI, :) = KCB_ini_l
     if (ubound(KCB_mid_l,1) == iNumberOfLanduses)  KCB_l( KCB_MID, :) = KCB_mid_l
@@ -335,53 +143,111 @@ contains
     if (ubound(KCB_nov,1) == iNumberOfLanduses)   KCB_l( NOV, :) = KCB_nov
     if (ubound(KCB_dec,1) == iNumberOfLanduses)   KCB_l( DEC, :) = KCB_dec
 
-    ! go through the table values and try to figure out how Kcb curves should be constructed:
-    ! Monthly Kcb, GDD-based, or DOY-based
-    do iIndex = lbound( KCB_METHOD, 1), ubound( KCB_METHOD, 1)
+    ! Assign KCB_METHOD based on phenology module's per-landuse method determination.
+    ! The phenology module has already validated and assigned PHENOLOGY_METHOD_INDEX;
+    ! this module only needs to know what Kcb interpolation strategy to use.
+    do iIndex = lbound(KCB_METHOD, 1), ubound(KCB_METHOD, 1)
 
-      if ( all( KCB_l( JAN:DEC, iIndex ) > 0.0_c_float ) ) then
-        KCB_METHOD( iIndex ) = KCB_METHOD_MONTHLY_VALUES
-        KCB_l( KCB_MIN, iIndex ) = minval( KCB_l(JAN:DEC, iIndex) )
-        KCB_l( KCB_MID, iIndex) = minval( KCB_l(JAN:DEC, iIndex) )
+      select case ( PHENOLOGY_METHOD_INDEX(iIndex) )
 
-      elseif ( all( GROWTH_STAGE_GDD( :, iIndex ) >= 0.0_c_float )              &
-         .and. all( KCB_l( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
-        KCB_METHOD( iIndex ) = KCB_METHOD_GDD
+        case ( PHENOLOGY_FAO56_GDD )
+          ! Phenology module determined this LU uses GDD-based stages
+          if ( all( KCB_l( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
+            KCB_METHOD( iIndex ) = KCB_METHOD_GDD
+          else
+            call warn("FAO56_GDD phenology active for landuse "              &
+              //asCharacter(LANDUSE_CODE(iIndex))                            &
+              //" but KCB values are missing or zero.", lFatal=TRUE)
+          end if
 
-      elseif ( all( GROWTH_STAGE_LENGTH_IN_DAYS( PLANTING_DATE:, iIndex ) >= 0.0_c_float )              &
-         .and. all( KCB_l( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
-        KCB_METHOD( iIndex ) = KCB_METHOD_FAO56
-      endif
+        case ( PHENOLOGY_FAO56_DATES )
+          ! Phenology module determined this LU uses date-based stages
+          if ( all( KCB_l( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
+            KCB_METHOD( iIndex ) = KCB_METHOD_FAO56
+          else
+            call warn("FAO56_DATES phenology active for landuse "            &
+              //asCharacter(LANDUSE_CODE(iIndex))                            &
+              //" but KCB values are missing or zero.", lFatal=TRUE)
+          end if
 
-      if ( KCB_METHOD( iIndex ) < 0 ) then
-        call warn("There are missing day-of-year (L_ini, L_dev, L_mid, L_late, L_fallow), " &
-          //"growing degree-day ~(GDD_plant, GDD_ini, GDD_dev, GDD_mid, GDD_late)," &
-          //" or monthly crop ~coefficients (Kcb_jan...Kcb_dec) for" &
-          //" landuse "//asCharacter( LANDUSE_CODE( iIndex ) ), lFatal=TRUE )
-      endif
+        case ( PHENOLOGY_DOY_BASED, PHENOLOGY_GDD_THRESHOLD )
+          ! Simple binary growing season — check for monthly Kcb first, then staged
+          if ( all( KCB_l( JAN:DEC, iIndex ) > 0.0_c_float ) ) then
+            KCB_METHOD( iIndex ) = KCB_METHOD_MONTHLY_VALUES
+            KCB_l( KCB_MIN, iIndex ) = minval( KCB_l(JAN:DEC, iIndex) )
+            KCB_l( KCB_MID, iIndex ) = maxval( KCB_l(JAN:DEC, iIndex) )
+          else if ( all( KCB_l( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
+            KCB_METHOD( iIndex ) = KCB_METHOD_FAO56
+          else
+            call warn("Crop coefficient module is active but landuse "       &
+              //asCharacter(LANDUSE_CODE(iIndex))                            &
+              //" has no valid Kcb values (monthly Kcb_Jan..Dec"             &
+              //" or staged Kcb_ini/mid/end/min)."                           &
+              //" All land uses must have explicit Kcb values when"           &
+              //" the FAO-56 crop coefficient method is in use.", lFatal=TRUE)
+          end if
 
-    enddo
+        case ( PHENOLOGY_NONE )
+          ! No phenology method — user must still supply Kcb values explicitly.
+          ! Even barren/impervious land uses need Kcb values when the crop
+          ! coefficient module is active (e.g., Kcb=0.0 for a parking lot,
+          ! or Kcb=0.3 for weedy disturbed land).
+          if ( all( KCB_l( JAN:DEC, iIndex ) > 0.0_c_float ) ) then
+            KCB_METHOD( iIndex ) = KCB_METHOD_MONTHLY_VALUES
+            KCB_l( KCB_MIN, iIndex ) = minval( KCB_l(JAN:DEC, iIndex) )
+            KCB_l( KCB_MID, iIndex ) = maxval( KCB_l(JAN:DEC, iIndex) )
+          else if ( all( KCB_l( KCB_INI:KCB_MIN, iIndex ) >= 0.0_c_float ) ) then
+            KCB_METHOD( iIndex ) = KCB_METHOD_FAO56
+          else
+            call warn("Crop coefficient module is active but landuse "       &
+              //asCharacter(LANDUSE_CODE(iIndex))                            &
+              //" has no phenology method and no valid Kcb values."           &
+              //" All land uses must have explicit Kcb values when"           &
+              //" the FAO-56 crop coefficient method is in use,"             &
+              //" even for non-vegetated surfaces (use Kcb=0.0 if"           &
+              //" appropriate).", lFatal=TRUE)
+          end if
 
-!    do iIndex = lbound( fSoilStorage, 1 ), ubound( fSoilStorage,1 )
+        case default
+          call warn("Unrecognized phenology method for landuse "             &
+            //asCharacter(LANDUSE_CODE(iIndex)), lFatal=TRUE)
 
-!      fKcb_initial = update_crop_coefficient_date_as_threshold( iLanduseIndex( iIndex ) )
+      end select
 
-      ! call calc_effective_root_depth( fRz_i=fRz_initial, iLanduseIndex=iLanduseIndex( iIndex ),    &
-      !                                 fZr_max=fMax_Rooting_Depths( iLanduseIndex( iIndex ),        &
-      !                                 iSoilGroup( iIndex ) ),                                      &
-      !                                 Kcb=fKcb_initial )
-      !
-      ! fSoilStorage( iIndex ) = INITIAL_PERCENT_SOIL_MOISTURE( iIndex ) / 100.0_c_float             &
-      !                          * fRz_initial * fAvailable_Water_Content( iIndex )
+    end do
 
-!    enddo
-
-  !> @TODO Add more logic here to perform checks on the validity of this data.
-
-  !> @TODO Need to handle missing values. WHat do we do if an entire column of values
-  !!       is missing?
+    ! Log summary of assigned KCB methods
+    call LOGS%write(" ## Crop Coefficient Method Summary ##", iLinesAfter=1)
+    call LOGS%write("Landuse Code | KCB Method")
+    call LOGS%write("-------------|---------------------")
+    do iIndex = 1, iNumberOfLanduses
+      select case ( KCB_METHOD(iIndex) )
+        case ( KCB_METHOD_GDD )
+          call LOGS%write("  "//asCharacter(LANDUSE_CODE(iIndex))//"   | GDD")
+        case ( KCB_METHOD_FAO56 )
+          call LOGS%write("  "//asCharacter(LANDUSE_CODE(iIndex))//"   | FAO56_DATES")
+        case ( KCB_METHOD_MONTHLY_VALUES )
+          call LOGS%write("  "//asCharacter(LANDUSE_CODE(iIndex))//"   | MONTHLY")
+        case ( KCB_METHOD_NONE )
+          call LOGS%write("  "//asCharacter(LANDUSE_CODE(iIndex))//"   | NONE")
+      end select
+    end do
 
   end subroutine crop_coefficients_FAO56_initialize
+
+!--------------------------------------------------------------------------------------------------
+
+  !> @brief Deallocate module-level arrays.
+  !!
+  !! Intended for use in unit tests that need to re-initialize the module
+  !! with different parameters. Not intended for production use.
+  subroutine crop_coefficients_FAO56_deallocate()
+
+    if (allocated(KCB_l))        deallocate(KCB_l)
+    if (allocated(KCB_METHOD))   deallocate(KCB_METHOD)
+    if (allocated(LANDUSE_CODE)) deallocate(LANDUSE_CODE)
+
+  end subroutine crop_coefficients_FAO56_deallocate
 
 !--------------------------------------------------------------------------------------------------
 

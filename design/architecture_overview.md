@@ -1,6 +1,6 @@
 # SWB2 Codebase Architecture Overview
 
-**Last updated:** May 2026  
+**Last updated:** July 2026  
 **SWB2 version:** v2.4.1  
 
 ---
@@ -19,7 +19,8 @@ main.F90
   │     ├─ Initialize grid (MODEL%initialize_grid)
   │     ├─ Read static grids (land use, soils, flow direction, AWC, etc.)
   │     ├─ Set method pointers from control file directives
-  │     ├─ Initialize each method (open data files, read lookup tables)
+  │     ├─ Initialize ancillary values (phenology determines growth methods per LU)
+  │     ├─ Initialize each method (crop coefficients defer to phenology for Kcb method)
   │     └─ Allocate all state arrays in MODEL
   │
   ├─ iterate_over_simulation_days(MODEL) [model_iterate.F90]
@@ -193,7 +194,7 @@ main ← (constants, logfiles, model_initialize, model_domain, model_iterate, fs
 | `et__jensen_haise` | `et__jensen_haise.F90` | Reference ET₀ |
 | `et__gridded_values` | `et__gridded_values.F90` | Reference ET₀ |
 | `et__zone_values` | `et__zone_values.F90` | Reference ET₀ |
-| `crop_coefficients__fao56` | `crop_coefficients__fao56.F90` | Crop coefficients |
+| `crop_coefficients__fao56` | `crop_coefficients__fao56.F90` | Crop coefficients (defers to phenology for method selection) |
 | `runoff__curve_number` | `runoff__curve_number.F90` | Runoff |
 | `runoff__gridded_values` | `runoff__gridded_values.F90` | Runoff |
 | `snowfall__original` | `snowfall__original.F90` | Snow partitioning |
@@ -205,7 +206,7 @@ main ← (constants, logfiles, model_initialize, model_domain, model_iterate, fs
 | `fog__monthly_grid` | `fog__monthly_grid.F90` | Fog drip |
 | `growing_degree_day` | `growing_degree_day.F90` | GDD |
 | `growing_degree_day_baskerville_emin` | `growing_degree_day_baskerville_emin.F90` | GDD |
-| `growing_season` | `growing_season.F90` | Growing season detection |
+| `phenology` | `phenology.F90` | Vegetation phenology (growth stage, growing season) |
 | `awc__depth_integrated` | `awc__depth_integrated.F90` | Available water capacity |
 | `awc__gridded_values` | `awc__gridded_values.F90` | Available water capacity |
 | `rooting_depth__FAO56` | `rooting_depth__FAO56.F90` | Rooting depth |
@@ -238,6 +239,8 @@ main ← (constants, logfiles, model_initialize, model_domain, model_iterate, fs
 4. **Separation of mass balances**: Four distinct mass-balance modules (snow, interception, impervious, soil) each enforce conservation independently.
 
 5. **Coordinate-system-aware I/O**: Input grids can be in any projection; PROJ4 handles reprojection to the model grid's coordinate system transparently.
+
+6. **Phenology-first initialization**: The phenology module reads growth timing columns (GDD thresholds, stage lengths, planting dates) and determines `PHENOLOGY_METHOD_INDEX` per land use. Downstream modules (crop coefficients, interception) defer to this determination rather than independently re-reading and validating the same columns.
 
 ---
 
