@@ -38,3 +38,23 @@ CMakeLists.txt text eol=lf
 *.asc binary
 *.gch binary
 *.ipynb binary
+
+
+# ===== Linguist overrides =====
+# Goal: report only Fortran, C (our code), and Python
+
+# Vendored: bundled PROJ4 library (third-party)
+src/proj4/** linguist-vendored
+
+# Vendored: doxygen-awesome-css theme (third-party)
+doc_src/doxygen-awesome-css/** linguist-vendored
+
+# Documentation: doc_src support files
+doc_src/*.css linguist-documentation
+doc_src/*.html linguist-documentation
+
+# Vendored: test-drive framework
+test/unit_tests/testdrive.F90 linguist-vendored
+
+# Generated: Jupyter notebooks
+*.ipynb linguist-generated
