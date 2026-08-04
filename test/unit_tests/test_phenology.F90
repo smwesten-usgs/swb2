@@ -55,6 +55,7 @@ contains
       new_unittest("gdd_at_threshold_is_growing", test_gdd_at_threshold_is_growing), &
       new_unittest("gdd_above_threshold_is_growing", test_gdd_above_threshold_is_growing), &
       new_unittest("gdd_killing_frost_ends_season", test_gdd_killing_frost_ends_season), &
+      new_unittest("gdd_early_frost_no_latch", test_gdd_early_frost_no_latch), &
       new_unittest("gdd_above_frost_threshold_stays_growing", test_gdd_above_frost_stays_growing), &
       new_unittest("init_reads_mmdd_as_doy", test_init_reads_mmdd_as_doy), &
       new_unittest("init_lu_code_count", test_init_lu_code_count), &
@@ -407,7 +408,9 @@ contains
                "GDD 500 > threshold, warm temp: should remain growing")
   end subroutine test_gdd_above_threshold_is_growing
 
-  !> @brief Killing frost while growing: season ends.
+  !> @brief Killing frost while growing (GDD well past threshold): season ends with latch.
+  !! The hard latch only engages when current_gdd >= 3 * growing_season_start_gdd,
+  !! indicating a true fall frost-kill rather than a spring false start.
   subroutine test_gdd_killing_frost_ends_season(error)
     type(error_type), allocatable, intent(out) :: error
     real(c_float) :: growth_fraction
@@ -417,8 +420,9 @@ contains
 
     frost_killed_season = FALSE
 
+    ! GDD=700 is well above 3 * 200 = 600 (latch threshold)
     call phenology_update_gdd_threshold( &
-      current_gdd=500.0_c_float, &
+      current_gdd=700.0_c_float, &
       mean_air_temperature=25.0_c_float, &
       growing_season_start_gdd=200.0_c_float, &
       killing_frost_temperature=28.0_c_float, &
@@ -431,8 +435,39 @@ contains
     call check(error, it_is_growing_season .eqv. .false., &
                "Temperature 25 <= frost threshold 28: season should end")
     call check(error, frost_killed_season .eqv. .true., &
-               "frost_killed_season should be set TRUE after killing frost")
+               "frost_killed_season should be set TRUE after killing frost (GDD >> 3x threshold)")
   end subroutine test_gdd_killing_frost_ends_season
+
+  !> @brief Early frost (GDD below 3x threshold) ends season but does NOT latch.
+  !! This represents a spring false start — the season can restart on the next warm day.
+  subroutine test_gdd_early_frost_no_latch(error)
+    type(error_type), allocatable, intent(out) :: error
+    real(c_float) :: growth_fraction
+    logical(c_bool) :: it_is_growing_season
+    logical(c_bool) :: frost_killed_season
+    integer(c_int) :: growth_stage
+
+    frost_killed_season = FALSE
+
+    ! GDD=400 is below 3 * 200 = 600 (latch threshold)
+    ! Frost ends the season temporarily but should NOT set hard latch
+    call phenology_update_gdd_threshold( &
+      current_gdd=400.0_c_float, &
+      mean_air_temperature=25.0_c_float, &
+      growing_season_start_gdd=200.0_c_float, &
+      killing_frost_temperature=28.0_c_float, &
+      it_is_growing_season_in=TRUE, &
+      frost_killed_season=frost_killed_season, &
+      growth_fraction=growth_fraction, &
+      it_is_growing_season=it_is_growing_season, &
+      growth_stage=growth_stage)
+
+    call check(error, it_is_growing_season .eqv. .false., &
+               "Early frost: season should end (go dormant)")
+    if (allocated(error)) return
+    call check(error, frost_killed_season .eqv. .false., &
+               "Early frost (GDD < 3x threshold): hard latch should NOT engage")
+  end subroutine test_gdd_early_frost_no_latch
 
   !> @brief Temperature above frost threshold while growing: season continues.
   subroutine test_gdd_above_frost_stays_growing(error)

@@ -725,8 +725,11 @@ contains
   !! frost threshold. Season ends when mean air temperature drops to or below
   !! the killing frost temperature.
   !!
-  !! Once a killing frost terminates the growing season, it cannot restart
-  !! until the next calendar year (hard latch via frost_killed_season flag).
+  !! The hard latch (frost_killed_season) only engages when the frost occurs
+  !! after sufficient GDD accumulation (>= 3x the start threshold), indicating
+  !! a true fall frost-kill rather than a false spring start. Early-season
+  !! frosts cause temporary dormancy but allow the season to restart when
+  !! temperatures recover.
   !!
   !! @param[in]     current_gdd               Accumulated GDD for current year (degree-days)
   !! @param[in]     mean_air_temperature      Current mean daily air temperature
@@ -772,7 +775,11 @@ contains
       ! Already growing — check for killing frost
       if ( mean_air_temperature <= killing_frost_temperature ) then
         is_growing = .false.
-        frost_killed_season = TRUE
+        ! Only engage hard latch if GDD is well past the start threshold,
+        ! indicating a true fall frost-kill rather than a spring false start.
+        if ( current_gdd >= 3.0_c_float * growing_season_start_gdd ) then
+          frost_killed_season = TRUE
+        end if
       else
         is_growing = .true.
       end if
@@ -938,7 +945,14 @@ contains
   !! stages are determined by cumulative GDD thresholds (GDD_ini, GDD_dev,
   !! GDD_mid, GDD_late) counted from the planting GDD. growth_fraction ramps
   !! from 0 to 1 over INI+DEV and holds at 1.0 through MID and LATE.
-  !! Season ends on killing frost (hard latch for remainder of year).
+  !!
+  !! Killing frost behavior: frost terminates the growing season at any stage,
+  !! but the hard latch (preventing restart for the remainder of the year)
+  !! only engages once the plant has developed past the DEV stage (i.e.,
+  !! gdd_since_planting >= gdd_ini + gdd_dev). This prevents early spring
+  !! false starts from permanently killing the entire year's growing season.
+  !! Frosts during INI or DEV cause temporary dormancy; the season resumes
+  !! when temperatures recover (since GDD remains above the start threshold).
   !!
   !! @param[in]     current_gdd               Accumulated GDD for current year
   !! @param[in]     mean_air_temperature      Current mean daily air temperature
@@ -948,7 +962,7 @@ contains
   !! @param[in]     gdd_dev                   GDD accumulation for development stage
   !! @param[in]     gdd_mid                   GDD accumulation for mid-season stage
   !! @param[in]     gdd_late                  GDD accumulation for late-season stage
-  !! @param[inout]  frost_killed_season       Hard latch: TRUE after killing frost
+  !! @param[inout]  frost_killed_season       Hard latch: TRUE after killing frost in MID/LATE
   !! @param[out]    growth_stage              DORMANT, INI, DEV, MID, or LATE
   !! @param[out]    stage_fraction            0.0–1.0 position within current stage
   !! @param[out]    growth_fraction           0.0–1.0 structural development (holds at 1.0 through LATE)
@@ -1001,10 +1015,22 @@ contains
       return
     end if
 
-    ! Check for killing frost (only meaningful once season has started)
+    ! Check for killing frost (only meaningful once GDD >= start threshold)
     if ( current_gdd >= growing_season_start_gdd &
          .and. mean_air_temperature <= killing_frost_temperature ) then
-      frost_killed_season  = TRUE
+
+      ! Determine GDD position to decide whether to engage hard latch
+      gdd_since_planting = current_gdd - growing_season_start_gdd
+
+      ! Only engage hard latch if we are past the development stage
+      ! (i.e., into MID or LATE). This represents a true fall frost-kill.
+      ! Frosts during INI or DEV are treated as temporary — the season
+      ! can resume when temperatures recover.
+      if ( gdd_since_planting >= end_dev ) then
+        frost_killed_season = TRUE
+      end if
+
+      ! Go dormant immediately regardless of stage
       growth_stage         = GROWTH_STAGE_DORMANT
       stage_fraction       = 0.0_c_float
       growth_fraction      = 0.0_c_float
