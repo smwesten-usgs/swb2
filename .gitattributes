@@ -41,20 +41,17 @@ CMakeLists.txt text eol=lf
 
 
 # ===== Linguist overrides =====
-# Goal: report only Fortran, C (our code), and Python
+# Goal: report only Fortran and Python (our code)
 
-# Vendored: bundled PROJ4 library (third-party)
+# Exclude everything by default
+* linguist-vendored
+
+# Include only our source code
+src/*.F90 linguist-vendored=false
+src/*.f90 linguist-vendored=false
+test/**/*.F90 linguist-vendored=false
+test/**/*.py linguist-vendored=false
+
+# Re-exclude vendored items within src/ and test/
 src/proj4/** linguist-vendored
-
-# Vendored: doxygen-awesome-css theme (third-party)
-doc_src/doxygen-awesome-css/** linguist-vendored
-
-# Documentation: doc_src support files
-doc_src/*.css linguist-documentation
-doc_src/*.html linguist-documentation
-
-# Vendored: test-drive framework
 test/unit_tests/testdrive.F90 linguist-vendored
-
-# Generated: Jupyter notebooks
-*.ipynb linguist-generated
