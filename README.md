@@ -15,6 +15,13 @@ Official documentation for the code may be found here: https://pubs.er.usgs.gov/
 Unofficial online supplemental documentation of the code may be found [here](http://smwesten-usgs.github.io/swb2/).
 
 
+Official Version
+----------------
+
+Suggested citation:
+Westenbroek, S.M., 2026, Soil-Water-Balance Code version 2.4.1: U.S. Geological Survey Software Release, 18 August 2026, https://doi.org/10.5066/P1FMURCF.
+
+
 Disclaimer
 ----------
 This software is in the public domain because it contains materials that originally came from the U.S. Geological Survey, an agency of the United States Department of Interior. For more information, see the official USGS copyright policy at [http://www.usgs.gov/visual-id/credit_usgs.html#copyright](http://www.usgs.gov/visual-id/credit_usgs.html#copyright)
