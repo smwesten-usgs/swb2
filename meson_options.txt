@@ -6,13 +6,18 @@ option('netcdf_root',
 )
 
 # Build profile:
-#   release         - optimized, FPE traps, backtrace (default)
+#   release         - optimized (-O2), FPE traps, backtrace (default)
+#   release_fast    - aggressive optimization (-O3) WITHOUT -ffast-math; IEEE
+#                     floating-point semantics preserved, FPE traps retained.
+#                     Intended as a safe performance-experiment profile.
+#   profile         - gprof instrumentation (-pg) at -O2; produces gmon.out for
+#                     function-level hot-spot analysis. Realistic optimized code.
 #   develop         - runtime checks, NaN init, FPE traps
 #   static_analysis - pedantic warnings from both compilers; compilation continues
 #                     even with non-conforming code so you get a comprehensive report
 option('profile',
   type: 'combo',
-  choices: ['release', 'develop', 'static_analysis'],
+  choices: ['release', 'release_fast', 'profile', 'develop', 'static_analysis'],
   value: 'release',
   description: 'Build profile controlling compiler flags'
 )

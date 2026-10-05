@@ -31,7 +31,7 @@ GROWING_SEASON 133 268 TRUE
 %% define location, projection, and conversions for weather data
 ----------------------------------------------------------------
 
-PRECIPITATION NETCDF prcp_Daymet_v3_%y.nc
+PRECIPITATION NETCDF daymet_v4_daily_prcp_%y_cs.nc
 PRECIPITATION_GRID_PROJECTION_DEFINITION +proj=lcc +lat_1=25.0 +lat_2=60.0 +lat_0=42.5 +lon_0=-100.0 +x_0=0.0 +y_0=0.0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs
 PRECIPITATION_NETCDF_Z_VAR                prcp
 PRECIPITATION_SCALE_FACTOR          0.03937008
@@ -39,7 +39,7 @@ PRECIPITATION_MISSING_VALUES_CODE      -9999.0
 PRECIPITATION_MISSING_VALUES_OPERATOR      <=
 PRECIPITATION_MISSING_VALUES_ACTION       zero
 
-TMAX NETCDF tmax_Daymet_v3_%y.nc
+TMAX NETCDF daymet_v4_daily_tmax_%y_cs.nc
 TMAX_GRID_PROJECTION_DEFINITION +proj=lcc +lat_1=25.0 +lat_2=60.0 +lat_0=42.5 +lon_0=-100.0 +x_0=0.0 +y_0=0.0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs
 TMAX_SCALE_FACTOR                 1.8
 TMAX_ADD_OFFSET                  32.0
@@ -47,7 +47,7 @@ TMAX_MISSING_VALUES_CODE      -9999.0
 TMAX_MISSING_VALUES_OPERATOR      <=
 TMAX_MISSING_VALUES_ACTION       mean
 
-TMIN NETCDF tmin_Daymet_v3_%y.nc
+TMIN NETCDF daymet_v4_daily_tmin_%y_cs.nc
 TMIN_GRID_PROJECTION_DEFINITION +proj=lcc +lat_1=25.0 +lat_2=60.0 +lat_0=42.5 +lon_0=-100.0 +x_0=0.0 +y_0=0.0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs
 TMIN_SCALE_FACTOR                 1.8
 TMIN_ADD_OFFSET                  32.0

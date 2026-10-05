@@ -19,22 +19,57 @@ graphviz = "*"
 [tasks]
 # Note: CONDA_PREFIX is set automatically by pixi when running tasks.
 # It points to this project's .pixi/envs/default — NOT to any system conda/mamba.
-setup = { cmd = "meson setup builddir --wipe -Dprofile=release -Dnetcdf_root=$CONDA_PREFIX" }
+setup = { cmd = "meson setup builddir --wipe -Dprofile=release -Doptimization=2 -Dnetcdf_root=$CONDA_PREFIX" }
+setup-fast = { cmd = "meson setup builddir --wipe -Dprofile=release_fast -Doptimization=3 -Dnetcdf_root=$CONDA_PREFIX" }
+setup-profile = { cmd = "meson setup builddir --wipe -Dprofile=profile -Doptimization=2 -Dnetcdf_root=$CONDA_PREFIX" }
 setup-dev = { cmd = "meson setup builddir --wipe -Dprofile=develop -Doptimization=0 -Dnetcdf_root=$CONDA_PREFIX" }
 setup-sa = { cmd = "meson setup builddir --wipe -Dprofile=static_analysis -Dnetcdf_root=$CONDA_PREFIX" }
 build = "meson compile -C builddir"
 test = { cmd = "rm -f SWB_LOGFILE__*.md && ../../builddir/test/unit_tests/swbtest", cwd = "test/unit_tests" }
+# Timed Central Sands run (Linux). Prints the exact exe path/size/mtime first so
+# every timing is tied to a specific binary (many stale swb2 builds exist), then
+# runs the cs case; SWB2's built-in timer reports init/run wall-clock. Build with
+# `pixi run setup`+`build` (-O2) or `pixi run setup-fast`+`build` (-O3) first.
+time-cs = { cmd = "echo '=== EXECUTABLE UNDER TEST ===' && ls -l ../../../builddir/src/swb2 && echo '============================' && rm -rf output logfile && mkdir -p output logfile && ../../../builddir/src/swb2 --output_prefix=central_sands_ --data_dir=../../test_data/cs --weather_data_dir=../../test_data/cs --output_dir=output --logfile_dir=logfile --lookup_dir=../../test_data/tables central_sands_swb2.ctl", cwd = "test/integration_tests/cs" }
+# gprof profiling run (Linux — gprof produces full timing here, unlike MinGW).
+# Requires `pixi run setup-profile`+`build` (gfortran -pg at -O2). Runs the cs
+# case (writes gmon.out), then gprof produces gprof_report.txt (flat profile =
+# self-time per function, then call graph). Head of the flat profile is shown.
+profile-cs = { cmd = "echo '=== EXECUTABLE UNDER TEST ===' && ls -l ../../../builddir/src/swb2 && echo '============================' && rm -f gmon.out && rm -rf output logfile && mkdir -p output logfile && ../../../builddir/src/swb2 --output_prefix=central_sands_ --data_dir=../../test_data/cs --weather_data_dir=../../test_data/cs --output_dir=output --logfile_dir=logfile --lookup_dir=../../test_data/tables central_sands_swb2.ctl && echo '=== GENERATING GPROF REPORT ===' && gprof ../../../builddir/src/swb2 gmon.out > gprof_report.txt && echo 'Wrote gprof_report.txt' && echo '--- TOP OF FLAT PROFILE ---' && head -n 40 gprof_report.txt", cwd = "test/integration_tests/cs" }
 clean = "rm -rf builddir"
 install = { cmd = "cp builddir/src/swb2 $SWB_INSTALL_DIR/ && cp builddir/src/swbstats2 $SWB_INSTALL_DIR/", env = { SWB_INSTALL_DIR = "$HOME/bin" } }
 docs = { cmd = "rm -rf ../docs && doxygen Doxyfile", cwd = "doxygen" }
 
 [target.win-64.tasks]
-setup = { cmd = "cmd /c meson setup builddir --wipe -Dprofile=release -Dnetcdf_root=%CONDA_PREFIX%/Library" }
+setup = { cmd = "cmd /c meson setup builddir --wipe -Dprofile=release -Doptimization=2 -Dnetcdf_root=%CONDA_PREFIX%/Library" }
+setup-fast = { cmd = "cmd /c meson setup builddir --wipe -Dprofile=release_fast -Doptimization=3 -Dnetcdf_root=%CONDA_PREFIX%/Library" }
+setup-profile = { cmd = "cmd /c meson setup builddir --wipe -Dprofile=profile -Doptimization=2 -Dnetcdf_root=%CONDA_PREFIX%/Library" }
 setup-dev = { cmd = "cmd /c meson setup builddir --wipe -Dprofile=develop -Doptimization=0 -Dnetcdf_root=%CONDA_PREFIX%/Library" }
 setup-sa = { cmd = "cmd /c meson setup builddir --wipe -Dprofile=static_analysis -Dnetcdf_root=%CONDA_PREFIX%/Library" }
 clean = { cmd = "cmd /c \"rmdir /s /q builddir 2>nul || exit /b 0\"" }
 test = { cmd = "cmd /c \"del /q SWB_LOGFILE__*.md 2>nul & ..\\..\\builddir\\test\\unit_tests\\swbtest.exe\"", cwd = "test/unit_tests" }
 integration-test = { cmd = "cmd /c \"rmdir /s /q output 2>nul & rmdir /s /q logfile 2>nul & mkdir output & mkdir logfile & ..\\..\\..\\builddir\\src\\swb2.exe --output_prefix=central_sands_ --data_dir=..\\..\\test_data\\cs --weather_data_dir=..\\..\\test_data\\cs --output_dir=output --logfile_dir=logfile --lookup_dir=..\\..\\test_data\\tables central_sands_swb2.ctl\"", cwd = "test/integration_tests/cs" }
+# Timed Central Sands run. SWB2 reports its own init and run wall-clock via the
+# built-in timer (see main.F90 runtimer), echoed to console and logfile — so no
+# external timing wrapper is needed. Build first with either
+# `pixi run setup`+`build` (baseline -O2) or `pixi run setup-fast`+`build`
+# (-O3, no -ffast-math), then run this and read the reported time.
+#
+# IMPORTANT: this task first prints the FULL PATH, SIZE, and BUILD TIMESTAMP of
+# the exact swb2.exe being run (via `dir`), so every timing is unambiguously
+# tied to a specific binary. Multiple stale swb2.exe builds exist on this system;
+# always confirm the printed timestamp matches the build you just made. The
+# SWB2 banner additionally prints its compile date and git hash/branch.
+#
+# For a longer benchmark, set END_DATE later in central_sands_swb2.ctl
+# (weather data on disk spans 2012-2018).
+time-cs = { cmd = "cmd /c \"echo === EXECUTABLE UNDER TEST === & dir ..\\..\\..\\builddir\\src\\swb2.exe & echo ============================ & rmdir /s /q output 2>nul & rmdir /s /q logfile 2>nul & mkdir output & mkdir logfile & ..\\..\\..\\builddir\\src\\swb2.exe --output_prefix=central_sands_ --data_dir=..\\..\\test_data\\cs --weather_data_dir=..\\..\\test_data\\cs --output_dir=output --logfile_dir=logfile --lookup_dir=..\\..\\test_data\\tables central_sands_swb2.ctl\"", cwd = "test/integration_tests/cs" }
+# gprof profiling run. Requires a build made with `pixi run setup-profile`+`build`
+# (gfortran -pg at -O2). Runs the Central Sands case — which writes gmon.out into
+# this directory on normal exit — then runs gprof to produce gprof_report.txt
+# (flat profile = time per function, followed by the call graph). The head of the
+# flat profile is echoed. For a shorter profiling run, lower END_DATE in the .ctl.
+profile-cs = { cmd = "cmd /c \"echo === EXECUTABLE UNDER TEST === & dir ..\\..\\..\\builddir\\src\\swb2.exe & echo ============================ & del /q gmon.out 2>nul & rmdir /s /q output 2>nul & rmdir /s /q logfile 2>nul & mkdir output & mkdir logfile & ..\\..\\..\\builddir\\src\\swb2.exe --output_prefix=central_sands_ --data_dir=..\\..\\test_data\\cs --weather_data_dir=..\\..\\test_data\\cs --output_dir=output --logfile_dir=logfile --lookup_dir=..\\..\\test_data\\tables central_sands_swb2.ctl & echo === GENERATING GPROF REPORT === & x86_64-w64-mingw32-gprof.exe ..\\..\\..\\builddir\\src\\swb2.exe gmon.out > gprof_report.txt & echo Wrote gprof_report.txt & echo --- TOP OF FLAT PROFILE --- & more gprof_report.txt\"", cwd = "test/integration_tests/cs" }
 integration-test-phenology = { cmd = "cmd /c \"rmdir /s /q output 2>nul & rmdir /s /q logfile 2>nul & mkdir output & mkdir logfile & ..\\..\\..\\builddir\\src\\swb2.exe --data_dir=..\\..\\test_data\\cs --weather_data_dir=..\\..\\test_data\\cs --output_dir=output --logfile_dir=logfile --lookup_dir=..\\..\\test_data\\tables phenology_test.ctl & python verify_phenology.py output\"", cwd = "test/integration_tests/cs_phenology" }
 integration-test-interception = { cmd = "cmd /c \"rmdir /s /q output 2>nul & rmdir /s /q logfile 2>nul & mkdir output & mkdir logfile & ..\\..\\..\\builddir\\src\\swb2.exe --data_dir=..\\..\\test_data\\cs --weather_data_dir=..\\..\\test_data\\cs --output_dir=output --logfile_dir=logfile interception_test.ctl & python verify_interception.py output\"", cwd = "test/integration_tests/cs_interception" }
 integration-test-comprehensive = { cmd = "cmd /c \"rmdir /s /q output 2>nul & rmdir /s /q logfile 2>nul & mkdir output & mkdir logfile & ..\\..\\..\\builddir\\src\\swb2.exe --data_dir=..\\..\\test_data\\cs --weather_data_dir=..\\..\\test_data\\cs --output_dir=output --logfile_dir=logfile comprehensive_phenology_test.ctl & python verify_comprehensive_phenology.py output\"", cwd = "test/integration_tests/cs_comprehensive_phenology" }

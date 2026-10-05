@@ -103,6 +103,32 @@ if fc_id == 'gcc'
       '-fbacktrace',
     ]
 
+  elif profile == 'release_fast'
+    # Aggressive optimization WITHOUT -ffast-math.
+    # -O3 over -O2 adds more loop vectorization/unrolling and inlining, but does
+    # NOT reassociate floating-point or relax IEEE semantics (that is -ffast-math,
+    # which is deliberately NOT used here). FPE traps are retained so any newly
+    # exposed overflow/divide-by-zero still halts the run.
+    # NOTE: the -O3 level itself is supplied by the setup task via
+    # -Doptimization=3; the flags below are the additive, value-safe extras.
+    compile_args += [
+      '-funroll-loops',
+      '-ffpe-trap=overflow,zero',
+      '-fbacktrace',
+    ]
+
+  elif profile == 'profile'
+    # gprof instrumentation. -pg must appear on BOTH compile and link lines
+    # (link flag added separately below). Profiled at the -O2 default so the
+    # hot-spot breakdown reflects realistic optimized code, not debug code.
+    # Retain FPE traps/backtrace for parity with the release profile.
+    compile_args += [
+      '-pg',
+      '-ffpe-trap=overflow,zero',
+      '-fbacktrace',
+    ]
+    link_args += ['-pg']
+
   elif profile == 'develop'
     compile_args += [
       '-fcheck=all',

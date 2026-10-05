@@ -134,6 +134,62 @@ This is a longer-term architectural consideration — not something to do in the
 
 ---
 
+## Caveats: Easy to Underestimate, Not Show-Stoppers (added 2026-09-11)
+
+None of these blocks GDAL adoption, but **missing any one produces subtle, hard-to-debug
+problems** rather than a clean failure. They arise because adopting GDAL is also the
+natural vehicle for retiring the bundled PROJ4 (see the "Relationship" section and
+`feature_consideration__adopt_modern_PROJ_library.md`), and the SWB2↔PROJ seam has
+legacy assumptions baked into the *call sites*, not just the wrapper. Verified by tracing
+the transform code on 2026-09-11 (`grid.F90` `grid_Transform` ~line 1537;
+`data_catalog_entry.F90` direct call ~line 2107).
+
+The transform call surface is genuinely small — **one C wrapper (`pj_init_and_transform`)
+called from two Fortran sites** (`grid_Transform`, and one direct corner-point call) plus
+the pure-string parser in `proj4_support.F90`. But watch these three:
+
+1. **Radians vs. degrees (silent 57× error).** Legacy PROJ4 expects *geographic*
+   coordinates in **radians**, so `grid_Transform` and the direct call site manually
+   multiply by `DEGREES_TO_RADIANS` before the transform and `RADIANS_TO_DEGREES` after.
+   **Modern PROJ / GDAL work in degrees** (with `proj_normalize_for_visualization`, or
+   GDAL's `OCTNewCoordinateTransformation`). If the migration reuses the wrapper but
+   leaves these conversion blocks in place, lat/lon transforms are wrong by a factor of
+   ~57.3 — and it will **not** crash, just produce garbage coordinates. The conversion
+   blocks must be **removed at both call sites** as part of the swap.
+
+2. **CRS-type detection by string-sniffing breaks on WKT/EPSG.** The radians logic keys
+   off `csFromPROJ4 .containssimilar. "latlon"/"lonlat"/…`, and `swbstats2` keys its
+   volume-unit factor off `.containssimilar. "units=m"/"us-ft"/"ft"` in the PROJ4 text.
+   **Those tokens do not exist in a WKT2 or `EPSG:XXXX` string** — exactly the new input
+   formats this upgrade enables. So any code that sniffs the CRS string must be replaced
+   with a real PROJ/GDAL query (`proj_get_type`, coordinate-system axis/unit query), or
+   the moment a user supplies `EPSG:5070` the geographic-vs-projected and unit logic
+   misfires. This couples the GeoTIFF/PROJ upgrade to a small cleanup in **both**
+   `grid.F90` and `swbstats2` (see the CF-compliance note in the VA project design for
+   the swbstats2 side).
+
+3. **Error-return semantics differ.** `grid_CheckForPROJ4Error` decodes the old
+   `pj_transform` integer-code contract. Modern `proj_trans` reports per-coordinate
+   `HUGE_VAL`/errno, and GDAL uses `CPLGetLastErrorNo`/return flags. This routine needs
+   reworking, not a pass-through — otherwise transform failures may go undetected (points
+   silently set to `HUGE_VAL` and propagated).
+
+**Additional GeoTIFF-specific gotchas** (distinct from the PROJ seam):
+
+- **GeoTransform vs. cell-center coordinates.** GDAL's 6-element geotransform is
+  **pixel-corner** origin (top-left), and Y resolution is **negative** (north-up). SWB2's
+  grids reason in cell terms; mixing corner vs. center by half a cell, or dropping the
+  Y-sign, shifts everything by one pixel or flips the raster. Convert deliberately.
+- **NoData translation.** GeoTIFF NoData must be mapped to/from SWB2's internal
+  nodata/`_FillValue` convention (and the AWC<0 active-cell masking convention this
+  project relies on) — a silent mismatch turns masked cells into real zeros or vice versa.
+- **Data-type and band assumptions.** The example wrapper reads band 1 as `Float32`;
+  real inputs may be integer (land use), multi-band, or tiled/compressed. Assert the band
+  count / type rather than assuming.
+- **`proj.db` at runtime.** Same asterisk as the PROJ doc: GDAL (which bundles PROJ)
+  still needs `proj.db` findable at runtime (`PROJ_DATA`/search path), or EPSG/WKT
+  resolution fails while raw PROJ4 strings still work — a confusing partial failure.
+
 ## Effort Estimate
 
 | Task | Effort |
@@ -147,6 +203,15 @@ This is a longer-term architectural consideration — not something to do in the
 | **Total** | **~3-4 days** |
 
 Assumes pixi is already adopted (GDAL is trivial via `pixi add libgdal`). Without pixi, finding GDAL on Windows adds another half-day.
+
+**The ~3-4 days covers GeoTIFF read/write only.** If this same GDAL adoption is used to
+*retire the bundled PROJ4* (the natural bundling — see "Relationship" below), add
+**~1-2 days** for the three CRS-seam caveats above (removing the radians conversions,
+replacing CRS-string sniffing with PROJ/GDAL queries in `grid.F90` **and** `swbstats2`,
+and reworking `grid_CheckForPROJ4Error`). These are cheap individually but must all be
+done together — a partial job is where the "interesting problems" hide. Combined realistic
+estimate for GeoTIFF **+** PROJ retirement: **~5-6 days**, most of the risk in Windows
+packaging and cross-platform transform testing, not in code volume.
 
 ---
 
