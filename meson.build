@@ -103,6 +103,16 @@ if fc_id == 'gcc'
       '-fbacktrace',
     ]
 
+  elif profile == 'release_notrap'
+    # Diagnostic: identical to 'release' (-O2) but WITHOUT -ffpe-trap. Used to
+    # measure how much runtime the FP-exception trapping machinery costs on the
+    # hot path. If a time-cs run here is dramatically faster than 'release',
+    # the trap machinery is the culprit; if not, it is not the lever.
+    # Numerics are unchanged; only the FP-exception trapping is removed.
+    compile_args += [
+      '-fbacktrace',
+    ]
+
   elif profile == 'release_fast'
     # Aggressive optimization WITHOUT -ffast-math.
     # -O3 over -O2 adds more loop vectorization/unrolling and inlining, but does

@@ -21,6 +21,7 @@ graphviz = "*"
 # It points to this project's .pixi/envs/default — NOT to any system conda/mamba.
 setup = { cmd = "meson setup builddir --wipe -Dprofile=release -Doptimization=2 -Dnetcdf_root=$CONDA_PREFIX" }
 setup-fast = { cmd = "meson setup builddir --wipe -Dprofile=release_fast -Doptimization=3 -Dnetcdf_root=$CONDA_PREFIX" }
+setup-notrap = { cmd = "meson setup builddir --wipe -Dprofile=release_notrap -Doptimization=2 -Dnetcdf_root=$CONDA_PREFIX" }
 setup-profile = { cmd = "meson setup builddir --wipe -Dprofile=profile -Doptimization=2 -Dnetcdf_root=$CONDA_PREFIX" }
 setup-dev = { cmd = "meson setup builddir --wipe -Dprofile=develop -Doptimization=0 -Dnetcdf_root=$CONDA_PREFIX" }
 setup-sa = { cmd = "meson setup builddir --wipe -Dprofile=static_analysis -Dnetcdf_root=$CONDA_PREFIX" }

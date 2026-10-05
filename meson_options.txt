@@ -17,7 +17,7 @@ option('netcdf_root',
 #                     even with non-conforming code so you get a comprehensive report
 option('profile',
   type: 'combo',
-  choices: ['release', 'release_fast', 'profile', 'develop', 'static_analysis'],
+  choices: ['release', 'release_notrap', 'release_fast', 'profile', 'develop', 'static_analysis'],
   value: 'release',
   description: 'Build profile controlling compiler flags'
 )
